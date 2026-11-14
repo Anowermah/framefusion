@@ -1,0 +1,59 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
+header('Content-Type: text/plain; charset=utf-8');
+
+echo "=== FrameFusion Server Diagnostic ===\n\n";
+echo "PHP Version: " . phpversion() . "\n";
+echo "Server Software: " . ($_SERVER['SERVER_SOFTWARE'] ?? 'Unknown') . "\n";
+echo "Document Root: " . ($_SERVER['DOCUMENT_ROOT'] ?? 'Unknown') . "\n";
+echo "Current File: " . __FILE__ . "\n";
+echo "Current Dir: " . __DIR__ . "\n\n";
+
+$baseDir = dirname(__DIR__);
+
+echo "Checking Files & Folders in: " . $baseDir . "\n";
+echo "----------------------------------------\n";
+$checks = [
+    'vendor/autoload.php' => $baseDir . '/vendor/autoload.php',
+    '.env' => $baseDir . '/.env',
+    '.env.example' => $baseDir . '/.env.example',
+    'bootstrap/app.php' => $baseDir . '/bootstrap/app.php',
+    'storage' => $baseDir . '/storage',
+    'storage/framework' => $baseDir . '/storage/framework',
+    'storage/framework/views' => $baseDir . '/storage/framework/views',
+    'storage/logs' => $baseDir . '/storage/logs',
+    'database/database.sqlite' => $baseDir . '/database/database.sqlite',
+    'public/build/manifest.json' => __DIR__ . '/build/manifest.json',
+];
+
+foreach ($checks as $name => $path) {
+    $exists = file_exists($path);
+    $writable = $exists && is_writable($path);
+    echo sprintf("%-30s: %s %s\n", $name, $exists ? '[EXISTS]' : '[MISSING]', $exists ? ($writable ? '(Writable)' : '(Read-Only)') : '');
+}
+
+echo "\nPHP Extensions:\n";
+echo "----------------------------------------\n";
+$exts = ['pdo', 'pdo_mysql', 'pdo_sqlite', 'gd', 'fileinfo', 'mbstring', 'openssl', 'tokenizer', 'xml', 'ctype', 'json', 'bcmath'];
+foreach ($exts as $ext) {
+    echo sprintf("%-15s: %s\n", $ext, extension_loaded($ext) ? '[ENABLED]' : '[MISSING]');
+}
+
+echo "\nAttempting Laravel Bootstrap:\n";
+echo "----------------------------------------\n";
+if (file_exists($baseDir . '/vendor/autoload.php')) {
+    try {
+        require $baseDir . '/vendor/autoload.php';
+        $app = require_once $baseDir . '/bootstrap/app.php';
+        echo "Laravel bootstrap SUCCESS!\n";
+    } catch (\Throwable $e) {
+        echo "Laravel bootstrap FAILED with exception:\n";
+        echo $e->getMessage() . "\n";
+        echo $e->getFile() . ":" . $e->getLine() . "\n";
+        echo $e->getTraceAsString() . "\n";
+    }
+} else {
+    echo "Cannot bootstrap Laravel: vendor/autoload.php is MISSING.\n";
+}

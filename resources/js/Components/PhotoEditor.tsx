@@ -67,15 +67,33 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
 
     // 1. Load Campaign Transparent Frame
     useEffect(() => {
+        let isMounted = true;
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.src = campaign.frame_url;
         img.onload = () => {
-            setFrameImage(img);
-            setFrameLoaded(true);
+            if (isMounted) {
+                setFrameImage(img);
+                setFrameLoaded(true);
+            }
         };
         img.onerror = () => {
-            console.error('Failed to load campaign frame overlay.');
+            console.warn('CORS or direct overlay load failed, retrying without anonymous crossOrigin...');
+            const retryImg = new Image();
+            retryImg.onload = () => {
+                if (isMounted) {
+                    setFrameImage(retryImg);
+                    setFrameLoaded(true);
+                }
+            };
+            retryImg.onerror = () => {
+                console.error('All attempts to load campaign frame overlay failed.');
+            };
+            retryImg.src = campaign.frame_url;
+        };
+
+        return () => {
+            isMounted = false;
         };
     }, [campaign.frame_url]);
 

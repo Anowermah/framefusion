@@ -236,6 +236,22 @@ class CampaignController extends Controller
         $file = $request->file('frame_file');
         $fileName = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
         $file->storeAs('frames', $fileName, 'public');
+
+        // Dual storage assurance for shared hosting / cPanel environments
+        $storedAppPath = storage_path('app/public/frames/' . $fileName);
+        if (file_exists($storedAppPath)) {
+            @chmod($storedAppPath, 0644);
+        }
+
+        $publicFramesDir = public_path('storage/frames');
+        if (!file_exists($publicFramesDir)) {
+            @mkdir($publicFramesDir, 0755, true);
+        }
+        if (file_exists($storedAppPath) && !file_exists($publicFramesDir . '/' . $fileName)) {
+            @copy($storedAppPath, $publicFramesDir . '/' . $fileName);
+            @chmod($publicFramesDir . '/' . $fileName, 0644);
+        }
+
         $frameUrl = '/storage/frames/' . $fileName;
 
         $campaign = Campaign::create([

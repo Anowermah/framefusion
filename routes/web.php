@@ -28,6 +28,50 @@ Route::get('/category/{slug}', fn($slug) => redirect()->route('campaigns.explore
 Route::get('/categories/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
 Route::get('/search', fn() => redirect()->route('campaigns.explore'));
 
+// Direct Storage & Uploaded Frames Handler (CPanel, LiteSpeed & Shared Hosting compatibility)
+Route::match(['get', 'head'], '/storage/{path}', function (string $path) {
+    // 1. Check storage/app/public
+    $appPublicFile = storage_path('app/public/' . $path);
+    if (file_exists($appPublicFile) && is_file($appPublicFile)) {
+        // Sync to public/storage so webserver can also serve it directly
+        $pubFile = public_path('storage/' . $path);
+        $pubDir = dirname($pubFile);
+        if (!file_exists($pubDir)) {
+            @mkdir($pubDir, 0755, true);
+        }
+        if (!file_exists($pubFile)) {
+            @copy($appPublicFile, $pubFile);
+            @chmod($pubFile, 0644);
+        }
+
+        return response()->file($appPublicFile, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, HEAD, OPTIONS',
+            'Cache-Control' => 'public, max-age=604800',
+        ]);
+    }
+
+    // 2. Check public/storage
+    $publicStorageFile = public_path('storage/' . $path);
+    if (file_exists($publicStorageFile) && is_file($publicStorageFile)) {
+        return response()->file($publicStorageFile, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, HEAD, OPTIONS',
+            'Cache-Control' => 'public, max-age=604800',
+        ]);
+    }
+
+    abort(404);
+})->where('path', '.*')->name('storage.serve');
+
+Route::options('/storage/{path}', function () {
+    return response('', 204)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS')
+        ->header('Access-Control-Allow-Headers', '*');
+})->where('path', '.*');
+
+
 // Campaign Actions (Guest & User)
 Route::post('/campaigns/{id}/generate', [CampaignController::class, 'generate'])->name('campaigns.generate');
 Route::post('/campaigns/{id}/save', [CampaignController::class, 'toggleSave'])->name('campaigns.save');

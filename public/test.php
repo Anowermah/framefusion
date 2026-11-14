@@ -81,14 +81,25 @@ if (file_exists($pubFrames) && is_dir($pubFrames)) {
 
 echo "\nFiles in storage/app/public/frames:\n";
 $appFrames = $storageAppPublic . '/frames';
-if (file_exists($appFrames) && is_dir($appFrames)) {
-    $f = scandir($appFrames);
-    foreach ($f as $file) {
-        if ($file === '.' || $file === '..') continue;
-        $p = $appFrames . '/' . $file;
-        echo sprintf(" - %-35s (perm: %o, size: %d)\n", $file, fileperms($p) & 0777, filesize($p));
+if (isset($_GET['sync']) || true) {
+    echo "\nAuto-Syncing Frames between storage/app/public and public/storage:\n";
+    echo "----------------------------------------\n";
+    $appFrames = $storageAppPublic . '/frames';
+    $pubFrames = __DIR__ . '/storage/frames';
+    if (!file_exists($pubFrames)) {
+        @mkdir($pubFrames, 0755, true);
     }
-} else {
-    echo "Directory storage/app/public/frames does not exist!\n";
+    if (file_exists($appFrames) && is_dir($appFrames)) {
+        foreach (scandir($appFrames) as $file) {
+            if ($file === '.' || $file === '..') continue;
+            $src = $appFrames . '/' . $file;
+            $dst = $pubFrames . '/' . $file;
+            if (!file_exists($dst)) {
+                $copied = @copy($src, $dst);
+                @chmod($dst, 0644);
+                echo "Copied to public: $file " . ($copied ? '[OK]' : '[FAILED]') . "\n";
+            }
+        }
+    }
 }
 

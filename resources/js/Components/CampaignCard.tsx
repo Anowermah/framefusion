@@ -41,6 +41,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     const { auth } = usePage().props as any;
     const [saved, setSaved] = useState(campaign.is_saved ?? false);
     const [saving, setSaving] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     const title = language === 'bn' && campaign.title_bn ? campaign.title_bn : campaign.title;
     const categoryName = language === 'bn' && campaign.category?.name_bn ? campaign.category.name_bn : campaign.category?.name;
@@ -83,12 +84,21 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                         }}
                     />
 
-                    <img
-                        src={campaign.thumbnail_url || campaign.frame_url}
-                        alt={title}
-                        className="relative z-10 w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                    />
+                    {!imageError ? (
+                        <img
+                            src={campaign.thumbnail_url || campaign.frame_url}
+                            alt={title}
+                            className="relative z-10 w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gray-50/80 rounded-xl border border-dashed border-gray-200">
+                            <Sparkles className="w-8 h-8 text-brand-400 mb-1 animate-pulse" />
+                            <span className="text-xs font-semibold text-gray-700 line-clamp-1">{title}</span>
+                            <span className="text-[10px] text-gray-400">Campaign Frame</span>
+                        </div>
+                    )}
                 </Link>
 
                 {/* Floating Badges */}

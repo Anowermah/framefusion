@@ -57,3 +57,38 @@ if (file_exists($baseDir . '/vendor/autoload.php')) {
 } else {
     echo "Cannot bootstrap Laravel: vendor/autoload.php is MISSING.\n";
 }
+
+echo "\nStorage & Frames Diagnostic:\n";
+echo "----------------------------------------\n";
+$pubStorage = __DIR__ . '/storage';
+echo "public/storage type: " . (is_link($pubStorage) ? 'SYMLINK -> ' . readlink($pubStorage) : (is_dir($pubStorage) ? 'REAL DIRECTORY' : (file_exists($pubStorage) ? 'FILE' : 'DOES NOT EXIST'))) . "\n";
+
+$storageAppPublic = $baseDir . '/storage/app/public';
+echo "storage/app/public exists: " . (file_exists($storageAppPublic) ? 'YES' : 'NO') . "\n";
+
+echo "\nFiles in public/storage/frames:\n";
+$pubFrames = __DIR__ . '/storage/frames';
+if (file_exists($pubFrames) && is_dir($pubFrames)) {
+    $f = scandir($pubFrames);
+    foreach ($f as $file) {
+        if ($file === '.' || $file === '..') continue;
+        $p = $pubFrames . '/' . $file;
+        echo sprintf(" - %-35s (perm: %o, size: %d)\n", $file, fileperms($p) & 0777, filesize($p));
+    }
+} else {
+    echo "Directory public/storage/frames does not exist!\n";
+}
+
+echo "\nFiles in storage/app/public/frames:\n";
+$appFrames = $storageAppPublic . '/frames';
+if (file_exists($appFrames) && is_dir($appFrames)) {
+    $f = scandir($appFrames);
+    foreach ($f as $file) {
+        if ($file === '.' || $file === '..') continue;
+        $p = $appFrames . '/' . $file;
+        echo sprintf(" - %-35s (perm: %o, size: %d)\n", $file, fileperms($p) & 0777, filesize($p));
+    }
+} else {
+    echo "Directory storage/app/public/frames does not exist!\n";
+}
+

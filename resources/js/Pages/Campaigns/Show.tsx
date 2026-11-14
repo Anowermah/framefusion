@@ -42,6 +42,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
     const [reportReason, setReportReason] = useState('Inappropriate Content');
     const [reportDescription, setReportDescription] = useState('');
     const [reportSuccess, setReportSuccess] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     const title = language === 'bn' && campaign.title_bn ? campaign.title_bn : campaign.title;
     const description = language === 'bn' && campaign.description_bn ? campaign.description_bn : campaign.description;
@@ -126,11 +127,20 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                         backgroundColor: '#FFFFFF',
                                     }}
                                 >
+                                {!imageError ? (
                                     <img
                                         src={campaign.frame_url}
                                         alt={title}
                                         className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
+                                        onError={() => setImageError(true)}
                                     />
+                                ) : (
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                                        <Sparkles className="w-12 h-12 text-brand-400 mb-2 animate-pulse" />
+                                        <span className="text-sm font-semibold text-gray-700">{title}</span>
+                                        <span className="text-xs text-gray-400 mt-1">Official Campaign Frame</span>
+                                    </div>
+                                )}
                                 </div>
                             </div>
                         </div>

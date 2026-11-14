@@ -9,11 +9,24 @@ use App\Models\PlatformSetting;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class AdminController extends Controller
+class AdminController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(function ($request, $next) {
+                if (!Auth::check() || Auth::user()->role !== 'admin') {
+                    abort(403, 'Unauthorized. Admin access required.');
+                }
+                return $next($request);
+            }),
+        ];
+    }
     /**
      * Admin Overview
      */

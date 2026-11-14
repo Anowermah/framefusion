@@ -81,7 +81,19 @@ if (file_exists($pubFrames) && is_dir($pubFrames)) {
 
 echo "\nFiles in storage/app/public/frames:\n";
 $appFrames = $storageAppPublic . '/frames';
-if (isset($_GET['sync']) || true) {
+echo "\nDatabase Connection Diagnostic:\n";
+echo "----------------------------------------\n";
+try {
+    $dbConn = \Illuminate\Support\Facades\DB::getDefaultConnection();
+    $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
+    echo "Default DB Connection: $dbConn\n";
+    echo "Database Name: $dbName\n";
+    $campaignSlugs = \Illuminate\Support\Facades\DB::table('campaigns')->pluck('slug')->toArray();
+    echo "Existing Campaigns (" . count($campaignSlugs) . "): " . implode(', ', $campaignSlugs) . "\n";
+} catch (\Throwable $e) {
+    echo "Database connection error: " . $e->getMessage() . "\n";
+}
+
     echo "\nAuto-Syncing Frames between storage/app/public and public/storage:\n";
     echo "----------------------------------------\n";
     $appFrames = $storageAppPublic . '/frames';

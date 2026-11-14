@@ -89,3 +89,4 @@ class FrameFusionPlatformTest extends TestCase
         $this->actingAs($admin)->get('/admin/analytics')->assertStatus(200);
     }
 }
+

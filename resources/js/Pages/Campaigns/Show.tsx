@@ -3,10 +3,10 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
-import { 
-    Users, Eye, Calendar, Share2, Copy, 
-    Bookmark, Flag, ArrowRight, Camera, 
-    Check, Sparkles, MessageSquare, ThumbsUp, 
+import {
+    Users, Eye, Calendar, Share2, Copy,
+    Bookmark, Flag, ArrowRight, Camera,
+    Check, Sparkles, MessageSquare, ThumbsUp,
     ShieldAlert, X, Heart
 } from 'lucide-react';
 
@@ -61,7 +61,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                 title: campaign.title,
                 text: campaign.description,
                 url: currentUrl,
-            }).catch(() => {});
+            }).catch(() => { });
         } else {
             handleCopyLink();
         }
@@ -80,8 +80,8 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as any)?.content || '',
             },
         })
-        .then(res => res.json())
-        .then(data => setSaved(data.saved));
+            .then(res => res.json())
+            .then(data => setSaved(data.saved));
     };
 
     const handleReportSubmit = (e: React.FormEvent) => {
@@ -97,19 +97,19 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                 description: reportDescription,
             }),
         })
-        .then(res => res.json())
-        .then(() => {
-            setReportSuccess(true);
-            setTimeout(() => {
-                setReportSuccess(false);
-                setReportModalOpen(false);
-            }, 2000);
-        });
+            .then(res => res.json())
+            .then(() => {
+                setReportSuccess(true);
+                setTimeout(() => {
+                    setReportSuccess(false);
+                    setReportModalOpen(false);
+                }, 2000);
+            });
     };
 
     return (
         <MainLayout>
-            <Head title={`${title} - FrameFusion`} />
+            <Head title={title} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">
                 {/* Campaign Hero Showcase */}
@@ -118,7 +118,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                         {/* Frame Visual Display */}
                         <div className="lg:col-span-5 flex justify-center">
                             <div className="relative w-full max-w-sm aspect-square rounded-3xl bg-linear-to-br from-gray-50 to-gray-100/70 p-4 border border-gray-100 shadow-xl overflow-hidden group">
-                                <div 
+                                <div
                                     className="w-full h-full rounded-2xl overflow-hidden relative flex items-center justify-center"
                                     style={{
                                         backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
@@ -140,7 +140,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                             <div className="space-y-3">
                                 <div className="flex flex-wrap items-center gap-2">
                                     {categoryName && (
-                                        <Link 
+                                        <Link
                                             href={`/explore?category=${campaign.category?.slug}`}
                                             className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-50 text-brand-600 hover:bg-brand-100 transition-colors"
                                         >
@@ -191,11 +191,10 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
 
                                 <button
                                     onClick={handleToggleSave}
-                                    className={`px-5 py-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                                        saved 
-                                            ? 'border-brand-500 bg-brand-50 text-brand-600' 
-                                            : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                                    }`}
+                                    className={`px-5 py-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${saved
+                                        ? 'border-brand-500 bg-brand-50 text-brand-600'
+                                        : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                                        }`}
                                 >
                                     <Bookmark className={`w-4 h-4 ${saved ? 'fill-brand-500' : ''}`} />
                                     <span>{saved ? t('saved') : t('saveCampaign')}</span>

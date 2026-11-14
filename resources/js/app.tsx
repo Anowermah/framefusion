@@ -9,7 +9,11 @@ import { LanguageProvider } from '@/Context/LanguageContext';
 const appName = import.meta.env.VITE_APP_NAME || 'FrameFusion';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => {
+        if (!title || !title.trim()) return appName;
+        if (title.includes(appName)) return title;
+        return `${title} | ${appName}`;
+    },
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.tsx`,

@@ -3,11 +3,11 @@ import { Head, Link, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
-import { 
-    Search, Sparkles, Flame, Star, ArrowRight, 
-    Upload, Sliders, Download, CheckCircle, Shield, 
-    Users, HeartHandshake, Flag, GraduationCap, Cpu, 
-    Trophy, Briefcase, ChevronRight 
+import {
+    Search, Sparkles, Flame, Star, ArrowRight,
+    Upload, Sliders, Download, CheckCircle, Shield,
+    Users, HeartHandshake, Flag, GraduationCap, Cpu,
+    Trophy, Briefcase, ChevronRight
 } from 'lucide-react';
 
 interface CategoryData {
@@ -59,7 +59,7 @@ export default function Home({
 
     return (
         <MainLayout>
-            <Head title="FrameFusion - Visual Campaign Platform" />
+            <Head title="Visual Campaign Platform" />
 
             {/* HERO SECTION */}
             <section className="relative overflow-hidden pt-8 pb-16 lg:pt-16 lg:pb-24 bg-linear-to-b from-brand-50/60 via-white to-[#F8F9FC]">
@@ -123,7 +123,7 @@ export default function Home({
                             <div className="relative w-full max-w-[420px] aspect-square">
                                 {/* Sample Floating Twibbon Cards Collage */}
                                 <div className="absolute top-0 right-4 w-52 sm:w-60 aspect-square rounded-3xl bg-white p-3 shadow-2xl border border-gray-100 rotate-6 hover:rotate-0 transition-transform duration-300 z-20">
-                                    <div 
+                                    <div
                                         className="w-full h-full rounded-2xl overflow-hidden relative"
                                         style={{
                                             backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
@@ -143,7 +143,7 @@ export default function Home({
                                 </div>
 
                                 <div className="absolute bottom-2 left-4 w-52 sm:w-60 aspect-square rounded-3xl bg-white p-3 shadow-2xl border border-gray-100 -rotate-6 hover:rotate-0 transition-transform duration-300 z-10">
-                                    <div 
+                                    <div
                                         className="w-full h-full rounded-2xl overflow-hidden relative"
                                         style={{
                                             backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
@@ -169,7 +169,7 @@ export default function Home({
 
             {/* SEARCH & DISCOVERY BAR */}
             <section className="max-w-5xl mx-auto px-4 -mt-6 sm:-mt-8 relative z-30">
-                <form 
+                <form
                     onSubmit={handleSearchSubmit}
                     className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 p-2 sm:p-3 flex flex-col sm:flex-row items-center gap-2"
                 >

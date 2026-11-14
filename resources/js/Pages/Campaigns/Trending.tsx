@@ -18,7 +18,7 @@ export default function Trending({ campaigns }: { campaigns: PaginationData<Camp
 
     return (
         <MainLayout>
-            <Head title="Trending Campaigns - FrameFusion" />
+            <Head title="Trending Campaigns" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
                 <div className="flex items-center gap-3">
@@ -48,13 +48,12 @@ export default function Trending({ campaigns }: { campaigns: PaginationData<Camp
                                 key={i}
                                 href={link.url || '#'}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
-                                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                    link.active
-                                        ? 'bg-brand-500 text-white shadow-xs'
-                                        : link.url
+                                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${link.active
+                                    ? 'bg-brand-500 text-white shadow-xs'
+                                    : link.url
                                         ? 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                                         : 'text-gray-300 cursor-not-allowed'
-                                }`}
+                                    }`}
                             />
                         ))}
                     </div>

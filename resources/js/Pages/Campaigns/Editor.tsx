@@ -10,7 +10,7 @@ interface EditorPageProps {
 export default function Editor({ campaign }: EditorPageProps) {
     return (
         <MainLayout>
-            <Head title={`Photo Studio - ${campaign.title} - FrameFusion`} />
+            <Head title={`Photo Studio | ${campaign.title}`} />
             <PhotoEditor campaign={campaign} />
         </MainLayout>
     );

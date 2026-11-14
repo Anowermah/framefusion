@@ -40,7 +40,7 @@ export default function HowItWorks() {
 
     return (
         <MainLayout>
-            <Head title="How It Works - FrameFusion" />
+            <Head title="How It Works" />
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
                 <div className="text-center space-y-3">

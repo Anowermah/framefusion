@@ -9,7 +9,7 @@ export default function About() {
 
     return (
         <MainLayout>
-            <Head title="About Us - FrameFusion" />
+            <Head title="About Us" />
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
                 <div className="text-center space-y-4">

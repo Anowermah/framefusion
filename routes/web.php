@@ -21,6 +21,13 @@ Route::post('/campaigns', [CampaignController::class, 'store'])->name('campaigns
 Route::get('/campaigns/{slug}', [CampaignController::class, 'show'])->name('campaigns.show');
 Route::get('/campaigns/{slug}/editor', [CampaignController::class, 'editor'])->name('campaigns.editor');
 
+// Aliases & friendly redirects
+Route::get('/campaign/{slug}', fn($slug) => redirect()->route('campaigns.show', ['slug' => $slug]));
+Route::get('/campaign/{slug}/editor', fn($slug) => redirect()->route('campaigns.editor', ['slug' => $slug]));
+Route::get('/category/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
+Route::get('/categories/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
+Route::get('/search', fn() => redirect()->route('campaigns.explore'));
+
 // Campaign Actions (Guest & User)
 Route::post('/campaigns/{id}/generate', [CampaignController::class, 'generate'])->name('campaigns.generate');
 Route::post('/campaigns/{id}/save', [CampaignController::class, 'toggleSave'])->name('campaigns.save');

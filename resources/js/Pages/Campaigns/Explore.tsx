@@ -36,17 +36,18 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
     const [selectedCat, setSelectedCat] = useState(filters.category || '');
     const [selectedSort, setSelectedSort] = useState(filters.sort || 'trending');
 
-    const handleApplyFilters = (newCat?: string, newSort?: string) => {
+    const handleApplyFilters = (newCat?: string, newSort?: string, newSearch?: string) => {
         const cat = newCat !== undefined ? newCat : selectedCat;
         const srt = newSort !== undefined ? newSort : selectedSort;
+        const q = newSearch !== undefined ? newSearch : search;
 
-        router.visit('/explore', {
-            data: {
-                search: search || undefined,
-                category: cat || undefined,
-                sort: srt || undefined,
-            },
+        router.get('/explore', {
+            search: q || undefined,
+            category: cat || undefined,
+            sort: srt || undefined,
+        }, {
             preserveState: true,
+            preserveScroll: true,
         });
     };
 
@@ -57,7 +58,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
 
     return (
         <MainLayout>
-            <Head title="Explore Campaigns - FrameFusion" />
+            <Head title={language === 'bn' ? 'ক্যাম্পেইন এক্সপ্লোর করুন' : 'Explore Campaigns'} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
                 {/* Header */}
@@ -117,11 +118,10 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                                 setSelectedCat('');
                                 handleApplyFilters('', undefined);
                             }}
-                            className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 ${
-                                selectedCat === '' 
-                                    ? 'bg-brand-500 text-white shadow-xs' 
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
+                            className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 ${selectedCat === ''
+                                ? 'bg-brand-500 text-white shadow-xs'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
                         >
                             {t('allCategories')}
                         </button>
@@ -133,11 +133,10 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                                     setSelectedCat(c.slug);
                                     handleApplyFilters(c.slug, undefined);
                                 }}
-                                className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 ${
-                                    selectedCat === c.slug 
-                                        ? 'bg-brand-500 text-white shadow-xs' 
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
+                                className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 ${selectedCat === c.slug
+                                    ? 'bg-brand-500 text-white shadow-xs'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
                             >
                                 {language === 'bn' && c.name_bn ? c.name_bn : c.name}
                             </button>
@@ -172,13 +171,12 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                                 key={i}
                                 href={link.url || '#'}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
-                                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                    link.active
-                                        ? 'bg-brand-500 text-white shadow-xs'
-                                        : link.url
+                                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${link.active
+                                    ? 'bg-brand-500 text-white shadow-xs'
+                                    : link.url
                                         ? 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                                         : 'text-gray-300 cursor-not-allowed'
-                                }`}
+                                    }`}
                             />
                         ))}
                     </div>

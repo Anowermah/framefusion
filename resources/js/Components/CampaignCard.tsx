@@ -72,25 +72,27 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     return (
         <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden">
             {/* Thumbnail Preview Area */}
-            <Link href={`/campaigns/${campaign.slug}`} className="relative aspect-square w-full bg-linear-to-br from-gray-50 to-gray-100/70 p-4 flex items-center justify-center overflow-hidden">
-                {/* Subtle checkerboard to indicate transparent PNG capability */}
-                <div 
-                    className="absolute inset-0 opacity-15"
-                    style={{
-                        backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
-                        backgroundSize: '16px 16px'
-                    }}
-                />
+            <div className="relative aspect-square w-full bg-linear-to-br from-gray-50 to-gray-100/70 p-4 flex items-center justify-center overflow-hidden">
+                <Link href={`/campaigns/${campaign.slug}`} className="absolute inset-0 p-4 flex items-center justify-center">
+                    {/* Subtle checkerboard to indicate transparent PNG capability */}
+                    <div 
+                        className="absolute inset-0 opacity-15"
+                        style={{
+                            backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
+                            backgroundSize: '16px 16px'
+                        }}
+                    />
 
-                <img
-                    src={campaign.thumbnail_url || campaign.frame_url}
-                    alt={title}
-                    className="relative z-10 w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                />
+                    <img
+                        src={campaign.thumbnail_url || campaign.frame_url}
+                        alt={title}
+                        className="relative z-10 w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                    />
+                </Link>
 
                 {/* Floating Badges */}
-                <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5">
+                <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 pointer-events-none">
                     {campaign.is_trending && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/90 text-white backdrop-blur-xs shadow-xs">
                             <Flame className="w-3 h-3 fill-white" />
@@ -118,7 +120,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                 >
                     <Bookmark className={`w-4 h-4 ${saved ? 'fill-white' : ''}`} />
                 </button>
-            </Link>
+            </div>
 
             {/* Campaign Information Content */}
             <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">

@@ -5,7 +5,7 @@ import MainLayout from '@/Layouts/MainLayout';
 export default function Terms() {
     return (
         <MainLayout>
-            <Head title="Terms & Conditions - FrameFusion" />
+            <Head title="Terms & Conditions" />
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
                 <div className="space-y-3">

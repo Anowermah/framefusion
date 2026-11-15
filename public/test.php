@@ -81,37 +81,55 @@ if (file_exists($pubFrames) && is_dir($pubFrames)) {
 
 echo "\nFiles in storage/app/public/frames:\n";
 $appFrames = $storageAppPublic . '/frames';
-echo "\nDatabase Connection Diagnostic:\n";
+echo "\nDatabase Connection & Tables Diagnostic:\n";
 echo "----------------------------------------\n";
 try {
     $dbConn = \Illuminate\Support\Facades\DB::getDefaultConnection();
     $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
     echo "Default DB Connection: $dbConn\n";
     echo "Database Name: $dbName\n";
-    $campaignSlugs = \Illuminate\Support\Facades\DB::table('campaigns')->pluck('slug')->toArray();
-    echo "Existing Campaigns (" . count($campaignSlugs) . "): " . implode(', ', $campaignSlugs) . "\n";
+
+    $hasSessions = \Illuminate\Support\Facades\Schema::hasTable('sessions');
+    $hasCampaigns = \Illuminate\Support\Facades\Schema::hasTable('campaigns');
+
+    echo "Table 'sessions' exists: " . ($hasSessions ? 'YES' : 'NO') . "\n";
+    echo "Table 'campaigns' exists: " . ($hasCampaigns ? 'YES' : 'NO') . "\n";
+
+    if (!$hasSessions || !$hasCampaigns) {
+        echo "Tables missing! Running automatic migration and seeder...\n";
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        echo "Migrate Output: " . trim(\Illuminate\Support\Facades\Artisan::output()) . "\n";
+
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        echo "Seed Output: " . trim(\Illuminate\Support\Facades\Artisan::output()) . "\n";
+    }
+
+    if (\Illuminate\Support\Facades\Schema::hasTable('campaigns')) {
+        $campaignSlugs = \Illuminate\Support\Facades\DB::table('campaigns')->pluck('slug')->toArray();
+        echo "Existing Campaigns (" . count($campaignSlugs) . "): " . implode(', ', $campaignSlugs) . "\n";
+    }
 } catch (\Throwable $e) {
-    echo "Database connection error: " . $e->getMessage() . "\n";
+    echo "Database diagnostic error: " . $e->getMessage() . "\n";
 }
 
-    echo "\nAuto-Syncing Frames between storage/app/public and public/storage:\n";
-    echo "----------------------------------------\n";
-    $appFrames = $storageAppPublic . '/frames';
-    $pubFrames = __DIR__ . '/storage/frames';
-    if (!file_exists($pubFrames)) {
-        @mkdir($pubFrames, 0755, true);
-    }
-    if (file_exists($appFrames) && is_dir($appFrames)) {
-        foreach (scandir($appFrames) as $file) {
-            if ($file === '.' || $file === '..') continue;
-            $src = $appFrames . '/' . $file;
-            $dst = $pubFrames . '/' . $file;
-            if (!file_exists($dst)) {
-                $copied = @copy($src, $dst);
-                @chmod($dst, 0644);
-                echo "Copied to public: $file " . ($copied ? '[OK]' : '[FAILED]') . "\n";
-            }
+echo "\nAuto-Syncing Frames between storage/app/public and public/storage:\n";
+echo "----------------------------------------\n";
+$appFrames = $storageAppPublic . '/frames';
+$pubFrames = __DIR__ . '/storage/frames';
+if (!file_exists($pubFrames)) {
+    @mkdir($pubFrames, 0755, true);
+}
+if (file_exists($appFrames) && is_dir($appFrames)) {
+    foreach (scandir($appFrames) as $file) {
+        if ($file === '.' || $file === '..') continue;
+        $src = $appFrames . '/' . $file;
+        $dst = $pubFrames . '/' . $file;
+        if (!file_exists($dst)) {
+            $copied = @copy($src, $dst);
+            @chmod($dst, 0644);
+            echo "Copied to public: $file " . ($copied ? '[OK]' : '[FAILED]') . "\n";
         }
     }
 }
+
 

@@ -12,7 +12,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Safe session fallback: if database session table is missing, gracefully use file driver
+        if (config('session.driver') === 'database') {
+            try {
+                if (!\Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+                    config(['session.driver' => 'file']);
+                }
+            } catch (\Throwable $e) {
+                config(['session.driver' => 'file']);
+            }
+        }
     }
 
     /**

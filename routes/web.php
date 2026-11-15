@@ -111,14 +111,19 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/users/{id}/role', [AdminController::class, 'updateUserRole'])->name('admin.users.role');
     Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus'])->name('admin.users.status');
+    Route::post('/users/{id}/reset-password', [AdminController::class, 'resetUserPassword'])->name('admin.users.reset-password');
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
 
     Route::get('/campaigns', [AdminController::class, 'campaigns'])->name('admin.campaigns');
     Route::post('/campaigns/{id}/feature', [AdminController::class, 'toggleCampaignFeature'])->name('admin.campaigns.feature');
     Route::post('/campaigns/{id}/trending', [AdminController::class, 'toggleCampaignTrending'])->name('admin.campaigns.trending');
+    Route::post('/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus'])->name('admin.campaigns.status');
     Route::delete('/campaigns/{id}', [AdminController::class, 'adminDeleteCampaign'])->name('admin.campaigns.delete');
 
     Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+    Route::put('/categories/{id}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+    Route::delete('/categories/{id}', [AdminController::class, 'destroyCategory'])->name('admin.categories.destroy');
 
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::post('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])->name('admin.reports.status');

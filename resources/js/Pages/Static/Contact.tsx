@@ -3,7 +3,10 @@ import { Head } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
 
-export default function Contact() {
+export default function Contact({ contactInfo }: { contactInfo?: { email?: string; phone?: string; address?: string } }) {
+    const emailAddress = contactInfo?.email || 'support@framefusion.io';
+    const locationAddress = contactInfo?.address || 'Dhaka, Bangladesh';
+    const phoneNumber = contactInfo?.phone || '+880 1700-000000';
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [subject, setSubject] = useState('');
@@ -48,9 +51,21 @@ export default function Contact() {
                                 </div>
                                 <div>
                                     <span className="font-bold text-gray-900 block">Email Us</span>
-                                    <span>support@framefusion.io</span>
+                                    <a href={`mailto:${emailAddress}`} className="hover:text-brand-600 transition-colors">{emailAddress}</a>
                                 </div>
                             </div>
+
+                            {phoneNumber && (
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                        <Phone className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <span className="font-bold text-gray-900 block">Call Us</span>
+                                        <a href={`tel:${phoneNumber}`} className="hover:text-emerald-600 transition-colors">{phoneNumber}</a>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
@@ -58,7 +73,7 @@ export default function Contact() {
                                 </div>
                                 <div>
                                     <span className="font-bold text-gray-900 block">Location</span>
-                                    <span>Dhaka, Bangladesh</span>
+                                    <span>{locationAddress}</span>
                                 </div>
                             </div>
                         </div>

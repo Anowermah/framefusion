@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
@@ -37,6 +37,7 @@ export default function Home({
     recentCampaigns = [],
     stats,
 }: HomeProps) {
+    const { platform_settings } = usePage().props as any;
     const { language, t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -72,15 +73,15 @@ export default function Home({
                         <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-100/70 text-brand-700 text-xs font-bold border border-brand-200">
                                 <Sparkles className="w-3.5 h-3.5 text-brand-600 animate-pulse" />
-                                <span>{t('trustedBy')}</span>
+                                <span>{platform_settings?.hero_badge || t('trustedBy')}</span>
                             </div>
 
                             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-[1.15]">
-                                {t('heroTitle')}
+                                {platform_settings?.hero_title || t('heroTitle')}
                             </h1>
 
                             <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                                {t('heroSubtitle')}
+                                {platform_settings?.hero_subtitle || t('heroSubtitle')}
                             </p>
 
                             {/* Hero Action Buttons */}
@@ -89,7 +90,7 @@ export default function Home({
                                     href="/explore"
                                     className="w-full sm:w-auto px-7 py-3.5 text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-2xl shadow-lg shadow-brand-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
                                 >
-                                    <span>{t('exploreCampaigns')}</span>
+                                    <span>{platform_settings?.hero_cta_text || t('exploreCampaigns')}</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
 
@@ -97,7 +98,7 @@ export default function Home({
                                     href="/campaigns/create"
                                     className="w-full sm:w-auto px-7 py-3.5 text-sm font-bold text-gray-800 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl shadow-xs transition-all text-center"
                                 >
-                                    {t('startCampaign')}
+                                    {platform_settings?.hero_secondary_cta_text || t('startCampaign')}
                                 </Link>
                             </div>
 

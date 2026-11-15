@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
@@ -21,13 +22,14 @@ class AdminController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(function ($request, $next) {
-                if (!Auth::check() || Auth::user()->role !== 'admin') {
+                if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'super_admin'])) {
                     abort(403, 'Unauthorized. Admin access required.');
                 }
                 return $next($request);
             }),
         ];
     }
+
     /**
      * Admin Overview
      */
@@ -39,10 +41,10 @@ class AdminController extends Controller implements HasMiddleware
         $pendingReports = Schema::hasTable('reports') ? Report::where('status', 'pending')->count() : 0;
         $totalSupporters = (int) (Campaign::sum('supporters_count') ?? 0);
 
-        $recentUsers = User::latest()->take(5)->get();
-        $recentCampaigns = Campaign::with('creator')->latest()->take(5)->get();
+        $recentUsers = User::latest()->take(6)->get();
+        $recentCampaigns = Campaign::with('creator')->latest()->take(6)->get();
         $recentReports = Schema::hasTable('reports')
-            ? Report::with(['campaign', 'reporter'])->latest()->take(5)->get()
+            ? Report::with(['campaign', 'reporter'])->latest()->take(6)->get()
             : collect([]);
 
         return Inertia::render('Admin/Overview', [
@@ -64,7 +66,7 @@ class AdminController extends Controller implements HasMiddleware
      */
     public function users(Request $request)
     {
-        $query = User::latest();
+        $query = User::withCount(['campaigns', 'generatedPhotos'])->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -78,17 +80,21 @@ class AdminController extends Controller implements HasMiddleware
             $query->where('role', $role);
         }
 
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
         $users = $query->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Users', [
             'users' => $users,
-            'filters' => $request->only(['search', 'role']),
+            'filters' => $request->only(['search', 'role', 'status']),
         ]);
     }
 
     public function updateUserRole(Request $request, int $id)
     {
-        $request->validate(['role' => 'required|in:user,creator,admin']);
+        $request->validate(['role' => 'required|in:user,creator,admin,super_admin']);
         $user = User::findOrFail($id);
         $user->role = $request->role;
         $user->save();
@@ -102,7 +108,32 @@ class AdminController extends Controller implements HasMiddleware
         $user->status = $user->status === 'active' ? 'suspended' : 'active';
         $user->save();
 
-        return back()->with('success', 'User status updated.');
+        return back()->with('success', 'User status updated to ' . $user->status . '.');
+    }
+
+    public function resetUserPassword(Request $request, int $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Password reset successfully for ' . $user->name . '.');
+    }
+
+    public function deleteUser(int $id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'You cannot delete your own admin account.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User deleted successfully.');
     }
 
     /**
@@ -113,13 +144,27 @@ class AdminController extends Controller implements HasMiddleware
         $query = Campaign::with(['creator', 'category'])->latest();
 
         if ($search = $request->input('search')) {
-            $query->where('title', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        if ($catId = $request->input('category_id')) {
+            $query->where('category_id', $catId);
         }
 
         $campaigns = $query->paginate(15)->withQueryString();
+        $categories = Category::orderBy('name')->get();
 
         return Inertia::render('Admin/Campaigns', [
             'campaigns' => $campaigns,
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'status', 'category_id']),
         ]);
     }
 
@@ -139,6 +184,19 @@ class AdminController extends Controller implements HasMiddleware
         $campaign->save();
 
         return back()->with('success', 'Campaign trending status updated.');
+    }
+
+    public function updateCampaignStatus(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|in:published,draft,pending,rejected,suspended',
+        ]);
+
+        $campaign = Campaign::findOrFail($id);
+        $campaign->status = $request->status;
+        $campaign->save();
+
+        return back()->with('success', 'Campaign status updated to ' . $request->status . '.');
     }
 
     public function adminDeleteCampaign(int $id)
@@ -168,11 +226,56 @@ class AdminController extends Controller implements HasMiddleware
             'name_bn' => 'nullable|string|max:100',
             'slug' => 'required|string|unique:categories,slug',
             'description' => 'nullable|string',
+            'icon' => 'nullable|string',
+            'order' => 'nullable|integer',
         ]);
 
-        Category::create($request->all());
+        Category::create([
+            'name' => $request->name,
+            'name_bn' => $request->name_bn,
+            'slug' => $request->slug,
+            'description' => $request->description,
+            'icon' => $request->icon ?? 'Briefcase',
+            'order' => (int) ($request->order ?? 0),
+        ]);
 
         return back()->with('success', 'Category created successfully.');
+    }
+
+    public function updateCategory(Request $request, int $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'name_bn' => 'nullable|string|max:100',
+            'slug' => 'required|string|unique:categories,slug,' . $id,
+            'description' => 'nullable|string',
+            'icon' => 'nullable|string',
+            'order' => 'nullable|integer',
+        ]);
+
+        $category = Category::findOrFail($id);
+        $category->update([
+            'name' => $request->name,
+            'name_bn' => $request->name_bn,
+            'slug' => $request->slug,
+            'description' => $request->description,
+            'icon' => $request->icon ?? $category->icon ?? 'Briefcase',
+            'order' => (int) ($request->order ?? 0),
+        ]);
+
+        return back()->with('success', 'Category updated successfully.');
+    }
+
+    public function destroyCategory(int $id)
+    {
+        $category = Category::findOrFail($id);
+        if ($category->campaigns()->count() > 0) {
+            return back()->with('error', 'Cannot delete this category because campaigns are assigned to it. Move or delete those campaigns first.');
+        }
+
+        $category->delete();
+
+        return back()->with('success', 'Category deleted successfully.');
     }
 
     /**
@@ -204,26 +307,21 @@ class AdminController extends Controller implements HasMiddleware
      */
     public function settings()
     {
-        $settings = [
-            'site_name' => PlatformSetting::get('site_name', 'FrameFusion'),
-            'site_tagline' => PlatformSetting::get('site_tagline', 'Create. Customize. Celebrate.'),
-            'primary_color' => PlatformSetting::get('primary_color', '#635BFF'),
-            'contact_email' => PlatformSetting::get('contact_email', 'support@framefusion.io'),
-            'allow_guest_downloads' => PlatformSetting::get('allow_guest_downloads', true),
-        ];
-
         return Inertia::render('Admin/Settings', [
-            'settings' => $settings,
+            'settings' => PlatformSetting::allKeyMap(),
         ]);
     }
 
     public function updateSettings(Request $request)
     {
-        foreach ($request->all() as $key => $val) {
-            PlatformSetting::set($key, $val);
+        $data = $request->except(['_token']);
+
+        foreach ($data as $key => $val) {
+            $type = is_bool($val) ? 'boolean' : (is_int($val) ? 'integer' : 'string');
+            PlatformSetting::set($key, $val, $type);
         }
 
-        return back()->with('success', 'Settings saved successfully.');
+        return back()->with('success', 'Website settings saved and updated in database successfully.');
     }
 
     /**
@@ -236,7 +334,7 @@ class AdminController extends Controller implements HasMiddleware
             'totalCampaigns' => Campaign::count(),
             'totalPhotos' => Schema::hasTable('generated_photos') ? GeneratedPhoto::count() : 0,
             'totalSupporters' => (int) (Campaign::sum('supporters_count') ?? 0),
-            'topCampaigns' => Campaign::orderByDesc('supporters_count')->take(5)->get(),
+            'topCampaigns' => Campaign::orderByDesc('supporters_count')->take(10)->get(),
         ];
 
         return Inertia::render('Admin/Analytics', [
@@ -244,4 +342,3 @@ class AdminController extends Controller implements HasMiddleware
         ]);
     }
 }
-

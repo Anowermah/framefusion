@@ -1,9 +1,8 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
-import { ShieldCheck } from 'lucide-react';
 
-export default function Privacy() {
+export default function Privacy({ customContent }: { customContent?: string }) {
     return (
         <MainLayout>
             <Head title="Privacy Policy" />
@@ -18,29 +17,34 @@ export default function Privacy() {
                 </div>
 
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-xs p-6 sm:p-10 space-y-6 text-sm text-gray-600 leading-relaxed">
-                    <section className="space-y-2">
-                        <h2 className="text-base font-bold text-gray-900">1. Client-Side Image Processing</h2>
-                        <p>
-                            FrameFusion prioritizes user privacy. When you upload photos to customize campaign frames, image compositing, zooming, and adjustments occur locally within your browser using HTML5 Canvas. We do not automatically store your personal photos on our servers unless you explicitly opt-in to publish them to a public supporter gallery.
-                        </p>
-                    </section>
+                    {customContent ? (
+                        <div className="whitespace-pre-wrap leading-relaxed">{customContent}</div>
+                    ) : (
+                        <>
+                            <section className="space-y-2">
+                                <h2 className="text-base font-bold text-gray-900">1. Client-Side Image Processing</h2>
+                                <p>
+                                    FrameFusion prioritizes user privacy. When you upload photos to customize campaign frames, image compositing, zooming, and adjustments occur locally within your browser using HTML5 Canvas. We do not automatically store your personal photos on our servers unless you explicitly opt-in to publish them to a public supporter gallery.
+                                </p>
+                            </section>
 
-                    <section className="space-y-2">
-                        <h2 className="text-base font-bold text-gray-900">2. Information We Collect</h2>
-                        <p>
-                            For registered accounts, we collect standard credentials such as your name, email address, chosen username, and profile biography. For campaign creators, uploaded frame assets are hosted on secure public CDN storage so supporters can access them.
-                        </p>
-                    </section>
+                            <section className="space-y-2">
+                                <h2 className="text-base font-bold text-gray-900">2. Information We Collect</h2>
+                                <p>
+                                    For registered accounts, we collect standard credentials such as your name, email address, chosen username, and profile biography. For campaign creators, uploaded frame assets are hosted on secure public CDN storage so supporters can access them.
+                                </p>
+                            </section>
 
-                    <section className="space-y-2">
-                        <h2 className="text-base font-bold text-gray-900">3. Cookies & Session Storage</h2>
-                        <p>
-                            We use secure session cookies to remember your authenticated session and language preferences (English/Bengali). We do not sell user data to third-party ad brokers.
-                        </p>
-                    </section>
+                            <section className="space-y-2">
+                                <h2 className="text-base font-bold text-gray-900">3. Cookies & Session Storage</h2>
+                                <p>
+                                    We use secure session cookies to remember your authenticated session and language preferences (English/Bengali). We do not sell user data to third-party ad brokers.
+                                </p>
+                            </section>
+                        </>
+                    )}
                 </div>
             </div>
         </MainLayout>
     );
 }
-

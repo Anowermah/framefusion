@@ -112,6 +112,7 @@ class CampaignController extends Controller
         $with = ['creator', 'category'];
         if (Schema::hasTable('campaign_frames')) {
             $with[] = 'primaryFrame';
+            $with[] = 'frames';
         }
         if (Schema::hasTable('gallery_posts')) {
             $with[] = 'galleryPosts.user';
@@ -160,7 +161,7 @@ class CampaignController extends Controller
      */
     public function editor(string $slug)
     {
-        $campaign = Campaign::with(['creator', 'category', 'primaryFrame'])
+        $campaign = Campaign::with(['creator', 'category', 'primaryFrame', 'frames'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -411,10 +412,14 @@ class CampaignController extends Controller
             'description' => 'nullable|string',
             'description_bn' => 'nullable|string',
             'tags' => 'nullable|string',
+            'caption_template' => 'nullable|string|max:1000',
+            'action_link_url' => 'nullable|url|max:255',
+            'action_link_text' => 'nullable|string|max:100',
             'visibility' => 'required|in:public,unlisted,private',
             'status' => 'required|in:published,draft',
             'aspect_ratio' => 'required|string',
             'default_zoom' => 'nullable|numeric',
+            'extra_frames.*' => 'nullable|image|mimes:png,webp|max:10240',
         ]);
 
         // Upload frame image
@@ -453,6 +458,9 @@ class CampaignController extends Controller
             'status' => $request->status,
             'visibility' => $request->visibility,
             'tags' => $request->tags,
+            'caption_template' => $request->caption_template,
+            'action_link_url' => $request->action_link_url,
+            'action_link_text' => $request->action_link_text,
             'supporters_count' => 1,
             'views_count' => 1,
             'start_date' => now(),
@@ -469,6 +477,38 @@ class CampaignController extends Controller
             ],
         ]);
 
+        // Upload extra frame variations if provided
+        if ($request->hasFile('extra_frames')) {
+            $maxExtra = (int) PlatformSetting::get('max_frames_per_campaign', 5) - 1;
+            $uploadedExtras = array_slice($request->file('extra_frames'), 0, max(0, $maxExtra));
+            foreach ($uploadedExtras as $idx => $extraFile) {
+                if ($extraFile && $extraFile->isValid()) {
+                    $extraName = time() . '_' . ($idx + 2) . '_' . Str::slug($request->title) . '.' . $extraFile->getClientOriginalExtension();
+                    $extraFile->storeAs('frames', $extraName, 'public');
+
+                    $storedExtraPath = storage_path('app/public/frames/' . $extraName);
+                    if (file_exists($storedExtraPath)) {
+                        @chmod($storedExtraPath, 0644);
+                        if (!file_exists($publicFramesDir . '/' . $extraName)) {
+                            @copy($storedExtraPath, $publicFramesDir . '/' . $extraName);
+                            @chmod($publicFramesDir . '/' . $extraName, 0644);
+                        }
+                    }
+
+                    CampaignFrame::create([
+                        'campaign_id' => $campaign->id,
+                        'frame_url' => '/storage/frames/' . $extraName,
+                        'canvas_width' => 1080,
+                        'canvas_height' => 1080,
+                        'aspect_ratio' => $request->aspect_ratio,
+                        'photo_area_config' => [
+                            'zoom' => (float) $request->input('default_zoom', 1),
+                        ],
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('campaigns.show', $campaign->slug)
             ->with('success', 'Campaign created successfully!');
     }
@@ -479,8 +519,8 @@ class CampaignController extends Controller
     public function edit(string $id)
     {
         $campaign = is_numeric($id)
-            ? Campaign::with(['primaryFrame', 'category'])->findOrFail((int) $id)
-            : Campaign::with(['primaryFrame', 'category'])->where('slug', $id)->firstOrFail();
+            ? Campaign::with(['primaryFrame', 'frames', 'category'])->findOrFail((int) $id)
+            : Campaign::with(['primaryFrame', 'frames', 'category'])->where('slug', $id)->firstOrFail();
 
         if (Auth::id() !== $campaign->creator_id && Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized. You can only edit your own campaigns.');
@@ -516,6 +556,9 @@ class CampaignController extends Controller
             'description' => 'nullable|string',
             'description_bn' => 'nullable|string',
             'tags' => 'nullable|string',
+            'caption_template' => 'nullable|string|max:1000',
+            'action_link_url' => 'nullable|url|max:255',
+            'action_link_text' => 'nullable|string|max:100',
             'visibility' => 'required|in:public,unlisted,private',
             'status' => 'required|in:published,draft',
             'aspect_ratio' => 'nullable|string',
@@ -561,6 +604,9 @@ class CampaignController extends Controller
             'status' => $request->status,
             'visibility' => $request->visibility,
             'tags' => $request->tags,
+            'caption_template' => $request->caption_template,
+            'action_link_url' => $request->action_link_url,
+            'action_link_text' => $request->action_link_text,
         ]);
 
         // Update or create primary frame configuration

@@ -190,6 +190,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/users/{id}/role', [AdminController::class, 'updateUserRole'])->name('admin.users.role');
     Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus'])->name('admin.users.status');
+    Route::post('/users/{id}/toggle-verification', [AdminController::class, 'toggleUserVerification'])->name('admin.users.verify');
     Route::post('/users/{id}/reset-password', [AdminController::class, 'resetUserPassword'])->name('admin.users.reset-password');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
 

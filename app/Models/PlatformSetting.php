@@ -52,6 +52,17 @@ class PlatformSetting extends Model
             'google_login_enabled' => true,
             'maintenance_mode' => false,
 
+            // Twibbonize & Advanced Campaign Engine
+            'enable_campaign_captions' => true,
+            'default_campaign_hashtags' => '#FrameFusion #Campaign #PhotoFrame',
+            'enable_qr_code_sharing' => true,
+            'enable_watermark' => false,
+            'watermark_text' => 'FrameFusion',
+            'watermark_position' => 'bottom_right',
+            'enable_external_action_links' => true,
+            'allow_multi_frame_campaigns' => true,
+            'max_frames_per_campaign' => 5,
+
             // SEO & Analytics
             'meta_title' => 'FrameFusion - Custom Photo Campaign & Twibbon Platform',
             'meta_description' => 'Create, customize, and celebrate visual photo campaigns and twibbons effortlessly.',

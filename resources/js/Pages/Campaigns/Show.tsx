@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
+import { QRCodeCanvas } from 'qrcode.react';
 import {
     Users, Eye, Calendar, Share2, Copy,
     Bookmark, Flag, ArrowRight, Camera,
     Check, Sparkles, MessageSquare, ThumbsUp,
-    ShieldAlert, X, Heart, Edit
+    ShieldAlert, X, Heart, Edit, QrCode, Download,
+    ExternalLink, BadgeCheck, CheckCircle2, MessageCircle
 } from 'lucide-react';
 
 interface CampaignShowProps {
@@ -16,12 +18,20 @@ interface CampaignShowProps {
         description_bn?: string;
         start_date?: string;
         tags?: string;
+        caption_template?: string;
+        action_link_url?: string;
+        action_link_text?: string;
         og_image_url?: string;
         direct_frame_url?: string;
         canonical_url?: string;
         primary_frame?: {
             aspect_ratio?: string;
         };
+        frames?: {
+            id: number;
+            frame_url: string;
+            aspect_ratio?: string;
+        }[];
         gallery_posts?: {
             id: number;
             image_url: string;
@@ -47,11 +57,42 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
     const [reportSuccess, setReportSuccess] = useState(false);
     const [imageError, setImageError] = useState(false);
 
+    // Twibbonize Suite States: Multi-frame, QR modal, Smart captions
+    const allFrames = campaign.frames && campaign.frames.length > 0
+        ? campaign.frames
+        : [{ id: 0, frame_url: campaign.frame_url }];
+    const [selectedFrameIndex, setSelectedFrameIndex] = useState(0);
+    const activeFrame = allFrames[selectedFrameIndex] || allFrames[0];
+
+    const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [captionCopied, setCaptionCopied] = useState(false);
+    const qrCanvasRef = useRef<HTMLDivElement>(null);
+
     const title = language === 'bn' && campaign.title_bn ? campaign.title_bn : campaign.title;
     const description = language === 'bn' && campaign.description_bn ? campaign.description_bn : campaign.description;
     const categoryName = language === 'bn' && campaign.category?.name_bn ? campaign.category.name_bn : campaign.category?.name;
 
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+    const smartCaption = campaign.caption_template ||
+        (language === 'bn'
+            ? `আমি "${title}" ক্যাম্পেইনকে সমর্থন জানিয়ে আমার ছবি তৈরি করেছি! আপনিও এখনই আপনার ছবি ফ্রেম করুন: ${currentUrl} #FrameFusion #Twibbon`
+            : `I just customized my photo in support of "${title}"! Create yours now at: ${currentUrl} #FrameFusion #Campaign #Twibbon`);
+
+    const handleCopyCaption = () => {
+        navigator.clipboard.writeText(smartCaption);
+        setCaptionCopied(true);
+        setTimeout(() => setCaptionCopied(false), 2500);
+    };
+
+    const handleDownloadQr = () => {
+        const canvas = qrCanvasRef.current?.querySelector('canvas');
+        if (!canvas) return;
+        const link = document.createElement('a');
+        link.download = `framefusion-${campaign.slug}-qr.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(currentUrl);
@@ -142,7 +183,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-card p-4 sm:p-10">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                         {/* Frame Visual Display */}
-                        <div className="lg:col-span-5 flex justify-center">
+                        <div className="lg:col-span-5 flex flex-col items-center">
                             <div className="relative w-full max-w-sm aspect-square rounded-3xl bg-linear-to-br from-gray-50 to-gray-100/70 p-4 border border-gray-100 shadow-xl overflow-hidden group">
                                 <div
                                     className="w-full h-full rounded-2xl overflow-hidden relative flex items-center justify-center"
@@ -154,7 +195,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                 >
                                 {!imageError ? (
                                     <img
-                                        src={campaign.frame_url}
+                                        src={activeFrame.frame_url}
                                         alt={title}
                                         className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
                                         onError={() => setImageError(true)}
@@ -168,6 +209,42 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                 )}
                                 </div>
                             </div>
+
+                            {/* Multi-Frame Variations Carousel */}
+                            {allFrames.length > 1 && (
+                                <div className="mt-4 w-full max-w-sm">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider">
+                                            {language === 'bn' ? 'ফ্রেম ভেরিয়েশন' : 'Frame Variations'} ({allFrames.length})
+                                        </span>
+                                        <span className="text-[10px] text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-full">
+                                            {selectedFrameIndex + 1} / {allFrames.length}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-thin">
+                                        {allFrames.map((f, idx) => (
+                                            <button
+                                                key={f.id || idx}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedFrameIndex(idx);
+                                                    setImageError(false);
+                                                }}
+                                                className={`relative w-16 h-16 rounded-2xl border-2 p-1.5 bg-white shrink-0 transition-all ${
+                                                    selectedFrameIndex === idx
+                                                        ? 'border-brand-600 shadow-md ring-2 ring-brand-100 scale-105'
+                                                        : 'border-slate-200 opacity-60 hover:opacity-100'
+                                                }`}
+                                            >
+                                                <img src={f.frame_url} alt="" className="w-full h-full object-contain" />
+                                                <span className="absolute bottom-1 right-1 bg-slate-900/80 text-white text-[9px] font-bold px-1 rounded">
+                                                    #{idx + 1}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Campaign Meta & Primary CTA */}
@@ -203,8 +280,15 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                     {title}
                                 </h1>
 
-                                <p className="text-xs text-gray-500">
-                                    {t('creator')}: <span className="text-gray-900 font-bold">{campaign.creator?.name || 'FrameFusion Creator'}</span>
+                                <p className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
+                                    <span>{t('creator')}:</span>
+                                    <span className="text-gray-900 font-bold">{campaign.creator?.name || 'FrameFusion Creator'}</span>
+                                    {campaign.creator?.is_verified && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black border border-blue-200">
+                                            <BadgeCheck className="w-3.5 h-3.5 text-blue-600 fill-blue-100" />
+                                            <span>Verified Creator</span>
+                                        </span>
+                                    )}
                                 </p>
                             </div>
 
@@ -239,13 +323,25 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                             {/* MAIN CTA BUTTON: CHOOSE YOUR PHOTO */}
                             <div className="pt-2 flex flex-col sm:flex-row gap-3">
                                 <Link
-                                    href={`/campaigns/${campaign.slug}/editor`}
+                                    href={`/campaigns/${campaign.slug}/editor${selectedFrameIndex > 0 ? `?frame=${selectedFrameIndex}` : ''}`}
                                     className="flex-1 py-4 px-6 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-black text-sm rounded-2xl shadow-lg shadow-brand-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2.5"
                                 >
                                     <Camera className="w-5 h-5" />
                                     <span>{t('chooseYourPhoto')}</span>
                                     <ArrowRight className="w-4 h-4 ml-1" />
                                 </Link>
+
+                                {campaign.action_link_url && (
+                                    <a
+                                        href={campaign.action_link_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-5 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shrink-0"
+                                    >
+                                        <span>{campaign.action_link_text || (language === 'bn' ? 'অফিসিয়াল লিংক' : 'Official Action')}</span>
+                                        <ExternalLink className="w-3.5 h-3.5 text-slate-300" />
+                                    </a>
+                                )}
 
                                 <button
                                     onClick={handleToggleSave}
@@ -275,6 +371,15 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                     <Share2 className="w-3.5 h-3.5" />
                                     {t('shareCampaign')}:
                                 </span>
+
+                                <button
+                                    onClick={() => setQrModalOpen(true)}
+                                    className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+                                    title="Generate Event QR Code"
+                                >
+                                    <QrCode className="w-3.5 h-3.5 text-slate-700" />
+                                    <span>QR Code</span>
+                                </button>
 
                                 <button
                                     onClick={handleCopyLink}
@@ -318,6 +423,54 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* Smart Caption & Auto-Hashtags Engine */}
+                <div className="bg-gradient-to-r from-violet-50/70 via-indigo-50/30 to-white rounded-3xl border border-violet-100/90 shadow-card p-5 sm:p-7 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-violet-500/20 shrink-0">
+                                <MessageCircle className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-extrabold text-slate-900">
+                                    {language === 'bn' ? 'স্মার্ট সোশ্যাল ক্যাপশন ও হ্যাশট্যাগ' : 'Smart Social Caption & Auto-Hashtags'}
+                                </h3>
+                                <p className="text-[11px] text-slate-500">
+                                    {language === 'bn' ? 'কপি করে আপনার ফ্রেম করা ছবির সাথে ফেসবুক, হোয়াটসঅ্যাপে পোস্ট করুন' : '1-click copy & share along with your customized photo on social networks'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                            <button
+                                onClick={handleCopyCaption}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
+                                    captionCopied
+                                        ? 'bg-green-600 text-white shadow-xs'
+                                        : 'bg-violet-600 hover:bg-violet-700 text-white shadow-xs'
+                                }`}
+                            >
+                                {captionCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{captionCopied ? (language === 'bn' ? 'কপিকৃত!' : 'Copied!') : (language === 'bn' ? 'ক্যাপশন কপি' : 'Copy Caption')}</span>
+                            </button>
+
+                            <a
+                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(smartCaption)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-3 py-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] text-xs font-bold flex items-center gap-1.5 transition-all"
+                                title="Share Caption to WhatsApp"
+                            >
+                                <Share2 className="w-3.5 h-3.5" />
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="p-4 bg-white/90 rounded-2xl border border-violet-100 text-xs text-slate-700 font-mono leading-relaxed select-all shadow-2xs">
+                        {smartCaption}
                     </div>
                 </div>
 
@@ -435,6 +588,62 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                 </button>
                             </form>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* INSTANT QR CODE GENERATOR MODAL */}
+            {qrModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+                    <div className="bg-white rounded-3xl max-w-sm w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 text-center">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-left">
+                                <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0">
+                                    <QrCode className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-extrabold text-slate-900">Campaign QR Code</h3>
+                                    <p className="text-[10px] text-slate-400">Scan to open campaign instantly</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setQrModalOpen(false)} className="text-gray-400 hover:text-gray-700 p-1">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Printable QR Code Canvas Card */}
+                        <div ref={qrCanvasRef} className="p-5 rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-slate-200/80 shadow-inner flex flex-col items-center justify-center space-y-3">
+                            <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 inline-block">
+                                <QRCodeCanvas
+                                    value={currentUrl || `https://framefusion.atrbd.com/campaigns/${campaign.slug}`}
+                                    size={200}
+                                    level="H"
+                                    includeMargin={true}
+                                />
+                            </div>
+                            <div className="text-center">
+                                <span className="text-xs font-black text-slate-900 block truncate max-w-[220px]">{title}</span>
+                                <span className="text-[10px] text-slate-400 font-mono">framefusion.atrbd.com</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 pt-1">
+                            <button
+                                onClick={handleDownloadQr}
+                                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                            >
+                                <Download className="w-4 h-4" />
+                                <span>Download QR Code (PNG)</span>
+                            </button>
+
+                            <button
+                                onClick={handleCopyLink}
+                                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs flex items-center justify-center gap-2 transition-all"
+                            >
+                                {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                                <span>{copied ? 'Link Copied!' : 'Copy Campaign Link'}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

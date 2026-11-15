@@ -23,6 +23,7 @@ class User extends Authenticatable
         'bio',
         'role',
         'status',
+        'is_verified',
         'social_links',
     ];
 
@@ -36,6 +37,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_verified' => 'boolean',
             'social_links' => 'array',
         ];
     }

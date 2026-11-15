@@ -5,9 +5,9 @@ import {
     Upload, ZoomIn, ZoomOut, RotateCcw, RotateCw, 
     RefreshCw, Download, Sliders, Move, Sparkles, 
     CheckCircle2, Share2, ArrowLeft, Eye, ShieldCheck,
-    Type
+    Type, Copy, Check, MessageCircle, Layers
 } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 interface CampaignProps {
     id: number;
@@ -16,12 +16,19 @@ interface CampaignProps {
     slug: string;
     frame_url: string;
     campaign_type: string;
+    caption_template?: string;
+    frames?: {
+        id: number;
+        frame_url: string;
+        aspect_ratio?: string;
+    }[];
     category?: {
         name: string;
         name_bn?: string;
     };
     creator?: {
         name: string;
+        is_verified?: boolean;
     };
 }
 
@@ -31,7 +38,34 @@ interface PhotoEditorProps {
 
 export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const { language, t } = useLanguage();
+    const { platform_settings } = (usePage?.()?.props || {}) as any;
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    // Multi-Frame Variations Support
+    const allFrames = campaign.frames && campaign.frames.length > 0
+        ? campaign.frames
+        : [{ id: 0, frame_url: campaign.frame_url }];
+
+    const initialFrameIdx = typeof window !== 'undefined'
+        ? parseInt(new URLSearchParams(window.location.search).get('frame') || '0', 10) || 0
+        : 0;
+    const [activeFrameIndex, setActiveFrameIndex] = useState(
+        initialFrameIdx >= 0 && initialFrameIdx < allFrames.length ? initialFrameIdx : 0
+    );
+    const activeFrameUrl = allFrames[activeFrameIndex]?.frame_url || campaign.frame_url;
+
+    // Watermark Configuration
+    const enableWatermark = !!platform_settings?.enable_watermark;
+    const watermarkText = platform_settings?.watermark_text || 'FrameFusion';
+    const watermarkPosition = platform_settings?.watermark_position || 'bottom_right';
+
+    // Caption for instant share
+    const [captionCopied, setCaptionCopied] = useState(false);
+    const pageUrl = typeof window !== 'undefined' ? `${window.location.origin}/campaigns/${campaign.slug}` : '';
+    const studioCaption = campaign.caption_template ||
+        (language === 'bn'
+            ? `আমি "${campaign.title_bn || campaign.title}" ক্যাম্পেইনে অংশ নিয়েছি! আপনিও আপনার ছবি ফ্রেম করুন: ${pageUrl} #FrameFusion #Twibbon`
+            : `I just framed my photo for "${campaign.title}"! Create yours now at: ${pageUrl} #FrameFusion #Campaign #Twibbon`);
 
     // Images state
     const [userImage, setUserImage] = useState<HTMLImageElement | null>(null);
@@ -81,12 +115,13 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [textBgStyle, setTextBgStyle] = useState<'dark_pill' | 'gold_ribbon' | 'brand_pill' | 'transparent'>('dark_pill');
     const [textSize, setTextSize] = useState<'sm' | 'md' | 'lg'>('md');
 
-    // 1. Load Campaign Transparent Frame
+    // 1. Load Campaign Transparent Frame (supports switching active frame)
     useEffect(() => {
         let isMounted = true;
+        setFrameLoaded(false);
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.src = campaign.frame_url;
+        img.src = activeFrameUrl;
         img.onload = () => {
             if (isMounted) {
                 setFrameImage(img);
@@ -105,13 +140,13 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             retryImg.onerror = () => {
                 console.error('All attempts to load campaign frame overlay failed.');
             };
-            retryImg.src = campaign.frame_url;
+            retryImg.src = activeFrameUrl;
         };
 
         return () => {
             isMounted = false;
         };
-    }, [campaign.frame_url]);
+    }, [activeFrameUrl]);
 
     // Handle User Image File Upload
     const handleFileUpload = (file: File) => {
@@ -334,11 +369,50 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
 
             ctx.restore();
         }
+
+        // LAYER 4: Attribution Watermark (Admin Controlled Twibbonize Feature)
+        if (enableWatermark && watermarkText) {
+            ctx.save();
+            const wmFontSize = Math.max(11, Math.round(13 * scaleMultiplier));
+            ctx.font = `600 ${wmFontSize}px system-ui, -apple-system, sans-serif`;
+            const textMetrics = ctx.measureText(watermarkText);
+            const wmPaddingX = Math.round(10 * scaleMultiplier);
+            const wmPaddingY = Math.round(5 * scaleMultiplier);
+            const wmWidth = textMetrics.width + (wmPaddingX * 2);
+            const wmHeight = wmFontSize + (wmPaddingY * 2);
+
+            let wmX = canvas.width - wmWidth - Math.round(16 * scaleMultiplier);
+            let wmY = canvas.height - wmHeight - Math.round(16 * scaleMultiplier);
+
+            if (watermarkPosition === 'bottom_left') {
+                wmX = Math.round(16 * scaleMultiplier);
+            } else if (watermarkPosition === 'top_right') {
+                wmY = Math.round(16 * scaleMultiplier);
+            }
+
+            // Translucent rounded capsule
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(wmX, wmY, wmWidth, wmHeight, Math.round(6 * scaleMultiplier));
+            } else {
+                ctx.rect(wmX, wmY, wmWidth, wmHeight);
+            }
+            ctx.fill();
+
+            // Text
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.fillText(watermarkText, wmX + (wmWidth / 2), wmY + (wmHeight / 2) + 1);
+            ctx.restore();
+        }
     }, [
         userImage, frameImage, zoom, position, rotation, brightness, contrast, 
         saturation, grayscale, sepia, aspectRatio, t,
         enableText, primaryText, secondaryText, textPosition, textYOffset, 
-        textColor, textShadow, textBgStyle, textSize
+        textColor, textShadow, textBgStyle, textSize,
+        enableWatermark, watermarkText, watermarkPosition
     ]);
 
     // Re-render display canvas whenever adjustments change
@@ -513,6 +587,37 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                         </button>
                     </div>
                 </div>
+
+                {/* Multi-Frame Variations Switcher Ribbon */}
+                {allFrames.length > 1 && (
+                    <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center justify-between gap-4 overflow-x-auto">
+                        <div className="flex items-center gap-2 shrink-0">
+                            <div className="w-7 h-7 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                                <Layers className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-800">
+                                {language === 'bn' ? 'ফ্রেম ভেরিয়েশন নির্বাচন করুন:' : 'Select Frame Variation:'}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {allFrames.map((f, idx) => (
+                                <button
+                                    key={f.id || idx}
+                                    type="button"
+                                    onClick={() => setActiveFrameIndex(idx)}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 transition-all ${
+                                        activeFrameIndex === idx
+                                            ? 'border-brand-600 bg-brand-50 text-brand-700 font-bold shadow-xs scale-102'
+                                            : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                                    }`}
+                                >
+                                    <img src={f.frame_url} alt="" className="w-6 h-6 object-contain" />
+                                    <span className="text-xs font-bold">Variation #{idx + 1}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Workspace Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1116,6 +1221,31 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                 <img src={downloadedImageUrl} alt="Generated" className="w-full h-full object-contain" />
                             </div>
                         )}
+
+                        {/* 1-Click Social Caption Box */}
+                        <div className="p-3.5 bg-violet-50/70 rounded-2xl border border-violet-100 text-left space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-violet-900 flex items-center gap-1.5">
+                                    <MessageCircle className="w-3.5 h-3.5 text-violet-600" />
+                                    <span>{language === 'bn' ? 'পোস্ট করার ক্যাপশন' : 'Share with Caption'}</span>
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(studioCaption);
+                                        setCaptionCopied(true);
+                                        setTimeout(() => setCaptionCopied(false), 2500);
+                                    }}
+                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                                        captionCopied ? 'bg-green-600 text-white' : 'bg-violet-600 text-white hover:bg-violet-700'
+                                    }`}
+                                >
+                                    {captionCopied ? (language === 'bn' ? 'কপিকৃত!' : 'Copied!') : (language === 'bn' ? 'কপি' : 'Copy')}
+                                </button>
+                            </div>
+                            <p className="text-[11px] text-slate-600 font-mono line-clamp-2 select-all">
+                                {studioCaption}
+                            </p>
+                        </div>
 
                         <div className="space-y-3 pt-2">
                             <button

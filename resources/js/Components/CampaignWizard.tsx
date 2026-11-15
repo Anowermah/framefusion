@@ -34,6 +34,10 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
     const [descriptionBn, setDescriptionBn] = useState('');
     const [categoryId, setCategoryId] = useState<number | ''>(categories[0]?.id || '');
     const [tags, setTags] = useState('');
+    const [captionTemplate, setCaptionTemplate] = useState('');
+    const [actionLinkUrl, setActionLinkUrl] = useState('');
+    const [actionLinkText, setActionLinkText] = useState('');
+    const [extraFrames, setExtraFrames] = useState<File[]>([]);
     const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private'>('public');
 
     // Photo Area Config
@@ -100,6 +104,12 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
         formData.append('description_bn', descriptionBn);
         formData.append('category_id', String(categoryId));
         formData.append('tags', tags);
+        formData.append('caption_template', captionTemplate);
+        formData.append('action_link_url', actionLinkUrl);
+        formData.append('action_link_text', actionLinkText);
+        extraFrames.forEach(f => {
+            formData.append('extra_frames[]', f);
+        });
         formData.append('visibility', visibility);
         formData.append('status', status);
         formData.append('aspect_ratio', aspectRatio);
@@ -355,6 +365,53 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                             </label>
                         )}
                     </div>
+
+                    {framePreviewUrl && (
+                        <div className="p-4 rounded-2xl bg-violet-50/50 border border-violet-100 space-y-3">
+                            <div className="flex items-center justify-between gap-2">
+                                <div>
+                                    <span className="text-xs font-bold text-slate-900 block">
+                                        {language === 'bn' ? 'অতিরিক্ত ফ্রেম ভেরিয়েশন (ঐচ্ছিক)' : 'Add Extra Frame Variations (Optional)'}
+                                    </span>
+                                    <span className="text-[11px] text-slate-500">
+                                        {language === 'bn' ? 'স্পিকার/অংশগ্রহণকারী বা বিভিন্ন রঙের বিকল্প যোগ করুন' : 'Provide variations like Male/Female, Speaker/Attendee, or colors'}
+                                    </span>
+                                </div>
+                                <label className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-xs shrink-0">
+                                    + Add Variation
+                                    <input
+                                        type="file"
+                                        accept="image/png,image/webp"
+                                        multiple
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            if (e.target.files) {
+                                                const newFiles = Array.from(e.target.files).slice(0, 4);
+                                                setExtraFrames(prev => [...prev, ...newFiles].slice(0, 4));
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            </div>
+
+                            {extraFrames.length > 0 && (
+                                <div className="flex items-center gap-2 flex-wrap pt-1">
+                                    {extraFrames.map((f, idx) => (
+                                        <div key={idx} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-violet-200 text-xs font-medium text-slate-700 shadow-2xs">
+                                            <span>Variation #{idx + 2}: {f.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setExtraFrames(prev => prev.filter((_, i) => i !== idx))}
+                                                className="text-red-500 hover:text-red-700 font-bold ml-1"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -460,6 +517,53 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                                 placeholder="independence, celebration, bangladesh"
                                 className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                             />
+                        </div>
+
+                        {/* Smart Caption & Auto-Hashtags Template (Twibbonize Feature) */}
+                        <div className="p-4 rounded-2xl bg-violet-50/60 border border-violet-100 space-y-3">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-800 block">
+                                    {language === 'bn' ? 'স্মার্ট সোশ্যাল ক্যাপশন ও হ্যাশট্যাগ (ঐচ্ছিক)' : 'Smart Social Caption Template (Optional)'}
+                                </label>
+                                <span className="text-[11px] text-slate-500 block">
+                                    {language === 'bn' ? 'সমর্থকরা ফ্রেম ডাউনলোড করে ১-ক্লিকে এই ক্যাপশনটি সোশ্যাল মিডিয়ায় শেয়ার করতে পারবে' : 'Supporters can 1-click copy this preset caption & hashtags when sharing their photo'}
+                                </span>
+                                <textarea
+                                    rows={2}
+                                    value={captionTemplate}
+                                    onChange={(e) => setCaptionTemplate(e.target.value)}
+                                    placeholder={language === 'bn' ? 'যেমন: আমি এই ক্যাম্পেইনকে সমর্থন করছি! আপনার ছবি তৈরি করুন... #FrameFusion' : 'e.g. I support this campaign! Frame your photo at... #FrameFusion #Twibbon'}
+                                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-violet-200 bg-white focus:ring-2 focus:ring-brand-500"
+                                />
+                            </div>
+
+                            {/* External Action / Donation / RSVP Link */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-800">
+                                        {language === 'bn' ? 'অ্যাকশন লিংক URL (ঐচ্ছিক)' : 'External Action Link URL (Optional)'}
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={actionLinkUrl}
+                                        onChange={(e) => setActionLinkUrl(e.target.value)}
+                                        placeholder="https://example.com/donate"
+                                        className="w-full px-3.5 py-2 text-xs rounded-xl border border-violet-200 bg-white"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-800">
+                                        {language === 'bn' ? 'বাটন লেবেল' : 'Button Label'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={actionLinkText}
+                                        onChange={(e) => setActionLinkText(e.target.value)}
+                                        placeholder={language === 'bn' ? 'যেমন: অনুদান দিন / রেজিস্ট্রেশন' : 'e.g. Donate Now / Register'}
+                                        className="w-full px-3.5 py-2 text-xs rounded-xl border border-violet-200 bg-white"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

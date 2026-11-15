@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import AdminNav from '@/Components/AdminNav';
-import { Search, Shield, UserCheck, UserX, Key, Trash2, X } from 'lucide-react';
+import { Search, Shield, UserCheck, UserX, Key, Trash2, X, BadgeCheck, CheckCircle2 } from 'lucide-react';
 
 interface UserItem {
     id: number;
@@ -11,6 +11,7 @@ interface UserItem {
     email: string;
     role: string;
     status: string;
+    is_verified?: boolean;
     campaigns_count?: number;
     generated_photos_count?: number;
     created_at: string;
@@ -45,6 +46,10 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
 
     const handleToggleStatus = (id: number) => {
         router.post(`/admin/users/${id}/toggle-status`, {}, { preserveScroll: true });
+    };
+
+    const handleToggleVerification = (id: number) => {
+        router.post(`/admin/users/${id}/toggle-verification`, {}, { preserveScroll: true });
     };
 
     const handleDeleteUser = (user: UserItem) => {
@@ -142,7 +147,12 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                             <div key={u.id} className="p-4 bg-gray-50/70 rounded-2xl border border-gray-200/70 space-y-3 shadow-2xs">
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="min-w-0">
-                                        <span className="font-bold text-gray-900 block truncate text-sm">{u.name}</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="font-bold text-gray-900 truncate text-sm">{u.name}</span>
+                                            {u.is_verified && (
+                                                <BadgeCheck className="w-4 h-4 text-blue-500 fill-blue-50 shrink-0" title="Verified Creator" />
+                                            )}
+                                        </div>
                                         <span className="text-xs text-gray-400 block truncate">{u.email}</span>
                                         {u.username && (
                                             <span className="text-[10px] text-purple-600 font-mono">@{u.username}</span>
@@ -181,6 +191,18 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                                         <option value="admin">Admin</option>
                                         <option value="super_admin">👑 Super Admin</option>
                                     </select>
+
+                                    <button
+                                        onClick={() => handleToggleVerification(u.id)}
+                                        className={`p-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                                            u.is_verified
+                                                ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                                                : 'bg-gray-100 text-gray-400 hover:text-blue-600'
+                                        }`}
+                                        title={u.is_verified ? 'Remove Verified Status' : 'Grant Verified Creator Badge'}
+                                    >
+                                        <BadgeCheck className="w-4 h-4" />
+                                    </button>
 
                                     <button
                                         onClick={() => handleToggleStatus(u.id)}
@@ -233,7 +255,12 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                                 {users.data?.map((u: UserItem) => (
                                     <tr key={u.id} className="hover:bg-gray-50/50">
                                         <td className="p-3">
-                                            <span className="font-bold text-gray-900 block">{u.name}</span>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-bold text-gray-900">{u.name}</span>
+                                                {u.is_verified && (
+                                                    <BadgeCheck className="w-4 h-4 text-blue-500 fill-blue-50 shrink-0" title="Verified Creator" />
+                                                )}
+                                            </div>
                                             <span className="text-[11px] text-gray-400 block">{u.email}</span>
                                             {u.username && (
                                                 <span className="text-[10px] text-purple-600 font-mono">@{u.username}</span>
@@ -275,6 +302,18 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                                             {u.generated_photos_count ?? 0}
                                         </td>
                                         <td className="p-3 text-right space-x-1 whitespace-nowrap">
+                                            <button
+                                                onClick={() => handleToggleVerification(u.id)}
+                                                className={`p-1.5 rounded-lg inline-block transition-all ${
+                                                    u.is_verified
+                                                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                                        : 'text-gray-400 hover:text-blue-600'
+                                                }`}
+                                                title={u.is_verified ? 'Remove Verified Status' : 'Grant Verified Creator Badge'}
+                                            >
+                                                <BadgeCheck className="w-4 h-4" />
+                                            </button>
+
                                             <button
                                                 onClick={() => handleToggleStatus(u.id)}
                                                 className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${

@@ -42,6 +42,17 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
         google_login_enabled: settings.google_login_enabled !== false,
         maintenance_mode: !!settings.maintenance_mode,
 
+        // Twibbonize & Advanced Campaign Engine
+        enable_campaign_captions: settings.enable_campaign_captions !== false,
+        default_campaign_hashtags: settings.default_campaign_hashtags || '#FrameFusion #Campaign #PhotoFrame',
+        enable_qr_code_sharing: settings.enable_qr_code_sharing !== false,
+        enable_watermark: !!settings.enable_watermark,
+        watermark_text: settings.watermark_text || 'FrameFusion',
+        watermark_position: settings.watermark_position || 'bottom_right',
+        enable_external_action_links: settings.enable_external_action_links !== false,
+        allow_multi_frame_campaigns: settings.allow_multi_frame_campaigns !== false,
+        max_frames_per_campaign: settings.max_frames_per_campaign || 5,
+
         // SEO & Analytics
         meta_title: settings.meta_title || 'FrameFusion - Custom Photo Campaign & Twibbon Platform',
         meta_description: settings.meta_description || 'Create, customize, and celebrate visual photo campaigns and twibbons effortlessly.',
@@ -474,6 +485,163 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                                                 />
                                                 <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
                                             </label>
+                                        </div>
+
+                                        {/* Twibbonize & Campaign Advanced Features Section */}
+                                        <div className="pt-6 border-t border-gray-200/80">
+                                            <div className="mb-4">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-violet-100 text-violet-800 rounded-md">
+                                                        Twibbonize Suite
+                                                    </span>
+                                                    <h4 className="text-sm font-extrabold text-gray-900">Advanced Campaign & Sharing Controls</h4>
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-0.5">Control smart captions, QR code generators, multi-frames, and attribution watermarking</p>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {/* Smart Captions */}
+                                                <div className="p-4 rounded-2xl bg-gradient-to-r from-violet-50/50 to-indigo-50/50 border border-violet-100/80 space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-xs font-bold text-gray-900 block">Smart Captions & 1-Click Social Sharing</span>
+                                                            <span className="text-[11px] text-gray-500">Allow campaign creators to provide default captions & hashtags for supporters to copy</span>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.enable_campaign_captions}
+                                                                onChange={e => handleChange('enable_campaign_captions', e.target.checked)}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                                        </label>
+                                                    </div>
+
+                                                    <div className="space-y-1">
+                                                        <label className="text-[11px] font-bold text-gray-700">Default Global Hashtags</label>
+                                                        <input
+                                                            type="text"
+                                                            value={formData.default_campaign_hashtags}
+                                                            onChange={e => handleChange('default_campaign_hashtags', e.target.value)}
+                                                            className="w-full p-2 rounded-xl border border-gray-200 text-xs bg-white"
+                                                            placeholder="#FrameFusion #Campaign #ProfileFrame"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Instant QR Code Sharing */}
+                                                <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-200/70">
+                                                    <div>
+                                                        <span className="text-xs font-bold text-gray-900 block">Instant QR Code Generator</span>
+                                                        <span className="text-[11px] text-gray-500">Provide high-resolution scannable QR Code download on campaign pages for event posters</span>
+                                                    </div>
+                                                    <label className="relative inline-flex items-center cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.enable_qr_code_sharing}
+                                                            onChange={e => handleChange('enable_qr_code_sharing', e.target.checked)}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                                    </label>
+                                                </div>
+
+                                                {/* Multi-Frame Campaigns */}
+                                                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200/70 space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-xs font-bold text-gray-900 block">Allow Multi-Frame Variations per Campaign</span>
+                                                            <span className="text-[11px] text-gray-500">Enable creators to upload multiple frame variations (e.g. Speaker/Attendee, Male/Female)</span>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.allow_multi_frame_campaigns}
+                                                                onChange={e => handleChange('allow_multi_frame_campaigns', e.target.checked)}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                                        </label>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3">
+                                                        <label className="text-[11px] font-bold text-gray-700 whitespace-nowrap">Max Frames Allowed Per Campaign:</label>
+                                                        <input
+                                                            type="number"
+                                                            min={1}
+                                                            max={10}
+                                                            value={formData.max_frames_per_campaign}
+                                                            onChange={e => handleChange('max_frames_per_campaign', parseInt(e.target.value) || 1)}
+                                                            className="w-24 p-1.5 rounded-xl border border-gray-200 text-xs bg-white text-center font-bold"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Attribution Watermark */}
+                                                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200/70 space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-xs font-bold text-gray-900 block">Canvas Export Watermark</span>
+                                                            <span className="text-[11px] text-gray-500">Stamp subtle branding watermark onto generated photos on download</span>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.enable_watermark}
+                                                                onChange={e => handleChange('enable_watermark', e.target.checked)}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                                        </label>
+                                                    </div>
+
+                                                    {formData.enable_watermark && (
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                                            <div className="space-y-1">
+                                                                <label className="text-[11px] font-bold text-gray-700">Watermark Text</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={formData.watermark_text}
+                                                                    onChange={e => handleChange('watermark_text', e.target.value)}
+                                                                    className="w-full p-2 rounded-xl border border-gray-200 text-xs bg-white"
+                                                                    placeholder="FrameFusion"
+                                                                />
+                                                            </div>
+
+                                                            <div className="space-y-1">
+                                                                <label className="text-[11px] font-bold text-gray-700">Watermark Position</label>
+                                                                <select
+                                                                    value={formData.watermark_position}
+                                                                    onChange={e => handleChange('watermark_position', e.target.value)}
+                                                                    className="w-full p-2 rounded-xl border border-gray-200 text-xs bg-white"
+                                                                >
+                                                                    <option value="bottom_right">Bottom Right Corner</option>
+                                                                    <option value="bottom_left">Bottom Left Corner</option>
+                                                                    <option value="top_right">Top Right Corner</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* External Action Links */}
+                                                <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-200/70">
+                                                    <div>
+                                                        <span className="text-xs font-bold text-gray-900 block">External Action Links (Petition, Donation, RSVP)</span>
+                                                        <span className="text-[11px] text-gray-500">Allow creators to attach an external donation or registration button to their campaigns</span>
+                                                    </div>
+                                                    <label className="relative inline-flex items-center cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.enable_external_action_links}
+                                                            onChange={e => handleChange('enable_external_action_links', e.target.checked)}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

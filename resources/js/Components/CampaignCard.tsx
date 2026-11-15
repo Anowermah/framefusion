@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useLanguage } from '@/Context/LanguageContext';
-import { Users, Flame, Star, Sparkles, Bookmark, ArrowRight } from 'lucide-react';
+import { Users, Flame, Star, Sparkles, Bookmark, ArrowRight, BadgeCheck } from 'lucide-react';
 
 export interface CampaignData {
     id: number;
@@ -23,6 +23,7 @@ export interface CampaignData {
         name: string;
         username?: string;
         avatar_url?: string;
+        is_verified?: boolean;
     };
     category?: {
         id: number;
@@ -168,8 +169,12 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                     </Link>
 
                     {/* Creator */}
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-                        {t('creator')}: <span className="text-gray-700 font-medium">{campaign.creator?.name || 'FrameFusion Creator'}</span>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-1 flex items-center gap-1">
+                        <span>{t('creator')}:</span>
+                        <span className="text-gray-700 font-medium truncate">{campaign.creator?.name || 'FrameFusion Creator'}</span>
+                        {campaign.creator?.is_verified && (
+                            <BadgeCheck className="w-3.5 h-3.5 text-blue-500 fill-blue-50 shrink-0" title="Verified Creator" />
+                        )}
                     </p>
                 </div>
 

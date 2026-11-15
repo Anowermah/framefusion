@@ -32,6 +32,9 @@ class Campaign extends Model
         'start_date',
         'end_date',
         'tags',
+        'caption_template',
+        'action_link_url',
+        'action_link_text',
     ];
 
     protected $casts = [

@@ -26,6 +26,9 @@ interface CampaignEditProps {
         frame_url: string;
         thumbnail_url?: string;
         campaign_type?: string;
+        caption_template?: string;
+        action_link_url?: string;
+        action_link_text?: string;
         visibility: 'public' | 'unlisted' | 'private';
         status: 'published' | 'draft';
         tags?: string;
@@ -51,6 +54,9 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
     const [description, setDescription] = useState(campaign.description || '');
     const [descriptionBn, setDescriptionBn] = useState(campaign.description_bn || '');
     const [tags, setTags] = useState(campaign.tags || '');
+    const [captionTemplate, setCaptionTemplate] = useState(campaign.caption_template || '');
+    const [actionLinkUrl, setActionLinkUrl] = useState(campaign.action_link_url || '');
+    const [actionLinkText, setActionLinkText] = useState(campaign.action_link_text || '');
     const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private'>(campaign.visibility || 'public');
     const [status, setStatus] = useState<'published' | 'draft'>(campaign.status || 'published');
     const [campaignType, setCampaignType] = useState<string>(campaign.campaign_type || 'frame');
@@ -97,6 +103,9 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
         formData.append('description', description);
         formData.append('description_bn', descriptionBn);
         formData.append('tags', tags);
+        formData.append('caption_template', captionTemplate);
+        formData.append('action_link_url', actionLinkUrl);
+        formData.append('action_link_text', actionLinkText);
         formData.append('visibility', visibility);
         formData.append('status', status);
         formData.append('aspect_ratio', aspectRatio);
@@ -291,6 +300,49 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
                                 placeholder="independence, bangladesh, celebrate"
                                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                             />
+                        </div>
+
+                        {/* Smart Caption & External Action Link (Twibbonize Feature) */}
+                        <div className="p-4 rounded-2xl bg-violet-50/60 border border-violet-100 space-y-3">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-800 mb-1">
+                                    {language === 'bn' ? 'স্মার্ট সোশ্যাল ক্যাপশন ও হ্যাশট্যাগ (ঐচ্ছিক)' : 'Smart Social Caption Template (Optional)'}
+                                </label>
+                                <textarea
+                                    rows={2}
+                                    value={captionTemplate}
+                                    onChange={(e) => setCaptionTemplate(e.target.value)}
+                                    placeholder={language === 'bn' ? 'যেমন: আমি এই ক্যাম্পেইনকে সমর্থন করছি! আপনার ছবি তৈরি করুন... #FrameFusion' : 'e.g. I support this campaign! Frame your photo at... #FrameFusion #Twibbon'}
+                                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-violet-200 bg-white focus:ring-2 focus:ring-brand-500"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-800 mb-1">
+                                        {language === 'bn' ? 'অ্যাকশন লিংক URL (ঐচ্ছিক)' : 'External Action Link URL (Optional)'}
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={actionLinkUrl}
+                                        onChange={(e) => setActionLinkUrl(e.target.value)}
+                                        placeholder="https://example.com/donate"
+                                        className="w-full px-3.5 py-2 text-xs rounded-xl border border-violet-200 bg-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-800 mb-1">
+                                        {language === 'bn' ? 'বাটন লেবেল' : 'Button Label'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={actionLinkText}
+                                        onChange={(e) => setActionLinkText(e.target.value)}
+                                        placeholder={language === 'bn' ? 'যেমন: অনুদান দিন / রেজিস্ট্রেশন' : 'e.g. Donate Now / Register'}
+                                        className="w-full px-3.5 py-2 text-xs rounded-xl border border-violet-200 bg-white"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 

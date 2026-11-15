@@ -136,6 +136,16 @@ class AdminController extends Controller implements HasMiddleware
         return back()->with('success', 'User status updated to ' . $targetUser->status . '.');
     }
 
+    public function toggleUserVerification(int $id)
+    {
+        $targetUser = User::findOrFail($id);
+        $targetUser->is_verified = !$targetUser->is_verified;
+        $targetUser->save();
+
+        $statusText = $targetUser->is_verified ? 'verified as Official Creator' : 'unverified';
+        return back()->with('success', "User {$targetUser->name} is now {$statusText}.");
+    }
+
     public function resetUserPassword(Request $request, int $id)
     {
         $request->validate([

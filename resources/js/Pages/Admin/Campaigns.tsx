@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import AdminNav from '@/Components/AdminNav';
-import { Star, Flame, Trash2, Eye } from 'lucide-react';
+import { Star, Flame, Trash2, Eye, Edit } from 'lucide-react';
 
 export default function AdminCampaigns({ campaigns }: { campaigns: any }) {
     const handleToggleFeature = (id: number) => {
@@ -77,8 +77,16 @@ export default function AdminCampaigns({ campaigns }: { campaigns: any }) {
                                             <Link
                                                 href={`/campaigns/${c.slug}`}
                                                 className="p-1.5 text-gray-400 hover:text-purple-600 rounded-lg inline-block"
+                                                title="View Public Page"
                                             >
                                                 <Eye className="w-4 h-4" />
+                                            </Link>
+                                            <Link
+                                                href={`/campaigns/${c.id}/edit`}
+                                                className="p-1.5 text-gray-400 hover:text-purple-600 rounded-lg inline-block"
+                                                title="Edit Campaign"
+                                            >
+                                                <Edit className="w-4 h-4" />
                                             </Link>
                                             <button
                                                 onClick={() => handleDelete(c.id)}

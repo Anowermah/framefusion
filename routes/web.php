@@ -21,6 +21,12 @@ Route::post('/campaigns', [CampaignController::class, 'store'])->name('campaigns
 Route::get('/campaigns/{slug}', [CampaignController::class, 'show'])->name('campaigns.show');
 Route::get('/campaigns/{slug}/editor', [CampaignController::class, 'editor'])->name('campaigns.editor');
 
+// Campaign Edit & Update (Requires Auth)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/campaigns/{id}/edit', [CampaignController::class, 'edit'])->name('campaigns.edit');
+    Route::post('/campaigns/{id}', [CampaignController::class, 'update'])->name('campaigns.update');
+});
+
 // Aliases & friendly redirects
 Route::get('/campaign/{slug}', fn($slug) => redirect()->route('campaigns.show', ['slug' => $slug]));
 Route::get('/campaign/{slug}/editor', fn($slug) => redirect()->route('campaigns.editor', ['slug' => $slug]));

@@ -289,6 +289,106 @@ class CampaignController extends Controller
     }
 
     /**
+     * Edit Campaign Page
+     */
+    public function edit(int $id)
+    {
+        $campaign = Campaign::with(['primaryFrame', 'category'])->findOrFail($id);
+
+        if (Auth::id() !== $campaign->creator_id && Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized. You can only edit your own campaigns.');
+        }
+
+        $categories = Category::orderBy('order')->get();
+
+        return Inertia::render('Campaigns/Edit', [
+            'campaign' => $campaign,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Update Existing Campaign
+     */
+    public function update(Request $request, int $id)
+    {
+        $campaign = Campaign::with('primaryFrame')->findOrFail($id);
+
+        if (Auth::id() !== $campaign->creator_id && Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'title_bn' => 'nullable|string|max:255',
+            'slug' => 'required|string|max:255|unique:campaigns,slug,' . $campaign->id,
+            'category_id' => 'required|exists:categories,id',
+            'frame_file' => 'nullable|image|mimes:png,webp|max:10240',
+            'description' => 'nullable|string',
+            'description_bn' => 'nullable|string',
+            'tags' => 'nullable|string',
+            'visibility' => 'required|in:public,unlisted,private',
+            'status' => 'required|in:published,draft',
+            'aspect_ratio' => 'nullable|string',
+            'default_zoom' => 'nullable|numeric',
+        ]);
+
+        $frameUrl = $campaign->frame_url;
+
+        // If new replacement frame is uploaded
+        if ($request->hasFile('frame_file')) {
+            $file = $request->file('frame_file');
+            $fileName = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('frames', $fileName, 'public');
+
+            // Dual storage sync
+            $storedAppPath = storage_path('app/public/frames/' . $fileName);
+            if (file_exists($storedAppPath)) {
+                @chmod($storedAppPath, 0644);
+            }
+
+            $publicFramesDir = public_path('storage/frames');
+            if (!file_exists($publicFramesDir)) {
+                @mkdir($publicFramesDir, 0755, true);
+            }
+            if (file_exists($storedAppPath) && !file_exists($publicFramesDir . '/' . $fileName)) {
+                @copy($storedAppPath, $publicFramesDir . '/' . $fileName);
+                @chmod($publicFramesDir . '/' . $fileName, 0644);
+            }
+
+            $frameUrl = '/storage/frames/' . $fileName;
+        }
+
+        $campaign->update([
+            'category_id' => $request->category_id,
+            'title' => $request->title,
+            'title_bn' => $request->title_bn,
+            'slug' => Str::slug($request->slug),
+            'description' => $request->description,
+            'description_bn' => $request->description_bn,
+            'frame_url' => $frameUrl,
+            'thumbnail_url' => $frameUrl,
+            'status' => $request->status,
+            'visibility' => $request->visibility,
+            'tags' => $request->tags,
+        ]);
+
+        // Update primary frame configuration
+        if ($campaign->primaryFrame) {
+            $campaign->primaryFrame->update([
+                'frame_url' => $frameUrl,
+                'aspect_ratio' => $request->input('aspect_ratio', $campaign->primaryFrame->aspect_ratio ?? '1:1'),
+                'photo_area_config' => [
+                    'zoom' => (float) $request->input('default_zoom', 1),
+                ],
+            ]);
+        }
+
+        return redirect()->route('campaigns.show', $campaign->slug)
+            ->with('success', 'Campaign updated successfully!');
+    }
+
+    /**
      * Report Campaign
      */
     public function report(Request $request, int $id)

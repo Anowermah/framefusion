@@ -95,5 +95,40 @@ class FrameFusionPlatformTest extends TestCase
         $this->actingAs($admin)->get('/admin/settings')->assertStatus(200);
         $this->actingAs($admin)->get('/admin/analytics')->assertStatus(200);
     }
+
+    public function test_creator_and_admin_can_edit_and_update_campaign(): void
+    {
+        $campaign = Campaign::first();
+        $creator = User::find($campaign->creator_id);
+
+        // Creator can access edit
+        $this->actingAs($creator)
+            ->get("/campaigns/{$campaign->id}/edit")
+            ->assertStatus(200);
+
+        // Creator can update campaign
+        $response = $this->actingAs($creator)
+            ->post("/campaigns/{$campaign->id}", [
+                'title' => 'Updated Campaign Title',
+                'title_bn' => 'আপডেটেড শিরোনাম',
+                'slug' => $campaign->slug,
+                'category_id' => $campaign->category_id,
+                'description' => 'Updated description text',
+                'description_bn' => 'আপডেটেড বিবরণ',
+                'visibility' => 'public',
+                'status' => 'published',
+                'aspect_ratio' => '1:1',
+                'default_zoom' => 1.2,
+            ]);
+
+        $response->assertRedirect("/campaigns/{$campaign->slug}");
+        $this->assertEquals('Updated Campaign Title', $campaign->fresh()->title);
+
+        // Unauthorized regular user cannot edit another creator's campaign
+        $otherUser = User::factory()->create(['role' => 'user']);
+        $this->actingAs($otherUser)
+            ->get("/campaigns/{$campaign->id}/edit")
+            ->assertStatus(403);
+    }
 }
 

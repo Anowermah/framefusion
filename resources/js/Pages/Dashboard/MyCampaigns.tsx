@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import DashboardNav from '@/Components/DashboardNav';
 import { useLanguage } from '@/Context/LanguageContext';
-import { PlusCircle, ExternalLink, Trash2, Eye, Power } from 'lucide-react';
+import { PlusCircle, ExternalLink, Trash2, Eye, Power, Edit } from 'lucide-react';
 
 export default function MyCampaigns({ campaigns }: { campaigns: any }) {
     const { t } = useLanguage();
@@ -85,6 +85,13 @@ export default function MyCampaigns({ campaigns }: { campaigns: any }) {
                                                     title="View Public Page"
                                                 >
                                                     <Eye className="w-4 h-4" />
+                                                </Link>
+                                                <Link
+                                                    href={`/campaigns/${c.id}/edit`}
+                                                    className="p-1.5 text-gray-500 hover:text-brand-600 rounded-lg inline-block"
+                                                    title="Edit Campaign"
+                                                >
+                                                    <Edit className="w-4 h-4" />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleToggleStatus(c.id)}

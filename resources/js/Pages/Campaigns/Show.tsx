@@ -7,7 +7,7 @@ import {
     Users, Eye, Calendar, Share2, Copy,
     Bookmark, Flag, ArrowRight, Camera,
     Check, Sparkles, MessageSquare, ThumbsUp,
-    ShieldAlert, X, Heart
+    ShieldAlert, X, Heart, Edit
 } from 'lucide-react';
 
 interface CampaignShowProps {
@@ -209,6 +209,16 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                     <Bookmark className={`w-4 h-4 ${saved ? 'fill-brand-500' : ''}`} />
                                     <span>{saved ? t('saved') : t('saveCampaign')}</span>
                                 </button>
+
+                                {auth?.user && (auth.user.id === campaign.creator?.id || auth.user.role === 'admin') && (
+                                    <Link
+                                        href={`/campaigns/${campaign.id}/edit`}
+                                        className="px-5 py-3.5 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-700 text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        <Edit className="w-4 h-4 text-brand-600" />
+                                        <span>Edit Campaign</span>
+                                    </Link>
+                                )}
                             </div>
 
                             {/* Social Share Bar */}

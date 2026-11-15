@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
-import { Flame, Sparkles } from 'lucide-react';
+import { Flame } from 'lucide-react';
 
 interface PaginationData<T> {
     data: T[];
@@ -21,22 +21,18 @@ export default function Trending({ campaigns }: { campaigns: PaginationData<Camp
         <MainLayout>
             <Head title={language === 'bn' ? 'ট্রেন্ডিং ক্যাম্পেইন সমূহ' : 'Trending Campaigns'} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
-                            <Flame className="w-6 h-6 fill-white" />
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100/80 flex items-center justify-center text-amber-600 shadow-xs shrink-0">
+                            <Flame className="w-5 h-5 fill-amber-500 text-amber-500" />
                         </div>
                         <div>
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/60 uppercase tracking-wider mb-1">
-                                <Sparkles className="w-3 h-3 text-amber-500" />
-                                <span>{language === 'bn' ? 'শীর্ষ জনপ্রিয়' : 'Top Trending'}</span>
-                            </div>
-                            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                                 {t('trendingSection')}
                             </h1>
-                            <p className="text-xs text-gray-500 mt-0.5">
+                            <p className="text-xs text-slate-400 mt-0.5">
                                 {t('trendingDesc')}
                             </p>
                         </div>
@@ -51,11 +47,11 @@ export default function Trending({ campaigns }: { campaigns: PaginationData<Camp
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center space-y-3">
-                        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center border border-amber-100">
-                            <Flame className="w-7 h-7" />
+                    <div className="bg-white rounded-3xl border border-gray-100 p-10 text-center space-y-3">
+                        <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center border border-amber-100">
+                            <Flame className="w-6 h-6 fill-amber-400" />
                         </div>
-                        <h3 className="text-base font-bold text-gray-800">
+                        <h3 className="text-sm font-bold text-gray-800">
                             {language === 'bn' ? 'কোন ট্রেন্ডিং ফ্রেম পাওয়া যায়নি' : 'No trending campaigns yet'}
                         </h3>
                     </div>

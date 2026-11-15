@@ -64,18 +64,14 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
         <MainLayout>
             <Head title={language === 'bn' ? 'ক্যাম্পেইন এক্সপ্লোর করুন' : 'Explore Campaigns'} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 sm:space-y-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                     <div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-brand-50 text-brand-600 border border-brand-100 mb-2">
-                            <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-                            <span>{language === 'bn' ? 'সকল ফ্রেম কালেকশন' : 'All Frame Collections'}</span>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             {t('exploreCampaigns')}
                         </h1>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 mt-0.5">
                             {language === 'bn' 
                                 ? 'হাজারো ট্রেন্ডিং ফটো ফ্রেম ও সোশ্যাল ক্যাম্পেইন অন্বেষণ করুন' 
                                 : 'Discover and join thousands of active photo frame campaigns'}
@@ -84,7 +80,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
 
                     {campaigns?.total !== undefined && (
                         <div className="text-xs font-bold text-gray-500 self-start sm:self-auto px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100">
-                            <span className="text-brand-600 font-extrabold">{campaigns.total}</span> {language === 'bn' ? 'টি ক্যাম্পেইন পাওয়া গেছে' : 'campaigns found'}
+                            <span className="text-brand-600 font-extrabold">{campaigns.total}</span> {language === 'bn' ? 'টি ফ্রেম' : 'campaigns'}
                         </div>
                     )}
                 </div>

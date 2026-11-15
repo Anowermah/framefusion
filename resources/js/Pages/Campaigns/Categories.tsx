@@ -63,21 +63,17 @@ export default function Categories({ categories }: { categories: CategoryItem[] 
         <MainLayout>
             <Head title={language === 'bn' ? 'ক্যাটাগরি ব্রাউজ করুন' : 'Browse Categories'} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                     <div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-brand-50 text-brand-600 border border-brand-100 mb-2">
-                            <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-                            <span>{language === 'bn' ? 'সকল বিভাগ' : 'All Categories'}</span>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                             {t('categories')}
                         </h1>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 mt-0.5">
                             {language === 'bn' 
                                 ? 'আপনার পছন্দের বিষয় অনুযায়ী ফ্রেম বা ক্যাম্পেইন খুঁজুন' 
-                                : 'Explore curated photo frame campaigns by theme and purpose'}
+                                : 'Explore curated photo frame campaigns by theme'}
                         </p>
                     </div>
                 </div>

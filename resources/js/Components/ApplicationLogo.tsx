@@ -13,15 +13,15 @@ export default function ApplicationLogo({ className = '', showTagline = false, s
     const siteTagline = platform_settings?.site_tagline || 'Create • Customize • Celebrate';
     const siteLogo = platform_settings?.site_logo;
 
-    const iconSize = size === 'sm' ? 28 : size === 'lg' ? 44 : 36;
-    const textSize = size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl';
+    const iconSize = size === 'sm' ? 26 : size === 'lg' ? 42 : 34;
+    const textSize = size === 'sm' ? 'text-base sm:text-lg' : size === 'lg' ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl';
 
     return (
-        <div className={`flex items-center gap-2.5 font-bold tracking-tight select-none ${className}`}>
+        <div className={`flex items-center gap-2 font-bold tracking-tight select-none shrink-0 ${className}`}>
             {siteLogo ? (
-                <img src={siteLogo} alt={siteName} style={{ height: iconSize }} className="object-contain" />
+                <img src={siteLogo} alt={siteName} style={{ height: iconSize }} className="object-contain shrink-0" />
             ) : (
-                <div className="relative flex items-center justify-center">
+                <div className="relative flex items-center justify-center shrink-0">
                     <svg
                         width={iconSize}
                         height={iconSize}
@@ -44,15 +44,15 @@ export default function ApplicationLogo({ className = '', showTagline = false, s
                     </svg>
                 </div>
             )}
-            <div className="flex flex-col">
+            <div className="flex flex-col shrink-0">
                 <div className={`flex items-center leading-none ${textSize}`}>
                     {siteName === 'FrameFusion' ? (
-                        <>
-                            <span className="text-[#171923] dark:text-white font-extrabold tracking-tight">Frame</span>
-                            <span className="text-brand-500 font-extrabold">Fusion</span>
-                        </>
+                        <span className="font-black tracking-tight inline-flex items-center">
+                            <span className="text-slate-900">Frame</span>
+                            <span className="text-brand-600">Fusion</span>
+                        </span>
                     ) : (
-                        <span className="text-[#171923] dark:text-white font-extrabold tracking-tight">{siteName}</span>
+                        <span className="text-slate-900 font-black tracking-tight">{siteName}</span>
                     )}
                 </div>
                 {showTagline && (

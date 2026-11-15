@@ -270,22 +270,13 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         )}
                     </div>
 
-                    {/* Mobile App Bar Controls (bKash/MyGP style) */}
-                    <div className="flex md:hidden items-center gap-2">
-                        {/* Quick Search */}
-                        <Link
-                            href="/explore"
-                            className="p-1.5 text-slate-500 hover:text-violet-600 active:scale-90 transition-transform"
-                            title={t('searchPlaceholder')}
-                        >
-                            <Search className="w-4 h-4" />
-                        </Link>
-
+                    {/* Mobile App Bar Controls: Ultra-clean, minimal, uncluttered */}
+                    <div className="flex md:hidden items-center gap-2 shrink-0">
                         {/* Segmented 1-Click Language Switcher Pill */}
-                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[10px] font-bold">
+                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[11px] font-bold">
                             <button
                                 onClick={() => setLanguage('bn')}
-                                className={`px-2 py-0.5 rounded-full transition-all ${
+                                className={`px-2.5 py-1 rounded-full transition-all ${
                                     language === 'bn' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
                                 }`}
                             >
@@ -293,7 +284,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </button>
                             <button
                                 onClick={() => setLanguage('en')}
-                                className={`px-2 py-0.5 rounded-full transition-all ${
+                                className={`px-2.5 py-1 rounded-full transition-all ${
                                     language === 'en' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
                                 }`}
                             >
@@ -301,11 +292,11 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </button>
                         </div>
 
-                        {/* Quick Avatar / Login */}
-                        {user ? (
+                        {/* If logged in, show sleek avatar link to dashboard */}
+                        {user && (
                             <Link
                                 href="/dashboard"
-                                className="w-7 h-7 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100 active:scale-90 transition-transform"
+                                className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100 active:scale-90 transition-transform"
                             >
                                 {user.avatar_url ? (
                                     <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -313,85 +304,10 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                                     user.name.charAt(0).toUpperCase()
                                 )}
                             </Link>
-                        ) : (
-                            <Link
-                                href="/login"
-                                className="px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full shadow-xs active:scale-95 transition-all"
-                            >
-                                {t('login')}
-                            </Link>
                         )}
-
-                        <button
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="p-1.5 text-slate-700 hover:text-violet-600 rounded-lg active:scale-90 transition-transform"
-                            aria-label="Toggle menu"
-                        >
-                            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                        </button>
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Dropdown Menu Drawer */}
-            {mobileMenuOpen && (
-                <div className="md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-3 shadow-xl">
-                    <nav className="flex flex-col space-y-1 text-xs font-bold text-slate-800">
-                        <Link href="/explore" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
-                            <Compass className="w-4 h-4 text-violet-600" />
-                            <span>{t('explore')}</span>
-                        </Link>
-                        <Link href="/categories" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
-                            <Layers className="w-4 h-4 text-purple-600" />
-                            <span>{t('categories')}</span>
-                        </Link>
-                        <Link href="/trending" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
-                            <Flame className="w-4 h-4 text-amber-500" />
-                            <span>{t('trending')}</span>
-                        </Link>
-                        <Link href="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
-                            <HelpCircle className="w-4 h-4 text-blue-500" />
-                            <span>{t('howItWorks')}</span>
-                        </Link>
-                        <Link 
-                            href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"} 
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-extrabold flex items-center justify-center gap-2 shadow-sm shadow-violet-500/25"
-                        >
-                            <Sparkles className="w-4 h-4 text-amber-300" />
-                            <span>{t('createCampaign')}</span>
-                        </Link>
-                    </nav>
-
-                    <div className="pt-2 border-t border-slate-100">
-                        {user ? (
-                            <div className="space-y-1 text-xs font-semibold">
-                                <div className="px-3 py-1 text-[11px] text-slate-400">
-                                    Signed in as <strong className="text-slate-800">{user.name}</strong>
-                                </div>
-                                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl hover:bg-slate-50">{t('dashboard')}</Link>
-                                <Link href="/dashboard/campaigns" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl hover:bg-slate-50">{t('myCampaigns')}</Link>
-                                <Link href="/dashboard/photos" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl hover:bg-slate-50">{t('myPhotos')}</Link>
-                                {isAdmin && (
-                                    <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl text-purple-700 bg-purple-50 font-bold">{t('adminPanel')}</Link>
-                                )}
-                                <Link href="/logout" method="post" as="button" className="w-full text-left py-2 px-3 text-red-600 rounded-xl hover:bg-red-50 font-bold">
-                                    {t('logout')}
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 gap-2 pt-1">
-                                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="py-2 text-center text-xs font-bold border border-slate-200 rounded-xl">
-                                    {t('login')}
-                                </Link>
-                                <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="py-2 text-center text-xs font-bold bg-slate-900 text-white rounded-xl">
-                                    {t('register')}
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </header>
     );
 }

@@ -39,9 +39,9 @@ export const translations = {
         filterBy: 'Filter By',
 
         // Sections
-        trendingSection: '🔥 Trending Campaigns',
+        trendingSection: 'Trending Campaigns',
         trendingDesc: 'The most popular community campaigns gaining momentum right now',
-        featuredSection: '⭐ Featured Campaigns',
+        featuredSection: 'Featured Campaigns',
         featuredDesc: 'Handpicked campaigns making a tangible social impact',
         popularSection: 'Popular This Week',
         recentlyCreated: 'Recently Created',
@@ -193,9 +193,9 @@ export const translations = {
         filterBy: 'ফিল্টার',
 
         // Sections
-        trendingSection: '🔥 ট্রেন্ডিং ক্যাম্পেইনসমূহ',
+        trendingSection: 'ট্রেন্ডিং ক্যাম্পেইনসমূহ',
         trendingDesc: 'বর্তমানে কমিউনিটিতে সবচেয়ে সাড়া জাগানো জনপ্রিয় ক্যাম্পেইন',
-        featuredSection: '⭐ ফিচার্ড ক্যাম্পেইন',
+        featuredSection: 'ফিচার্ড ক্যাম্পেইন',
         featuredDesc: 'আমাদের বাছাইকৃত সেরা ও প্রভাবশালী ক্যাম্পেইনসমূহ',
         popularSection: 'এই সপ্তাহের সেরা',
         recentlyCreated: 'নতুন ক্যাম্পেইন',

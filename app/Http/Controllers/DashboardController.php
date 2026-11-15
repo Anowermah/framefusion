@@ -7,6 +7,7 @@ use App\Models\GeneratedPhoto;
 use App\Models\SavedCampaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -19,20 +20,22 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         $campaignsCount = Campaign::where('creator_id', $user->id)->count();
-        $totalSupporters = Campaign::where('creator_id', $user->id)->sum('supporters_count');
-        $generatedPhotosCount = GeneratedPhoto::where('user_id', $user->id)->count();
-        $savedCampaignsCount = SavedCampaign::where('user_id', $user->id)->count();
+        $totalSupporters = (int) (Campaign::where('creator_id', $user->id)->sum('supporters_count') ?? 0);
+        $generatedPhotosCount = Schema::hasTable('generated_photos') ? GeneratedPhoto::where('user_id', $user->id)->count() : 0;
+        $savedCampaignsCount = Schema::hasTable('saved_campaigns') ? SavedCampaign::where('user_id', $user->id)->count() : 0;
 
         $recentCampaigns = Campaign::where('creator_id', $user->id)
             ->latest()
             ->take(5)
             ->get();
 
-        $recentGenerated = GeneratedPhoto::with('campaign')
-            ->where('user_id', $user->id)
-            ->latest()
-            ->take(6)
-            ->get();
+        $recentGenerated = Schema::hasTable('generated_photos')
+            ? GeneratedPhoto::with('campaign')
+                ->where('user_id', $user->id)
+                ->latest()
+                ->take(6)
+                ->get()
+            : collect([]);
 
         return Inertia::render('Dashboard/Overview', [
             'stats' => [
@@ -68,10 +71,12 @@ class DashboardController extends Controller
     public function myPhotos()
     {
         $user = Auth::user();
-        $photos = GeneratedPhoto::with('campaign')
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(12);
+        $photos = Schema::hasTable('generated_photos')
+            ? GeneratedPhoto::with('campaign')
+                ->where('user_id', $user->id)
+                ->latest()
+                ->paginate(12)
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12);
 
         return Inertia::render('Dashboard/MyPhotos', [
             'photos' => $photos,
@@ -84,10 +89,12 @@ class DashboardController extends Controller
     public function savedCampaigns()
     {
         $user = Auth::user();
-        $saved = SavedCampaign::with(['campaign.creator', 'campaign.category'])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(12);
+        $saved = Schema::hasTable('saved_campaigns')
+            ? SavedCampaign::with(['campaign.creator', 'campaign.category'])
+                ->where('user_id', $user->id)
+                ->latest()
+                ->paginate(12)
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12);
 
         return Inertia::render('Dashboard/Saved', [
             'savedCampaigns' => $saved,

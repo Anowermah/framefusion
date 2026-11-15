@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class AdminController extends Controller implements HasMiddleware
@@ -34,13 +35,15 @@ class AdminController extends Controller implements HasMiddleware
     {
         $totalUsers = User::count();
         $totalCampaigns = Campaign::count();
-        $totalPhotos = GeneratedPhoto::count();
-        $pendingReports = Report::where('status', 'pending')->count();
-        $totalSupporters = Campaign::sum('supporters_count');
+        $totalPhotos = Schema::hasTable('generated_photos') ? GeneratedPhoto::count() : 0;
+        $pendingReports = Schema::hasTable('reports') ? Report::where('status', 'pending')->count() : 0;
+        $totalSupporters = (int) (Campaign::sum('supporters_count') ?? 0);
 
         $recentUsers = User::latest()->take(5)->get();
         $recentCampaigns = Campaign::with('creator')->latest()->take(5)->get();
-        $recentReports = Report::with(['campaign', 'reporter'])->latest()->take(5)->get();
+        $recentReports = Schema::hasTable('reports')
+            ? Report::with(['campaign', 'reporter'])->latest()->take(5)->get()
+            : collect([]);
 
         return Inertia::render('Admin/Overview', [
             'stats' => [

@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 use Laravel\Socialite\Facades\Socialite;
 use Mockery;
@@ -88,6 +89,43 @@ class SocialAuthenticationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'google_id' => 'google-existing-id',
+        ]);
+    }
+
+    public function test_native_oauth_callback_fallback_works(): void
+    {
+        config(['services.google.client_id' => 'test-id']);
+        config(['services.google.client_secret' => 'test-secret']);
+        config(['services.google.redirect' => 'http://localhost/auth/google/callback']);
+
+        Http::fake([
+            'https://oauth2.googleapis.com/token' => Http::response([
+                'access_token' => 'mock_access_token',
+                'token_type' => 'Bearer',
+                'expires_in' => 3600,
+            ], 200),
+            'https://www.googleapis.com/oauth2/v3/userinfo' => Http::response([
+                'sub' => 'google-sub-987654',
+                'email' => 'native@example.com',
+                'name' => 'Native Fallback User',
+                'picture' => 'https://lh3.googleusercontent.com/native.jpg',
+            ], 200),
+        ]);
+
+        // Simulating when Socialite throws exception
+        $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+        $provider->shouldReceive('user')->andThrow(new \Exception('Socialite simulated driver error'));
+        Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+        $response = $this->get(route('auth.google.callback', ['code' => 'mock_auth_code']));
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'native@example.com',
+            'google_id' => 'google-sub-987654',
+            'name' => 'Native Fallback User',
         ]);
     }
 }

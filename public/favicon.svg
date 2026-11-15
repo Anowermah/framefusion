@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="ff-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#635BFF"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="ff-sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B8A"/>
+      <stop offset="100%" stop-color="#FFA07A"/>
+    </linearGradient>
+    <filter id="ff-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  <!-- Background with smooth squircle rounded corners -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#ff-grad)"/>
+  
+  <!-- Outer Photo Frame Border (semi-transparent white) -->
+  <rect x="11" y="11" width="42" height="42" rx="10" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-opacity="0.35"/>
+  
+  <!-- Frame Corner Accents (twibbon markers) -->
+  <path d="M16 11 H24 M11 16 V24" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 11 H40 M53 16 V24" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M16 53 H24 M11 48 V40" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 53 H40 M53 48 V40" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Center Celebration Sparkle / Star (FrameFusion mark) -->
+  <path d="M32 19 C32 26 37 32 45 32 C37 32 32 38 32 45 C32 38 27 32 19 32 C27 32 32 26 32 19 Z" fill="#FFFFFF" filter="url(#ff-glow)"/>
+  <circle cx="32" cy="32" r="4.5" fill="url(#ff-sparkle)"/>
+</svg>

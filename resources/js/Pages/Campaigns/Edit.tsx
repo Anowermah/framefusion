@@ -61,7 +61,8 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
 
     // Frame replacement file
     const [frameFile, setFrameFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string>(campaign.frame_url);
+    const initialFrame = campaign.frame_url ? (campaign.frame_url.startsWith('http') || campaign.frame_url.startsWith('/') ? campaign.frame_url : '/' + campaign.frame_url) : '';
+    const [previewUrl, setPreviewUrl] = useState<string>(initialFrame);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -289,11 +290,16 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
                                         backgroundSize: '12px 12px'
                                     }}
                                 >
-                                    <img
-                                        src={previewUrl}
-                                        alt="Current Frame"
-                                        className="w-full h-full object-contain filter drop-shadow-sm"
-                                    />
+                                    {previewUrl && (
+                                        <img
+                                            src={previewUrl}
+                                            alt=""
+                                            className="w-full h-full object-contain filter drop-shadow-sm"
+                                            onError={(e) => {
+                                                (e.currentTarget as HTMLElement).style.display = 'none';
+                                            }}
+                                        />
+                                    )}
                                 </div>
                                 <span className="text-[11px] text-gray-500 font-semibold mt-2">
                                     {frameFile ? 'New Frame Selected' : 'Current Frame'}

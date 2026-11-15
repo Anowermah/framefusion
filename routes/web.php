@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
 // Aliases & friendly redirects
 Route::get('/campaign/{slug}', fn($slug) => redirect()->route('campaigns.show', ['slug' => $slug]));
 Route::get('/campaign/{slug}/editor', fn($slug) => redirect()->route('campaigns.editor', ['slug' => $slug]));
+Route::get('/campaign/{slug}/edit', fn($slug) => redirect()->route('campaigns.edit', ['id' => $slug]));
 Route::get('/category/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
 Route::get('/categories/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
 Route::get('/search', fn() => redirect()->route('campaigns.explore'));

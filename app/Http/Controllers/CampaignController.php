@@ -13,6 +13,7 @@ use App\Models\SavedCampaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CampaignController extends Controller
@@ -63,7 +64,11 @@ class CampaignController extends Controller
         return Inertia::render('Campaigns/Explore', [
             'campaigns' => $campaigns,
             'categories' => $categories,
-            'filters' => $request->only(['search', 'category', 'sort']),
+            'filters' => [
+                'search' => (string) $request->input('search', ''),
+                'category' => (string) $request->input('category', ''),
+                'sort' => (string) $request->input('sort', 'trending'),
+            ],
         ]);
     }
 
@@ -291,9 +296,11 @@ class CampaignController extends Controller
     /**
      * Edit Campaign Page
      */
-    public function edit(int $id)
+    public function edit(string $id)
     {
-        $campaign = Campaign::with(['primaryFrame', 'category'])->findOrFail($id);
+        $campaign = is_numeric($id)
+            ? Campaign::with(['primaryFrame', 'category'])->findOrFail((int) $id)
+            : Campaign::with(['primaryFrame', 'category'])->where('slug', $id)->firstOrFail();
 
         if (Auth::id() !== $campaign->creator_id && Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized. You can only edit your own campaigns.');
@@ -310,9 +317,11 @@ class CampaignController extends Controller
     /**
      * Update Existing Campaign
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, string $id)
     {
-        $campaign = Campaign::with('primaryFrame')->findOrFail($id);
+        $campaign = is_numeric($id)
+            ? Campaign::with('primaryFrame')->findOrFail((int) $id)
+            : Campaign::with('primaryFrame')->where('slug', $id)->firstOrFail();
 
         if (Auth::id() !== $campaign->creator_id && Auth::user()->role !== 'admin') {
             abort(403, 'Unauthorized.');
@@ -321,7 +330,7 @@ class CampaignController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'title_bn' => 'nullable|string|max:255',
-            'slug' => 'required|string|max:255|unique:campaigns,slug,' . $campaign->id,
+            'slug' => ['required', 'string', 'max:255', Rule::unique('campaigns', 'slug')->ignore($campaign->id)],
             'category_id' => 'required|exists:categories,id',
             'frame_file' => 'nullable|image|mimes:png,webp|max:10240',
             'description' => 'nullable|string',
@@ -373,11 +382,22 @@ class CampaignController extends Controller
             'tags' => $request->tags,
         ]);
 
-        // Update primary frame configuration
+        // Update or create primary frame configuration
         if ($campaign->primaryFrame) {
             $campaign->primaryFrame->update([
                 'frame_url' => $frameUrl,
                 'aspect_ratio' => $request->input('aspect_ratio', $campaign->primaryFrame->aspect_ratio ?? '1:1'),
+                'photo_area_config' => [
+                    'zoom' => (float) $request->input('default_zoom', 1),
+                ],
+            ]);
+        } else {
+            CampaignFrame::create([
+                'campaign_id' => $campaign->id,
+                'frame_url' => $frameUrl,
+                'canvas_width' => 1080,
+                'canvas_height' => 1080,
+                'aspect_ratio' => $request->input('aspect_ratio', '1:1'),
                 'photo_area_config' => [
                     'zoom' => (float) $request->input('default_zoom', 1),
                 ],

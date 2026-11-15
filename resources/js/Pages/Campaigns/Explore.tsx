@@ -32,9 +32,13 @@ interface ExploreProps {
 
 export default function Explore({ campaigns, categories, filters }: ExploreProps) {
     const { language, t } = useLanguage();
-    const [search, setSearch] = useState(filters.search || '');
-    const [selectedCat, setSelectedCat] = useState(filters.category || '');
-    const [selectedSort, setSelectedSort] = useState(filters.sort || 'trending');
+    const safeFilters = (Array.isArray(filters) || !filters) ? {} : filters;
+    const [search, setSearch] = useState(typeof safeFilters.search === 'string' ? safeFilters.search : '');
+    const [selectedCat, setSelectedCat] = useState(typeof safeFilters.category === 'string' ? safeFilters.category : '');
+    const [selectedSort, setSelectedSort] = useState(typeof safeFilters.sort === 'string' ? safeFilters.sort : 'trending');
+
+    const categoryList = Array.isArray(categories) ? categories : [];
+    const campaignList = campaigns?.data && Array.isArray(campaigns.data) ? campaigns.data : [];
 
     const handleApplyFilters = (newCat?: string, newSort?: string, newSearch?: string) => {
         const cat = newCat !== undefined ? newCat : selectedCat;
@@ -126,7 +130,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                             {t('allCategories')}
                         </button>
 
-                        {categories.map((c) => (
+                        {categoryList.map((c) => (
                             <button
                                 key={c.id}
                                 onClick={() => {
@@ -145,9 +149,9 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                 </div>
 
                 {/* Campaign Grid */}
-                {campaigns.data.length > 0 ? (
+                {campaignList.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {campaigns.data.map((c) => (
+                        {campaignList.map((c) => (
                             <CampaignCard key={c.id} campaign={c} />
                         ))}
                     </div>
@@ -164,7 +168,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                 )}
 
                 {/* Pagination */}
-                {campaigns.last_page > 1 && (
+                {campaigns && campaigns.last_page > 1 && Array.isArray(campaigns.links) && (
                     <div className="flex justify-center items-center gap-1.5 pt-6">
                         {campaigns.links.map((link, i) => (
                             <Link

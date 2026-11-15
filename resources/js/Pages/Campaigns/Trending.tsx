@@ -15,6 +15,7 @@ interface PaginationData<T> {
 
 export default function Trending({ campaigns }: { campaigns: PaginationData<CampaignData> }) {
     const { t } = useLanguage();
+    const campaignList = campaigns?.data && Array.isArray(campaigns.data) ? campaigns.data : [];
 
     return (
         <MainLayout>
@@ -36,12 +37,12 @@ export default function Trending({ campaigns }: { campaigns: PaginationData<Camp
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {campaigns.data.map((c) => (
+                    {campaignList.map((c) => (
                         <CampaignCard key={c.id} campaign={c} />
                     ))}
                 </div>
 
-                {campaigns.last_page > 1 && (
+                {campaigns && campaigns.last_page > 1 && Array.isArray(campaigns.links) && (
                     <div className="flex justify-center items-center gap-1.5 pt-6">
                         {campaigns.links.map((link, i) => (
                             <Link

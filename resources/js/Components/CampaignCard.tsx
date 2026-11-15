@@ -46,6 +46,9 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     const title = language === 'bn' && campaign.title_bn ? campaign.title_bn : campaign.title;
     const categoryName = language === 'bn' && campaign.category?.name_bn ? campaign.category.name_bn : campaign.category?.name;
 
+    const rawImg = campaign.thumbnail_url || campaign.frame_url || '';
+    const imageUrl = rawImg ? (rawImg.startsWith('http') || rawImg.startsWith('/') ? rawImg : '/' + rawImg) : '';
+
     const handleToggleSave = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -84,13 +87,16 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                         }}
                     />
 
-                    {!imageError ? (
+                    {imageUrl && !imageError ? (
                         <img
-                            src={campaign.thumbnail_url || campaign.frame_url}
-                            alt={title}
+                            src={imageUrl}
+                            alt=""
                             className="relative z-10 w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"
-                            onError={() => setImageError(true)}
+                            onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                                setImageError(true);
+                            }}
                         />
                     ) : (
                         <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gray-50/80 rounded-xl border border-dashed border-gray-200">
@@ -159,7 +165,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                 <div className="pt-4 mt-3 border-t border-gray-100 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
                         <Users className="w-4 h-4 text-gray-400" />
-                        <span>{campaign.supporters_count.toLocaleString()} {t('supporters')}</span>
+                        <span>{(campaign.supporters_count ?? 0).toLocaleString()} {t('supporters')}</span>
                     </div>
 
                     <Link

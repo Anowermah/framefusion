@@ -145,11 +145,15 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                                         <div className="px-4 py-2 border-b border-gray-100">
                                             <p className="text-xs font-semibold text-gray-900 truncate">{user.name}</p>
                                             <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
-                                            {user.role === 'admin' && (
+                                            {user.role === 'super_admin' ? (
+                                                <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 rounded-full">
+                                                    👑 Super Admin
+                                                </span>
+                                            ) : user.role === 'admin' ? (
                                                 <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold bg-purple-100 text-purple-700 rounded-full">
                                                     Admin
                                                 </span>
-                                            )}
+                                            ) : null}
                                         </div>
 
                                         <div className="py-1">
@@ -182,7 +186,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                                                 <span>{t('savedCampaigns')}</span>
                                             </Link>
 
-                                            {user.role === 'admin' && (
+                                            {['admin', 'super_admin'].includes(user.role) && (
                                                 <Link
                                                     href="/admin"
                                                     className="flex items-center gap-2.5 px-4 py-2 text-xs text-purple-700 font-semibold bg-purple-50/60 hover:bg-purple-100"
@@ -279,7 +283,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                                 <Link href="/dashboard" className="block py-2 px-3 text-sm rounded-lg hover:bg-gray-50">{t('dashboard')}</Link>
                                 <Link href="/dashboard/campaigns" className="block py-2 px-3 text-sm rounded-lg hover:bg-gray-50">{t('myCampaigns')}</Link>
                                 <Link href="/dashboard/photos" className="block py-2 px-3 text-sm rounded-lg hover:bg-gray-50">{t('myPhotos')}</Link>
-                                {user.role === 'admin' && (
+                                {['admin', 'super_admin'].includes(user.role) && (
                                     <Link href="/admin" className="block py-2 px-3 text-sm rounded-lg text-purple-600 bg-purple-50 font-bold">{t('adminPanel')}</Link>
                                 )}
                                 <Link href="/logout" method="post" as="button" className="w-full text-left py-2 px-3 text-sm text-red-600 rounded-lg hover:bg-red-50">

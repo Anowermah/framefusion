@@ -150,4 +150,34 @@ class AdminTest extends TestCase
         $this->actingAs($admin)->delete('/admin/users/' . $targetUser->id);
         $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
     }
+
+    public function test_super_admin_has_full_exclusive_control_and_protection(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $regularAdmin = User::factory()->create(['role' => 'admin']);
+        $normalUser = User::factory()->create(['role' => 'user']);
+
+        // 1. Regular admin CANNOT promote user to super_admin
+        $this->actingAs($regularAdmin)->post('/admin/users/' . $normalUser->id . '/role', [
+            'role' => 'super_admin',
+        ]);
+        $this->assertEquals('user', $normalUser->fresh()->role);
+
+        // 2. Regular admin CANNOT delete or suspend a super_admin
+        $this->actingAs($regularAdmin)->delete('/admin/users/' . $superAdmin->id);
+        $this->assertDatabaseHas('users', ['id' => $superAdmin->id]);
+
+        $this->actingAs($regularAdmin)->post('/admin/users/' . $superAdmin->id . '/toggle-status');
+        $this->assertEquals('active', $superAdmin->fresh()->status);
+
+        // 3. Super admin CAN promote user to super_admin
+        $this->actingAs($superAdmin)->post('/admin/users/' . $normalUser->id . '/role', [
+            'role' => 'super_admin',
+        ]);
+        $this->assertEquals('super_admin', $normalUser->fresh()->role);
+
+        // 4. Super admin CAN delete another admin
+        $this->actingAs($superAdmin)->delete('/admin/users/' . $regularAdmin->id);
+        $this->assertDatabaseMissing('users', ['id' => $regularAdmin->id]);
+    }
 }

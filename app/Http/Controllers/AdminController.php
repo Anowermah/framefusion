@@ -22,8 +22,8 @@ class AdminController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(function ($request, $next) {
-                if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'super_admin'])) {
-                    abort(403, 'Unauthorized. Admin access required.');
+                if (!Auth::check() || !Auth::user()->isAdmin()) {
+                    abort(403, 'Unauthorized. Admin or Super Admin access required.');
                 }
                 return $next($request);
             }),
@@ -99,20 +99,41 @@ class AdminController extends Controller implements HasMiddleware
     public function updateUserRole(Request $request, int $id)
     {
         $request->validate(['role' => 'required|in:user,creator,admin,super_admin']);
-        $user = User::findOrFail($id);
-        $user->role = $request->role;
-        $user->save();
+        $currentUser = Auth::user();
+        $targetUser = User::findOrFail($id);
 
-        return back()->with('success', 'User role updated.');
+        // Only super_admin can create or modify super_admin roles
+        if ($targetUser->role === 'super_admin' && !$currentUser->isSuperAdmin()) {
+            return back()->with('error', 'Only Super Admin can modify another Super Admin account.');
+        }
+
+        if ($request->role === 'super_admin' && !$currentUser->isSuperAdmin()) {
+            return back()->with('error', 'Only Super Admin can promote someone to Super Admin.');
+        }
+
+        $targetUser->role = $request->role;
+        $targetUser->save();
+
+        return back()->with('success', 'User role updated to ' . $request->role . '.');
     }
 
     public function toggleUserStatus(int $id)
     {
-        $user = User::findOrFail($id);
-        $user->status = $user->status === 'active' ? 'suspended' : 'active';
-        $user->save();
+        $currentUser = Auth::user();
+        $targetUser = User::findOrFail($id);
 
-        return back()->with('success', 'User status updated to ' . $user->status . '.');
+        if ($targetUser->id === $currentUser->id) {
+            return back()->with('error', 'You cannot suspend your own account.');
+        }
+
+        if ($targetUser->isSuperAdmin() && !$currentUser->isSuperAdmin()) {
+            return back()->with('error', 'Only Super Admin can suspend a Super Admin.');
+        }
+
+        $targetUser->status = $targetUser->status === 'active' ? 'suspended' : 'active';
+        $targetUser->save();
+
+        return back()->with('success', 'User status updated to ' . $targetUser->status . '.');
     }
 
     public function resetUserPassword(Request $request, int $id)
@@ -121,21 +142,33 @@ class AdminController extends Controller implements HasMiddleware
             'password' => 'required|string|min:8',
         ]);
 
-        $user = User::findOrFail($id);
-        $user->password = Hash::make($request->password);
-        $user->save();
+        $currentUser = Auth::user();
+        $targetUser = User::findOrFail($id);
 
-        return back()->with('success', 'Password reset successfully for ' . $user->name . '.');
+        if ($targetUser->isSuperAdmin() && !$currentUser->isSuperAdmin()) {
+            return back()->with('error', 'Only Super Admin can reset a Super Admin password.');
+        }
+
+        $targetUser->password = Hash::make($request->password);
+        $targetUser->save();
+
+        return back()->with('success', 'Password reset successfully for ' . $targetUser->name . '.');
     }
 
     public function deleteUser(int $id)
     {
-        $user = User::findOrFail($id);
-        if ($user->id === Auth::id()) {
-            return back()->with('error', 'You cannot delete your own admin account.');
+        $currentUser = Auth::user();
+        $targetUser = User::findOrFail($id);
+
+        if ($targetUser->id === $currentUser->id) {
+            return back()->with('error', 'You cannot delete your own account.');
         }
 
-        $user->delete();
+        if ($targetUser->isSuperAdmin() && !$currentUser->isSuperAdmin()) {
+            return back()->with('error', 'Only Super Admin can delete a Super Admin account.');
+        }
+
+        $targetUser->delete();
 
         return back()->with('success', 'User deleted successfully.');
     }

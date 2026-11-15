@@ -162,12 +162,20 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                                             <select
                                                 value={u.role}
                                                 onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                                                className="text-xs p-1 rounded-lg border-gray-200 font-semibold"
+                                                className={`text-xs p-1.5 rounded-lg font-bold border transition-all ${
+                                                    u.role === 'super_admin'
+                                                        ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-2xs'
+                                                        : u.role === 'admin'
+                                                            ? 'bg-purple-50 text-purple-900 border-purple-200'
+                                                            : u.role === 'creator'
+                                                                ? 'bg-blue-50 text-blue-900 border-blue-200'
+                                                                : 'bg-white text-gray-700 border-gray-200 font-medium'
+                                                }`}
                                             >
                                                 <option value="user">User</option>
                                                 <option value="creator">Creator</option>
                                                 <option value="admin">Admin</option>
-                                                <option value="super_admin">Super Admin</option>
+                                                <option value="super_admin">👑 Super Admin</option>
                                             </select>
                                         </td>
                                         <td className="p-3">

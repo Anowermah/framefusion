@@ -37,6 +37,16 @@ class FixDatabaseCommand extends Command
             'cache',
         ];
 
+        // Ensure users table has google_id
+        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'google_id')) {
+            try {
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE `users` ADD COLUMN `google_id` VARCHAR(255) NULL UNIQUE AFTER `email`");
+                $this->info("  + Added `google_id` column to `users` table.");
+            } catch (\Throwable $e) {
+                // column might already exist or DB driver syntax difference
+            }
+        }
+
         $this->info("\n=== Table Status ===");
         $allGood = true;
         foreach ($tables as $t) {

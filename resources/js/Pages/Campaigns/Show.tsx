@@ -137,9 +137,9 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                 <meta name="twitter:image" content={shareImageUrl} />
             </Head>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">
+            <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-12 space-y-8 sm:space-y-12">
                 {/* Campaign Hero Showcase */}
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-card p-6 sm:p-10">
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-card p-4 sm:p-10">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                         {/* Frame Visual Display */}
                         <div className="lg:col-span-5 flex justify-center">

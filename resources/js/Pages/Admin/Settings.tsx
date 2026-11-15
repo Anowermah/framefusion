@@ -112,8 +112,8 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                 <AdminNav />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* Settings Sidebar Tabs */}
-                    <div className="lg:col-span-3 bg-white rounded-3xl border border-gray-100 shadow-xs p-3 space-y-1">
+                    {/* Settings Sidebar Tabs (Horizontal swipe on mobile, vertical sidebar on desktop) */}
+                    <div className="lg:col-span-3 bg-white rounded-3xl border border-gray-100 shadow-xs p-2 lg:p-3 flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible scrollbar-none">
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -122,14 +122,14 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                                     key={tab.id}
                                     type="button"
                                     onClick={() => setActiveTab(tab.id as any)}
-                                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+                                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 active:scale-95 ${
                                         isActive 
                                             ? 'bg-purple-600 text-white shadow-xs' 
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                     }`}
                                 >
                                     <Icon className="w-4 h-4 shrink-0" />
-                                    <span>{tab.label}</span>
+                                    <span className="whitespace-nowrap">{tab.label}</span>
                                 </button>
                             );
                         })}

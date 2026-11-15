@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
+import MobileBottomNav from '@/Components/MobileBottomNav';
 import { Megaphone, X } from 'lucide-react';
 
 interface MainLayoutProps {
@@ -37,10 +38,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
             )}
 
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 pb-20 md:pb-0">
                 {children}
             </main>
             <Footer />
+            <MobileBottomNav />
         </div>
     );
 }

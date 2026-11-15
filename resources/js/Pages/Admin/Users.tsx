@@ -136,7 +136,88 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                         </span>
                     </form>
 
-                    <div className="overflow-x-auto">
+                    {/* MOBILE CARD VIEW (Phone screens - bKash/Nagad style) */}
+                    <div className="block sm:hidden space-y-3 p-3">
+                        {users.data?.map((u: UserItem) => (
+                            <div key={u.id} className="p-4 bg-gray-50/70 rounded-2xl border border-gray-200/70 space-y-3 shadow-2xs">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="min-w-0">
+                                        <span className="font-bold text-gray-900 block truncate text-sm">{u.name}</span>
+                                        <span className="text-xs text-gray-400 block truncate">{u.email}</span>
+                                        {u.username && (
+                                            <span className="text-[10px] text-purple-600 font-mono">@{u.username}</span>
+                                        )}
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                        u.status === 'active' 
+                                            ? 'bg-green-100 text-green-700 border border-green-200' 
+                                            : 'bg-red-100 text-red-700 border border-red-200'
+                                    }`}>
+                                        {u.status}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between text-xs text-gray-500 pt-1 border-t border-gray-200/50">
+                                    <span>Campaigns: <strong className="text-gray-800">{u.campaigns_count ?? 0}</strong></span>
+                                    <span>Photos: <strong className="text-gray-800">{u.generated_photos_count ?? 0}</strong></span>
+                                </div>
+
+                                <div className="flex items-center gap-2 pt-1">
+                                    <select
+                                        value={u.role}
+                                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                                        className={`flex-1 text-xs p-2 rounded-xl font-bold border transition-all ${
+                                            u.role === 'super_admin'
+                                                ? 'bg-amber-50 text-amber-900 border-amber-300'
+                                                : u.role === 'admin'
+                                                    ? 'bg-purple-50 text-purple-900 border-purple-200'
+                                                    : u.role === 'creator'
+                                                        ? 'bg-blue-50 text-blue-900 border-blue-200'
+                                                        : 'bg-white text-gray-700 border-gray-200 font-medium'
+                                        }`}
+                                    >
+                                        <option value="user">User</option>
+                                        <option value="creator">Creator</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">👑 Super Admin</option>
+                                    </select>
+
+                                    <button
+                                        onClick={() => handleToggleStatus(u.id)}
+                                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                                            u.status === 'active'
+                                                ? 'bg-amber-100 text-amber-800'
+                                                : 'bg-green-100 text-green-800'
+                                        }`}
+                                    >
+                                        {u.status === 'active' ? 'Suspend' : 'Activate'}
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            setResettingUser(u);
+                                            setNewPassword('');
+                                        }}
+                                        className="p-2 bg-gray-100 text-gray-600 hover:text-purple-600 rounded-xl shrink-0"
+                                        title="Reset Password"
+                                    >
+                                        <Key className="w-4 h-4" />
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleDeleteUser(u)}
+                                        className="p-2 bg-red-50 text-red-600 rounded-xl shrink-0"
+                                        title="Delete User"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* DESKTOP TABLE VIEW */}
+                    <div className="hidden sm:block overflow-x-auto">
                         <table className="w-full text-left text-xs text-gray-600">
                             <thead className="bg-gray-50 text-[11px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
                                 <tr>

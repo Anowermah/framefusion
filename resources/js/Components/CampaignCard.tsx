@@ -74,10 +74,10 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     };
 
     return (
-        <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden">
+        <div className="group relative bg-white rounded-3xl border border-gray-100/90 shadow-xs hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden active:scale-[0.99]">
             {/* Thumbnail Preview Area */}
-            <div className="relative aspect-square w-full bg-linear-to-br from-gray-50 to-gray-100/70 p-4 flex items-center justify-center overflow-hidden">
-                <Link href={`/campaigns/${campaign.slug}`} className="absolute inset-0 p-4 flex items-center justify-center">
+            <div className="relative aspect-square w-full bg-linear-to-br from-gray-50 to-gray-100/80 p-3.5 sm:p-4 flex items-center justify-center overflow-hidden">
+                <Link href={`/campaigns/${campaign.slug}`} className="absolute inset-0 p-3.5 sm:p-4 flex items-center justify-center">
                     {/* Subtle checkerboard to indicate transparent PNG capability */}
                     <div 
                         className="absolute inset-0 opacity-15"

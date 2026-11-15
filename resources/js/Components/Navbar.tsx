@@ -21,12 +21,12 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
     const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-xs">
+        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-18">
+                <div className="flex items-center justify-between h-15 sm:h-18">
                     {/* Logo */}
                     <div className="flex items-center gap-8">
-                        <Link href="/" className="flex items-center">
+                        <Link href="/" className="flex items-center active:scale-95 transition-transform">
                             <ApplicationLogo size="md" />
                         </Link>
 
@@ -237,19 +237,50 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         )}
                     </div>
 
-                    {/* Mobile Hamburger button */}
-                    <div className="flex md:hidden items-center gap-2">
-                        {/* Mobile Lang */}
+                    {/* Mobile App Bar Controls (bKash/MyGP style) */}
+                    <div className="flex md:hidden items-center gap-1.5">
+                        {/* Quick Search */}
+                        <Link
+                            href="/explore"
+                            className="p-2 text-gray-500 hover:text-brand-500 active:scale-90 transition-transform"
+                            title={t('searchPlaceholder')}
+                        >
+                            <Search className="w-5 h-5" />
+                        </Link>
+
+                        {/* Mobile Language Pill */}
                         <button
                             onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                            className="px-2.5 py-1 text-xs font-bold text-gray-700 bg-gray-100 rounded-full"
+                            className="px-2.5 py-1 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 active:scale-95 rounded-full transition-all border border-gray-200/60"
                         >
                             {language === 'en' ? 'বাং' : 'EN'}
                         </button>
 
+                        {/* Quick Profile Avatar or Menu Button */}
+                        {user ? (
+                            <Link
+                                href="/dashboard"
+                                className="w-8 h-8 rounded-full bg-linear-to-tr from-brand-500 to-purple-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-brand-100 active:scale-90 transition-transform ml-1"
+                            >
+                                {user.avatar_url ? (
+                                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                    user.name.charAt(0).toUpperCase()
+                                )}
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="px-3 py-1 text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-xl shadow-xs active:scale-95 transition-all ml-1"
+                            >
+                                {t('login')}
+                            </Link>
+                        )}
+
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="p-2 text-gray-700 hover:text-brand-500 rounded-lg focus:outline-hidden"
+                            className="p-1.5 text-gray-700 hover:text-brand-500 rounded-lg active:scale-90 transition-transform ml-0.5"
+                            aria-label="Toggle menu"
                         >
                             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>

@@ -209,6 +209,63 @@ export default function Home({
                 </form>
             </section>
 
+            {/* MOBILE QUICK-ACTION APP STRIP (bKash & MyGP style) */}
+            <section className="block sm:hidden max-w-7xl mx-auto px-4 mt-6">
+                <div className="flex items-center justify-between mb-2.5 px-0.5">
+                    <span className="text-xs font-black text-gray-900 tracking-tight">
+                        {language === 'bn' ? '🔥 ট্রেন্ডিং ও জনপ্রিয় ফ্রেম' : '🔥 Popular Quick Actions'}
+                    </span>
+                    <Link href="/explore" className="text-[11px] font-bold text-brand-600 flex items-center">
+                        <span>{language === 'bn' ? 'সব দেখুন' : 'See all'}</span>
+                        <ChevronRight className="w-3 h-3 ml-0.5" />
+                    </Link>
+                </div>
+
+                <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none scroll-smooth">
+                    {/* 1. Trending shortcut */}
+                    <Link
+                        href="/trending"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-linear-to-b from-amber-50 to-white border border-amber-100/80 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm shadow-amber-500/25 mb-1.5">
+                            <Flame className="w-5 h-5 fill-white" />
+                        </div>
+                        <span className="text-[11px] font-bold text-gray-800 line-clamp-1">
+                            {language === 'bn' ? 'ট্রেন্ডিং' : 'Trending'}
+                        </span>
+                    </Link>
+
+                    {/* 2. Create Frame shortcut */}
+                    <Link
+                        href="/campaigns/create"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-linear-to-b from-purple-50 to-white border border-purple-100/80 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-sm shadow-purple-600/25 mb-1.5">
+                            <Sparkles className="w-5 h-5" />
+                        </div>
+                        <span className="text-[11px] font-bold text-gray-800 line-clamp-1">
+                            {language === 'bn' ? 'নতুন ফ্রেম' : 'New Frame'}
+                        </span>
+                    </Link>
+
+                    {/* Categories shortcuts */}
+                    {categories.slice(0, 5).map((cat) => (
+                        <Link
+                            key={cat.id}
+                            href={`/explore?category=${cat.slug}`}
+                            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-gray-100 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center mb-1.5 border border-gray-100">
+                                {getCategoryIcon(cat.icon)}
+                            </div>
+                            <span className="text-[11px] font-bold text-gray-800 line-clamp-1">
+                                {language === 'bn' && cat.name_bn ? cat.name_bn : cat.name}
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+
             {/* CATEGORIES DIRECTORY SECTION */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
                 <div className="flex items-center justify-between mb-6">

@@ -1,11 +1,10 @@
 -- FrameFusion Production MySQL Dump
--- Compatible with MySQL 5.7+ / 8.0+ / MariaDB 10.3+
--- Generated for phpMyAdmin Import
+-- Target: MySQL 5.7+ / 8.0+ / MariaDB 10.3+
+-- Generated on 2026-11-15 04:47:59
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 
 -- Table structure for `users`
 DROP TABLE IF EXISTS `users`;
@@ -15,15 +14,15 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(255) NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `avatar_url` varchar(255) DEFAULT NULL,
   `bio` text DEFAULT NULL,
   `role` varchar(50) NOT NULL DEFAULT 'user',
   `status` varchar(50) NOT NULL DEFAULT 'active',
-  `social_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `social_links` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
   UNIQUE KEY `users_username_unique` (`username`)
@@ -217,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `campaign_frames` (
   `canvas_width` int(11) NOT NULL DEFAULT 1080,
   `canvas_height` int(11) NOT NULL DEFAULT 1080,
   `aspect_ratio` varchar(50) NOT NULL DEFAULT '1:1',
-  `photo_area_config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `photo_area_config` longtext DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -225,13 +224,42 @@ CREATE TABLE IF NOT EXISTS `campaign_frames` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table `campaign_frames`
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('1', '1', '/storage/frames/bangladesh-independence.png', '1080', '1080', '1:1', '{"x":0,"y":0,"width":1080,"height":1080,"zoom":1,"rotation":0,"style":"center-fill"}', '2026-11-14 13:02:44', '2026-11-14 13:02:44');
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('2', '2', '/storage/frames/graduation-2026.png', '1080', '1080', '1:1', '{"x":0,"y":0,"width":1080,"height":1080,"zoom":1,"rotation":0,"style":"center-fill"}', '2026-11-14 13:02:46', '2026-11-14 13:02:46');
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('3', '3', '/storage/frames/tech-summit-2026.png', '1080', '1080', '1:1', '{"x":0,"y":0,"width":1080,"height":1080,"zoom":1,"rotation":0,"style":"center-fill"}', '2026-11-14 13:02:48', '2026-11-14 13:02:48');
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('4', '4', '/storage/frames/earth-day.png', '1080', '1080', '1:1', '{"x":0,"y":0,"width":1080,"height":1080,"zoom":1,"rotation":0,"style":"center-fill"}', '2026-11-14 13:02:50', '2026-11-14 13:02:50');
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('5', '5', '/storage/frames/champions-league.png', '1080', '1080', '1:1', '{"x":0,"y":0,"width":1080,"height":1080,"zoom":1,"rotation":0,"style":"center-fill"}', '2026-11-14 13:02:53', '2026-11-14 13:02:53');
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('6', '6', '/storage/frames/eid-mubarak.png', '1080', '1080', '1:1', '{"x":0,"y":0,"width":1080,"height":1080,"zoom":1,"rotation":0,"style":"center-fill"}', '2026-11-14 13:02:55', '2026-11-14 13:02:55');
-INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('7', '7', '/storage/frames/1794663061_dsff.png', '1080', '1080', '1:1', '{"zoom":1}', '2026-11-14 13:31:02', '2026-11-14 13:31:02');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('1', '1', '/storage/frames/bangladesh-independence.png', '1080', '1080', '1:1', '{\"x\":0,\"y\":0,\"width\":1080,\"height\":1080,\"zoom\":1,\"rotation\":0,\"style\":\"center-fill\"}', '2026-11-14 13:02:44', '2026-11-14 13:02:44');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('2', '2', '/storage/frames/graduation-2026.png', '1080', '1080', '1:1', '{\"x\":0,\"y\":0,\"width\":1080,\"height\":1080,\"zoom\":1,\"rotation\":0,\"style\":\"center-fill\"}', '2026-11-14 13:02:46', '2026-11-14 13:02:46');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('3', '3', '/storage/frames/tech-summit-2026.png', '1080', '1080', '1:1', '{\"x\":0,\"y\":0,\"width\":1080,\"height\":1080,\"zoom\":1,\"rotation\":0,\"style\":\"center-fill\"}', '2026-11-14 13:02:48', '2026-11-14 13:02:48');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('4', '4', '/storage/frames/earth-day.png', '1080', '1080', '1:1', '{\"x\":0,\"y\":0,\"width\":1080,\"height\":1080,\"zoom\":1,\"rotation\":0,\"style\":\"center-fill\"}', '2026-11-14 13:02:50', '2026-11-14 13:02:50');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('5', '5', '/storage/frames/champions-league.png', '1080', '1080', '1:1', '{\"x\":0,\"y\":0,\"width\":1080,\"height\":1080,\"zoom\":1,\"rotation\":0,\"style\":\"center-fill\"}', '2026-11-14 13:02:53', '2026-11-14 13:02:53');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('6', '6', '/storage/frames/eid-mubarak.png', '1080', '1080', '1:1', '{\"x\":0,\"y\":0,\"width\":1080,\"height\":1080,\"zoom\":1,\"rotation\":0,\"style\":\"center-fill\"}', '2026-11-14 13:02:55', '2026-11-14 13:02:55');
+INSERT INTO `campaign_frames` (`id`, `campaign_id`, `frame_url`, `canvas_width`, `canvas_height`, `aspect_ratio`, `photo_area_config`, `created_at`, `updated_at`) VALUES ('7', '7', '/storage/frames/1794663061_dsff.png', '1080', '1080', '1:1', '{\"zoom\":1}', '2026-11-14 13:31:02', '2026-11-14 13:31:02');
+
+-- Table structure for `generated_photos`
+DROP TABLE IF EXISTS `generated_photos`;
+CREATE TABLE IF NOT EXISTS `generated_photos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `campaign_id` bigint(20) unsigned NOT NULL,
+  `image_url` varchar(255) NOT NULL,
+  `format` varchar(20) NOT NULL DEFAULT 'png',
+  `quality` varchar(20) NOT NULL DEFAULT 'standard',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `generated_photos_user_id_foreign` (`user_id`),
+  KEY `generated_photos_campaign_id_foreign` (`campaign_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table structure for `saved_campaigns`
+DROP TABLE IF EXISTS `saved_campaigns`;
+CREATE TABLE IF NOT EXISTS `saved_campaigns` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `campaign_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `saved_campaigns_user_id_campaign_id_unique` (`user_id`,`campaign_id`),
+  KEY `saved_campaigns_campaign_id_foreign` (`campaign_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table structure for `campaign_supporters`
 DROP TABLE IF EXISTS `campaign_supporters`;
@@ -239,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `campaign_supporters` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `campaign_id` bigint(20) unsigned NOT NULL,
   `user_id` bigint(20) unsigned DEFAULT NULL,
-  `guest_ip` varchar(45) DEFAULT NULL,
+  `supporter_name` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -268,53 +296,22 @@ INSERT INTO `campaign_supporters` (`id`, `campaign_id`, `user_id`, `supporter_na
 INSERT INTO `campaign_supporters` (`id`, `campaign_id`, `user_id`, `supporter_name`, `created_at`, `updated_at`) VALUES ('18', '6', '3', 'Supporter #3', '2026-11-14 13:02:56', '2026-11-14 13:02:56');
 INSERT INTO `campaign_supporters` (`id`, `campaign_id`, `user_id`, `supporter_name`, `created_at`, `updated_at`) VALUES ('19', '1', NULL, 'Anonymous Supporter', '2026-11-14 13:22:54', '2026-11-14 13:22:54');
 
--- Table structure for `generated_photos`
-DROP TABLE IF EXISTS `generated_photos`;
-CREATE TABLE IF NOT EXISTS `generated_photos` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) unsigned DEFAULT NULL,
-  `campaign_id` bigint(20) unsigned NOT NULL,
-  `photo_url` varchar(255) DEFAULT NULL,
-  `format` varchar(20) NOT NULL DEFAULT 'png',
-  `quality` varchar(20) NOT NULL DEFAULT 'standard',
-  `is_public` tinyint(1) NOT NULL DEFAULT 0,
-  `guest_identifier` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `generated_photos_user_id_foreign` (`user_id`),
-  KEY `generated_photos_campaign_id_foreign` (`campaign_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Table structure for `saved_campaigns`
-DROP TABLE IF EXISTS `saved_campaigns`;
-CREATE TABLE IF NOT EXISTS `saved_campaigns` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) unsigned NOT NULL,
-  `campaign_id` bigint(20) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `saved_campaigns_user_id_campaign_id_unique` (`user_id`,`campaign_id`),
-  KEY `saved_campaigns_campaign_id_foreign` (`campaign_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Table structure for `gallery_posts`
 DROP TABLE IF EXISTS `gallery_posts`;
 CREATE TABLE IF NOT EXISTS `gallery_posts` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) unsigned NOT NULL,
   `campaign_id` bigint(20) unsigned NOT NULL,
-  `photo_url` varchar(255) NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `image_url` varchar(255) NOT NULL,
   `caption` text DEFAULT NULL,
+  `status` varchar(50) NOT NULL DEFAULT 'published',
   `likes_count` int(11) NOT NULL DEFAULT 0,
   `comments_count` int(11) NOT NULL DEFAULT 0,
-  `status` varchar(50) NOT NULL DEFAULT 'published',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `gallery_posts_user_id_foreign` (`user_id`),
-  KEY `gallery_posts_campaign_id_foreign` (`campaign_id`)
+  KEY `gallery_posts_campaign_id_foreign` (`campaign_id`),
+  KEY `gallery_posts_user_id_foreign` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table structure for `comments`
@@ -324,7 +321,6 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `user_id` bigint(20) unsigned NOT NULL,
   `gallery_post_id` bigint(20) unsigned NOT NULL,
   `content` text NOT NULL,
-  `status` varchar(50) NOT NULL DEFAULT 'approved',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -350,18 +346,15 @@ DROP TABLE IF EXISTS `reports`;
 CREATE TABLE IF NOT EXISTS `reports` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `reporter_id` bigint(20) unsigned DEFAULT NULL,
-  `reportable_type` varchar(255) NOT NULL,
-  `reportable_id` bigint(20) unsigned NOT NULL,
+  `campaign_id` bigint(20) unsigned NOT NULL,
   `reason` varchar(255) NOT NULL,
-  `details` text DEFAULT NULL,
+  `description` text DEFAULT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'pending',
-  `admin_notes` text DEFAULT NULL,
-  `resolved_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `reports_reporter_id_foreign` (`reporter_id`),
-  KEY `reports_reportable_type_reportable_id_index` (`reportable_type`,`reportable_id`)
+  KEY `reports_campaign_id_foreign` (`campaign_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table structure for `platform_settings`
@@ -370,6 +363,7 @@ CREATE TABLE IF NOT EXISTS `platform_settings` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(255) NOT NULL,
   `value` text DEFAULT NULL,
+  `type` varchar(50) NOT NULL DEFAULT 'string',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),

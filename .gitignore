@@ -17,7 +17,11 @@
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+/database/*.sqlite
 /database/*.sqlite-journal
+/database/*.sqlite-wal
+/database/*.sqlite-shm
+*.sqlite
 /storage/*.key
 /storage/pail
 /vendor

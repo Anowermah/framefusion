@@ -66,7 +66,11 @@ class AdminController extends Controller implements HasMiddleware
      */
     public function users(Request $request)
     {
-        $query = User::withCount(['campaigns', 'generatedPhotos'])->latest();
+        $withCount = ['campaigns'];
+        if (Schema::hasTable('generated_photos')) {
+            $withCount[] = 'generatedPhotos';
+        }
+        $query = User::withCount($withCount)->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {

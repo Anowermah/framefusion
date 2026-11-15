@@ -8,18 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('name_bn')->nullable();
-            $table->string('slug')->unique();
-            $table->string('icon')->default('Sparkles');
-            $table->text('description')->nullable();
-            $table->text('description_bn')->nullable();
-            $table->boolean('is_featured')->default(false);
-            $table->integer('order')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('categories')) {
+            Schema::create('categories', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('name_bn')->nullable();
+                $table->string('slug')->unique();
+                $table->string('icon')->default('Sparkles');
+                $table->text('description')->nullable();
+                $table->text('description_bn')->nullable();
+                $table->boolean('is_featured')->default(false);
+                $table->integer('order')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

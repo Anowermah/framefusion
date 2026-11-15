@@ -197,19 +197,30 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                             </div>
 
                             {/* Description */}
-                            <p className="text-sm text-gray-600 leading-relaxed font-normal">
+                            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
                                 {description}
                             </p>
 
-                            {/* Stats */}
-                            <div className="flex items-center gap-6 py-3 border-y border-gray-100 text-xs font-semibold text-gray-600">
-                                <div className="flex items-center gap-1.5">
-                                    <Users className="w-4 h-4 text-brand-500" />
-                                    <span><strong className="text-gray-900">{campaign.supporters_count.toLocaleString()}</strong> {t('supporters')}</span>
+                            {/* Stats Chips */}
+                            <div className="flex flex-wrap items-center gap-3 pt-1">
+                                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-gray-50 border border-gray-100/80">
+                                    <div className="w-7 h-7 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                                        <Users className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="leading-tight">
+                                        <span className="text-[10px] text-gray-400 block font-semibold uppercase">{t('supporters')}</span>
+                                        <span className="text-xs font-black text-gray-900">{campaign.supporters_count.toLocaleString()}</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Eye className="w-4 h-4 text-purple-500" />
-                                    <span><strong className="text-gray-900">{campaign.views_count.toLocaleString()}</strong> {t('views')}</span>
+
+                                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-gray-50 border border-gray-100/80">
+                                    <div className="w-7 h-7 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                                        <Eye className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="leading-tight">
+                                        <span className="text-[10px] text-gray-400 block font-semibold uppercase">{t('views')}</span>
+                                        <span className="text-xs font-black text-gray-900">{campaign.views_count.toLocaleString()}</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -217,7 +228,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                             <div className="pt-2 flex flex-col sm:flex-row gap-3">
                                 <Link
                                     href={`/campaigns/${campaign.slug}/editor`}
-                                    className="flex-1 py-4 px-8 bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-brand-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2.5"
+                                    className="flex-1 py-4 px-6 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-black text-sm rounded-2xl shadow-lg shadow-brand-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2.5"
                                 >
                                     <Camera className="w-5 h-5" />
                                     <span>{t('chooseYourPhoto')}</span>
@@ -226,8 +237,8 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
 
                                 <button
                                     onClick={handleToggleSave}
-                                    className={`px-5 py-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${saved
-                                        ? 'border-brand-500 bg-brand-50 text-brand-600'
+                                    className={`px-5 py-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${saved
+                                        ? 'border-brand-500 bg-brand-50 text-brand-600 shadow-xs'
                                         : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                                         }`}
                                 >
@@ -238,26 +249,26 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                 {auth?.user && (auth.user.id === campaign.creator?.id || auth.user.role === 'admin') && (
                                     <Link
                                         href={`/campaigns/${campaign.id}/edit`}
-                                        className="px-5 py-3.5 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-700 text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                                        className="px-5 py-3.5 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-700 text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
                                     >
                                         <Edit className="w-4 h-4 text-brand-600" />
-                                        <span>Edit Campaign</span>
+                                        <span>Edit</span>
                                     </Link>
                                 )}
                             </div>
 
                             {/* Social Share Bar */}
-                            <div className="pt-3 flex flex-wrap items-center gap-2">
-                                <span className="text-xs font-bold text-gray-500 mr-2 flex items-center gap-1">
+                            <div className="pt-2 flex flex-wrap items-center gap-2">
+                                <span className="text-xs font-bold text-gray-400 mr-1 flex items-center gap-1">
                                     <Share2 className="w-3.5 h-3.5" />
                                     {t('shareCampaign')}:
                                 </span>
 
                                 <button
                                     onClick={handleCopyLink}
-                                    className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                                    className="px-3.5 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200/70 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors active:scale-95"
                                 >
-                                    {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5 text-gray-500" />}
+                                    {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
                                     <span>{copied ? t('linkCopied') : t('copyLink')}</span>
                                 </button>
 
@@ -265,7 +276,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-3 py-1.5 bg-[#1877F2]/10 hover:bg-[#1877F2]/20 text-[#1877F2] rounded-xl text-xs font-semibold"
+                                    className="px-3.5 py-1.5 bg-[#1877F2]/10 hover:bg-[#1877F2]/20 text-[#1877F2] border border-[#1877F2]/20 rounded-full text-xs font-semibold active:scale-95 transition-all"
                                 >
                                     Facebook
                                 </a>
@@ -274,25 +285,16 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                     href={`https://api.whatsapp.com/send?text=${encodeURIComponent(campaign.title + ' ' + currentUrl)}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-3 py-1.5 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] rounded-xl text-xs font-semibold"
+                                    className="px-3.5 py-1.5 bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/20 rounded-full text-xs font-semibold active:scale-95 transition-all"
                                 >
                                     WhatsApp
                                 </a>
 
-                                <a
-                                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(campaign.title)}&url=${encodeURIComponent(currentUrl)}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="px-3 py-1.5 bg-gray-900/10 hover:bg-gray-900/20 text-gray-900 rounded-xl text-xs font-semibold"
-                                >
-                                    X (Twitter)
-                                </a>
-
                                 <button
                                     onClick={handleNativeShare}
-                                    className="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-semibold"
+                                    className="px-3.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 border border-brand-200/50 rounded-full text-xs font-semibold active:scale-95 transition-all"
                                 >
-                                    More...
+                                    More
                                 </button>
 
                                 <button

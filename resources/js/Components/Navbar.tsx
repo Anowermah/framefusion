@@ -3,9 +3,10 @@ import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { useLanguage } from '@/Context/LanguageContext';
 import { 
-    Search, PlusCircle, Globe, Menu, X, User, 
+    Search, Sparkles, Globe, Menu, X, User, 
     LayoutDashboard, Image, Bookmark, Settings, 
-    ShieldCheck, LogOut, ChevronDown 
+    ShieldCheck, LogOut, ChevronDown, Plus, Layers,
+    Flame, Compass, HelpCircle
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -14,106 +15,123 @@ interface NavbarProps {
 
 export default function Navbar({ onSearchClick }: NavbarProps) {
     const { auth } = usePage().props as any;
+    const { url } = usePage();
     const user = auth?.user;
     const { language, setLanguage, t } = useLanguage();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-    const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+
+    const isSuperAdmin = user?.role === 'super_admin';
+    const isAdmin = ['admin', 'super_admin'].includes(user?.role);
+
+    // Active route helper
+    const isLinkActive = (path: string) => {
+        if (path === '/') return url === '/';
+        return url.startsWith(path);
+    };
 
     return (
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs">
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] transition-all">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-15 sm:h-18">
-                    {/* Logo */}
-                    <div className="flex items-center gap-8">
-                        <Link href="/" className="flex items-center active:scale-95 transition-transform">
+                <div className="flex items-center justify-between h-14 sm:h-16">
+                    {/* Brand Logo & Desktop Nav */}
+                    <div className="flex items-center gap-7">
+                        <Link href="/" className="flex items-center active:scale-95 transition-transform shrink-0">
                             <ApplicationLogo size="md" />
                         </Link>
 
-                        {/* Desktop Navigation */}
-                        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
+                        {/* Minimal Desktop Capsule Navigation */}
+                        <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/50">
                             <Link 
                                 href="/explore" 
-                                className="transition-colors hover:text-brand-500 py-1"
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                    isLinkActive('/explore') 
+                                        ? 'bg-slate-900 text-white shadow-xs' 
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                                }`}
                             >
                                 {t('explore')}
                             </Link>
                             <Link 
                                 href="/categories" 
-                                className="transition-colors hover:text-brand-500 py-1"
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                    isLinkActive('/categories') 
+                                        ? 'bg-slate-900 text-white shadow-xs' 
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                                }`}
                             >
                                 {t('categories')}
                             </Link>
                             <Link 
                                 href="/trending" 
-                                className="transition-colors hover:text-brand-500 py-1"
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                    isLinkActive('/trending') 
+                                        ? 'bg-slate-900 text-white shadow-xs' 
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                                }`}
                             >
                                 {t('trending')}
                             </Link>
                             <Link 
                                 href="/how-it-works" 
-                                className="transition-colors hover:text-brand-500 py-1"
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                    isLinkActive('/how-it-works') 
+                                        ? 'bg-slate-900 text-white shadow-xs' 
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                                }`}
                             >
                                 {t('howItWorks')}
                             </Link>
                         </nav>
                     </div>
 
-                    {/* Right side controls */}
-                    <div className="hidden md:flex items-center gap-3">
-                        {/* Search button / trigger */}
+                    {/* Right Side Desktop Controls */}
+                    <div className="hidden md:flex items-center gap-2.5">
+                        {/* Minimalist Search Pill with ⌘K Keycap */}
                         <Link
                             href="/explore"
-                            className="p-2 text-gray-500 hover:text-brand-500 hover:bg-gray-50 rounded-full transition-colors"
+                            className="group flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-slate-100/80 hover:bg-slate-100 border border-slate-200/60 text-xs text-slate-400 transition-all hover:border-slate-300"
                             title={t('searchPlaceholder')}
                         >
-                            <Search className="w-5 h-5" />
+                            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 transition-colors" />
+                            <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-800 transition-colors">
+                                {language === 'bn' ? 'ফ্রেম খুঁজুন...' : 'Search frames...'}
+                            </span>
+                            <kbd className="text-[9px] font-mono font-bold text-slate-400 bg-white px-1.5 py-0.5 rounded-md border border-slate-200 shadow-2xs">
+                                ⌘K
+                            </kbd>
                         </Link>
 
-                        {/* Language Selector */}
-                        <div className="relative">
+                        {/* Segmented 1-Click Language Switcher Pill */}
+                        <div className="bg-slate-100/90 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[11px] font-bold">
                             <button
-                                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 rounded-full border border-gray-200 transition-colors"
+                                onClick={() => setLanguage('bn')}
+                                className={`px-2.5 py-1 rounded-full transition-all ${
+                                    language === 'bn'
+                                        ? 'bg-white text-slate-900 shadow-xs font-extrabold'
+                                        : 'text-slate-500 hover:text-slate-800'
+                                }`}
                             >
-                                <Globe className="w-3.5 h-3.5 text-brand-500" />
-                                <span>{language === 'en' ? 'EN' : 'বাং'}</span>
-                                <ChevronDown className="w-3 h-3 text-gray-400" />
+                                বাং
                             </button>
-
-                            {langDropdownOpen && (
-                                <div 
-                                    className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-in fade-in zoom-in-95 duration-150"
-                                    onClick={() => setLangDropdownOpen(false)}
-                                >
-                                    <button
-                                        onClick={() => setLanguage('en')}
-                                        className={`w-full text-left px-4 py-2 text-xs flex items-center justify-between ${
-                                            language === 'en' ? 'bg-brand-50 font-bold text-brand-600' : 'text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        <span>English</span>
-                                        <span className="text-[10px] text-gray-400">EN</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setLanguage('bn')}
-                                        className={`w-full text-left px-4 py-2 text-xs flex items-center justify-between font-bengali ${
-                                            language === 'bn' ? 'bg-brand-50 font-bold text-brand-600' : 'text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        <span>বাংলা</span>
-                                        <span className="text-[10px] text-gray-400">BN</span>
-                                    </button>
-                                </div>
-                            )}
+                            <button
+                                onClick={() => setLanguage('en')}
+                                className={`px-2.5 py-1 rounded-full transition-all ${
+                                    language === 'en'
+                                        ? 'bg-white text-slate-900 shadow-xs font-extrabold'
+                                        : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                EN
+                            </button>
                         </div>
 
-                        {/* Create Campaign CTA Button */}
+                        {/* Ultra-Premium Create Campaign CTA */}
                         <Link
                             href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-xl shadow-xs transition-all hover:shadow-brand-500/25 active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-extrabold text-white bg-linear-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-sm shadow-violet-500/25 active:scale-95 transition-all"
                         >
-                            <PlusCircle className="w-4 h-4" />
+                            <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse" />
                             <span>{t('createCampaign')}</span>
                         </Link>
 
@@ -122,97 +140,112 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             <div className="relative">
                                 <button
                                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                                    className="flex items-center gap-2 p-1.5 pl-2.5 rounded-full border border-gray-200 hover:border-brand-300 hover:bg-gray-50 transition-all"
+                                    className="flex items-center gap-2 p-1 pl-2 rounded-full border border-slate-200/80 hover:border-violet-300 hover:bg-slate-50 transition-all active:scale-95"
                                 >
-                                    <div className="w-7 h-7 rounded-full bg-brand-100 text-brand-600 font-bold flex items-center justify-center text-xs overflow-hidden">
+                                    <div className="w-7 h-7 rounded-full bg-linear-to-tr from-violet-500 to-indigo-600 text-white font-extrabold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100">
                                         {user.avatar_url ? (
-                                            <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                                            <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                                         ) : (
                                             user.name.charAt(0).toUpperCase()
                                         )}
                                     </div>
-                                    <span className="text-xs font-semibold text-gray-800 max-w-[100px] truncate">
+                                    <span className="text-xs font-bold text-slate-800 max-w-[90px] truncate">
                                         {user.name.split(' ')[0]}
                                     </span>
-                                    <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {userDropdownOpen && (
                                     <div 
-                                        className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                                        className="absolute right-0 mt-2 w-60 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-100 p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                                         onClick={() => setUserDropdownOpen(false)}
                                     >
-                                        <div className="px-4 py-2 border-b border-gray-100">
-                                            <p className="text-xs font-semibold text-gray-900 truncate">{user.name}</p>
-                                            <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
-                                            {user.role === 'super_admin' ? (
-                                                <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 rounded-full">
+                                        {/* User Brief Card */}
+                                        <div className="p-3 bg-slate-50/70 rounded-2xl border border-slate-100 mb-1">
+                                            <p className="text-xs font-extrabold text-slate-900 truncate">{user.name}</p>
+                                            <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                                            {isSuperAdmin ? (
+                                                <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-200 rounded-full">
                                                     👑 Super Admin
                                                 </span>
-                                            ) : user.role === 'admin' ? (
-                                                <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold bg-purple-100 text-purple-700 rounded-full">
+                                            ) : isAdmin ? (
+                                                <span className="inline-block mt-1.5 px-2 py-0.5 text-[9px] font-black bg-purple-100 text-purple-700 rounded-full">
                                                     Admin
                                                 </span>
                                             ) : null}
                                         </div>
 
-                                        <div className="py-1">
+                                        <div className="space-y-0.5 text-xs font-semibold">
                                             <Link
                                                 href="/dashboard"
-                                                className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 hover:text-brand-600"
+                                                className="flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-50 rounded-xl transition-colors"
                                             >
-                                                <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                                                <div className="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                                    <LayoutDashboard className="w-3.5 h-3.5" />
+                                                </div>
                                                 <span>{t('dashboard')}</span>
                                             </Link>
                                             <Link
                                                 href="/dashboard/campaigns"
-                                                className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 hover:text-brand-600"
+                                                className="flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-50 rounded-xl transition-colors"
                                             >
-                                                <PlusCircle className="w-4 h-4 text-gray-400" />
+                                                <div className="w-6 h-6 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                                                    <Plus className="w-3.5 h-3.5" />
+                                                </div>
                                                 <span>{t('myCampaigns')}</span>
                                             </Link>
                                             <Link
                                                 href="/dashboard/photos"
-                                                className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 hover:text-brand-600"
+                                                className="flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-50 rounded-xl transition-colors"
                                             >
-                                                <Image className="w-4 h-4 text-gray-400" />
+                                                <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                                                    <Image className="w-3.5 h-3.5" />
+                                                </div>
                                                 <span>{t('myPhotos')}</span>
                                             </Link>
                                             <Link
                                                 href="/dashboard/saved"
-                                                className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 hover:text-brand-600"
+                                                className="flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-50 rounded-xl transition-colors"
                                             >
-                                                <Bookmark className="w-4 h-4 text-gray-400" />
+                                                <div className="w-6 h-6 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                                                    <Bookmark className="w-3.5 h-3.5" />
+                                                </div>
                                                 <span>{t('savedCampaigns')}</span>
                                             </Link>
 
-                                            {['admin', 'super_admin'].includes(user.role) && (
+                                            {isAdmin && (
                                                 <Link
                                                     href="/admin"
-                                                    className="flex items-center gap-2.5 px-4 py-2 text-xs text-purple-700 font-semibold bg-purple-50/60 hover:bg-purple-100"
+                                                    className="flex items-center gap-2.5 px-3 py-2 text-purple-700 font-bold bg-purple-50/70 hover:bg-purple-100 rounded-xl transition-colors"
                                                 >
-                                                    <ShieldCheck className="w-4 h-4 text-purple-600" />
+                                                    <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center">
+                                                        <ShieldCheck className="w-3.5 h-3.5" />
+                                                    </div>
                                                     <span>{t('adminPanel')}</span>
                                                 </Link>
                                             )}
 
                                             <Link
                                                 href="/profile"
-                                                className="flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 hover:text-brand-600"
+                                                className="flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-50 rounded-xl transition-colors"
                                             >
-                                                <Settings className="w-4 h-4 text-gray-400" />
+                                                <div className="w-6 h-6 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                                                    <Settings className="w-3.5 h-3.5" />
+                                                </div>
                                                 <span>{t('profileSettings')}</span>
                                             </Link>
                                         </div>
 
-                                        <div className="border-t border-gray-100 pt-1">
+                                        <div className="border-t border-slate-100 pt-1 mt-1">
                                             <Link
                                                 href="/logout"
                                                 method="post"
                                                 as="button"
-                                                className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-red-600 hover:bg-red-50"
+                                                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                                             >
-                                                <LogOut className="w-4 h-4 text-red-400" />
+                                                <div className="w-6 h-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+                                                    <LogOut className="w-3.5 h-3.5" />
+                                                </div>
                                                 <span>{t('logout')}</span>
                                             </Link>
                                         </div>
@@ -220,16 +253,16 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                                 )}
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                                 <Link
                                     href="/login"
-                                    className="px-3.5 py-2 text-sm font-semibold text-gray-700 hover:text-brand-600 transition-colors"
+                                    className="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-violet-600 rounded-full hover:bg-slate-100 transition-colors"
                                 >
                                     {t('login')}
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="px-4 py-2 text-sm font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-xl transition-all"
+                                    className="px-4 py-1.5 text-xs font-bold text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-full transition-all"
                                 >
                                     {t('register')}
                                 </Link>
@@ -238,29 +271,41 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                     </div>
 
                     {/* Mobile App Bar Controls (bKash/MyGP style) */}
-                    <div className="flex md:hidden items-center gap-1.5">
+                    <div className="flex md:hidden items-center gap-2">
                         {/* Quick Search */}
                         <Link
                             href="/explore"
-                            className="p-2 text-gray-500 hover:text-brand-500 active:scale-90 transition-transform"
+                            className="p-1.5 text-slate-500 hover:text-violet-600 active:scale-90 transition-transform"
                             title={t('searchPlaceholder')}
                         >
-                            <Search className="w-5 h-5" />
+                            <Search className="w-4 h-4" />
                         </Link>
 
-                        {/* Mobile Language Pill */}
-                        <button
-                            onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                            className="px-2.5 py-1 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 active:scale-95 rounded-full transition-all border border-gray-200/60"
-                        >
-                            {language === 'en' ? 'বাং' : 'EN'}
-                        </button>
+                        {/* Segmented 1-Click Language Switcher Pill */}
+                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[10px] font-bold">
+                            <button
+                                onClick={() => setLanguage('bn')}
+                                className={`px-2 py-0.5 rounded-full transition-all ${
+                                    language === 'bn' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
+                                }`}
+                            >
+                                বাং
+                            </button>
+                            <button
+                                onClick={() => setLanguage('en')}
+                                className={`px-2 py-0.5 rounded-full transition-all ${
+                                    language === 'en' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
+                                }`}
+                            >
+                                EN
+                            </button>
+                        </div>
 
-                        {/* Quick Profile Avatar or Menu Button */}
+                        {/* Quick Avatar / Login */}
                         {user ? (
                             <Link
                                 href="/dashboard"
-                                className="w-8 h-8 rounded-full bg-linear-to-tr from-brand-500 to-purple-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-brand-100 active:scale-90 transition-transform ml-1"
+                                className="w-7 h-7 rounded-full bg-linear-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100 active:scale-90 transition-transform"
                             >
                                 {user.avatar_url ? (
                                     <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -271,7 +316,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         ) : (
                             <Link
                                 href="/login"
-                                className="px-3 py-1 text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-xl shadow-xs active:scale-95 transition-all ml-1"
+                                className="px-3 py-1 text-xs font-bold text-white bg-linear-to-r from-violet-600 to-indigo-600 rounded-full shadow-xs active:scale-95 transition-all"
                             >
                                 {t('login')}
                             </Link>
@@ -279,54 +324,67 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
 
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="p-1.5 text-gray-700 hover:text-brand-500 rounded-lg active:scale-90 transition-transform ml-0.5"
+                            className="p-1.5 text-slate-700 hover:text-violet-600 rounded-lg active:scale-90 transition-transform"
                             aria-label="Toggle menu"
                         >
-                            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile menu drawer */}
+            {/* Mobile Dropdown Menu Drawer */}
             {mobileMenuOpen && (
-                <div className="md:hidden border-t border-gray-100 bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
-                    <nav className="flex flex-col space-y-2 text-sm font-medium text-gray-800">
-                        <Link href="/explore" className="py-2 px-3 rounded-lg hover:bg-gray-50">{t('explore')}</Link>
-                        <Link href="/categories" className="py-2 px-3 rounded-lg hover:bg-gray-50">{t('categories')}</Link>
-                        <Link href="/trending" className="py-2 px-3 rounded-lg hover:bg-gray-50">{t('trending')}</Link>
-                        <Link href="/how-it-works" className="py-2 px-3 rounded-lg hover:bg-gray-50">{t('howItWorks')}</Link>
+                <div className="md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-3 shadow-xl">
+                    <nav className="flex flex-col space-y-1 text-xs font-bold text-slate-800">
+                        <Link href="/explore" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
+                            <Compass className="w-4 h-4 text-violet-600" />
+                            <span>{t('explore')}</span>
+                        </Link>
+                        <Link href="/categories" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
+                            <Layers className="w-4 h-4 text-purple-600" />
+                            <span>{t('categories')}</span>
+                        </Link>
+                        <Link href="/trending" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
+                            <Flame className="w-4 h-4 text-amber-500" />
+                            <span>{t('trending')}</span>
+                        </Link>
+                        <Link href="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="py-2.5 px-3 rounded-xl hover:bg-slate-50 flex items-center gap-2">
+                            <HelpCircle className="w-4 h-4 text-blue-500" />
+                            <span>{t('howItWorks')}</span>
+                        </Link>
                         <Link 
                             href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"} 
-                            className="py-2.5 px-3 rounded-xl bg-brand-500 text-white font-semibold flex items-center justify-center gap-2"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="py-2.5 px-3 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 text-white font-extrabold flex items-center justify-center gap-2 shadow-sm shadow-violet-500/25"
                         >
-                            <PlusCircle className="w-4 h-4" />
-                            {t('createCampaign')}
+                            <Sparkles className="w-4 h-4 text-amber-300" />
+                            <span>{t('createCampaign')}</span>
                         </Link>
                     </nav>
 
-                    <div className="pt-3 border-t border-gray-100">
+                    <div className="pt-2 border-t border-slate-100">
                         {user ? (
-                            <div className="space-y-2">
-                                <div className="px-3 py-1 text-xs text-gray-500">
-                                    Signed in as <span className="font-bold text-gray-800">{user.name}</span>
+                            <div className="space-y-1 text-xs font-semibold">
+                                <div className="px-3 py-1 text-[11px] text-slate-400">
+                                    Signed in as <strong className="text-slate-800">{user.name}</strong>
                                 </div>
-                                <Link href="/dashboard" className="block py-2 px-3 text-sm rounded-lg hover:bg-gray-50">{t('dashboard')}</Link>
-                                <Link href="/dashboard/campaigns" className="block py-2 px-3 text-sm rounded-lg hover:bg-gray-50">{t('myCampaigns')}</Link>
-                                <Link href="/dashboard/photos" className="block py-2 px-3 text-sm rounded-lg hover:bg-gray-50">{t('myPhotos')}</Link>
-                                {['admin', 'super_admin'].includes(user.role) && (
-                                    <Link href="/admin" className="block py-2 px-3 text-sm rounded-lg text-purple-600 bg-purple-50 font-bold">{t('adminPanel')}</Link>
+                                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl hover:bg-slate-50">{t('dashboard')}</Link>
+                                <Link href="/dashboard/campaigns" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl hover:bg-slate-50">{t('myCampaigns')}</Link>
+                                <Link href="/dashboard/photos" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl hover:bg-slate-50">{t('myPhotos')}</Link>
+                                {isAdmin && (
+                                    <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block py-2 px-3 rounded-xl text-purple-700 bg-purple-50 font-bold">{t('adminPanel')}</Link>
                                 )}
-                                <Link href="/logout" method="post" as="button" className="w-full text-left py-2 px-3 text-sm text-red-600 rounded-lg hover:bg-red-50">
+                                <Link href="/logout" method="post" as="button" className="w-full text-left py-2 px-3 text-red-600 rounded-xl hover:bg-red-50 font-bold">
                                     {t('logout')}
                                 </Link>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-3 pt-2">
-                                <Link href="/login" className="py-2 text-center text-sm font-semibold border border-gray-200 rounded-xl">
+                            <div className="grid grid-cols-2 gap-2 pt-1">
+                                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="py-2 text-center text-xs font-bold border border-slate-200 rounded-xl">
                                     {t('login')}
                                 </Link>
-                                <Link href="/register" className="py-2 text-center text-sm font-semibold bg-brand-500 text-white rounded-xl">
+                                <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="py-2 text-center text-xs font-bold bg-slate-900 text-white rounded-xl">
                                     {t('register')}
                                 </Link>
                             </div>
@@ -337,4 +395,3 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
         </header>
     );
 }
-

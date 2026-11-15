@@ -49,12 +49,42 @@ export default function Home({
 
     const getCategoryIcon = (iconName: string) => {
         switch (iconName) {
-            case 'Flag': return <Flag className="w-5 h-5 text-red-500" />;
-            case 'GraduationCap': return <GraduationCap className="w-5 h-5 text-blue-500" />;
-            case 'Cpu': return <Cpu className="w-5 h-5 text-purple-500" />;
-            case 'HeartHandshake': return <HeartHandshake className="w-5 h-5 text-emerald-500" />;
-            case 'Trophy': return <Trophy className="w-5 h-5 text-amber-500" />;
-            default: return <Briefcase className="w-5 h-5 text-brand-500" />;
+            case 'Flag': 
+                return (
+                    <div className="w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 ring-1 ring-rose-200/60 shadow-xs flex items-center justify-center">
+                        <Flag className="w-5 h-5" />
+                    </div>
+                );
+            case 'GraduationCap': 
+                return (
+                    <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-200/60 shadow-xs flex items-center justify-center">
+                        <GraduationCap className="w-5 h-5" />
+                    </div>
+                );
+            case 'Cpu': 
+                return (
+                    <div className="w-11 h-11 rounded-2xl bg-violet-50 text-violet-600 ring-1 ring-violet-200/60 shadow-xs flex items-center justify-center">
+                        <Cpu className="w-5 h-5" />
+                    </div>
+                );
+            case 'HeartHandshake': 
+                return (
+                    <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200/60 shadow-xs flex items-center justify-center">
+                        <HeartHandshake className="w-5 h-5" />
+                    </div>
+                );
+            case 'Trophy': 
+                return (
+                    <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/60 shadow-xs flex items-center justify-center">
+                        <Trophy className="w-5 h-5" />
+                    </div>
+                );
+            default: 
+                return (
+                    <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/60 shadow-xs flex items-center justify-center">
+                        <Briefcase className="w-5 h-5" />
+                    </div>
+                );
         }
     };
 
@@ -85,10 +115,10 @@ export default function Home({
                             </p>
 
                             {/* Hero Action Buttons */}
-                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
                                 <Link
                                     href="/explore"
-                                    className="w-full sm:w-auto px-7 py-3.5 text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-2xl shadow-lg shadow-brand-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
+                                    className="w-full sm:w-auto px-7 py-3 text-xs font-black text-white bg-linear-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-md shadow-violet-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
                                 >
                                     <span>{platform_settings?.hero_cta_text || t('exploreCampaigns')}</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -96,26 +126,26 @@ export default function Home({
 
                                 <Link
                                     href="/campaigns/create"
-                                    className="w-full sm:w-auto px-7 py-3.5 text-sm font-bold text-gray-800 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl shadow-xs transition-all text-center"
+                                    className="w-full sm:w-auto px-7 py-3 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full shadow-xs active:scale-95 transition-all text-center"
                                 >
                                     {platform_settings?.hero_secondary_cta_text || t('startCampaign')}
                                 </Link>
                             </div>
 
-                            {/* Trust badges */}
-                            <div className="pt-4 flex items-center justify-center lg:justify-start gap-6 text-xs text-gray-500 font-medium">
-                                <div className="flex items-center gap-1.5">
-                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                    <span>100% Free to Use</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                    <span>Ultra HD PNG Downloads</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                    <span>No App Install Needed</span>
-                                </div>
+                            {/* Minimalist Trust Badges */}
+                            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs font-semibold text-slate-500">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200/60 shadow-2xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    1-Click Instant
+                                </span>
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200/60 shadow-2xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                                    Ultra HD PNG
+                                </span>
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200/60 shadow-2xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                    100% Free
+                                </span>
                             </div>
                         </div>
 
@@ -169,28 +199,28 @@ export default function Home({
             </section>
 
             {/* SEARCH & DISCOVERY BAR */}
-            <section className="max-w-5xl mx-auto px-4 -mt-6 sm:-mt-8 relative z-30">
+            <section className="max-w-4xl mx-auto px-4 -mt-6 sm:-mt-8 relative z-30">
                 <form
                     onSubmit={handleSearchSubmit}
-                    className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 p-2 sm:p-3 flex flex-col sm:flex-row items-center gap-2"
+                    className="bg-white rounded-3xl sm:rounded-full shadow-xl shadow-slate-200/50 border border-slate-200/80 p-2 sm:p-2 flex flex-col sm:flex-row items-center gap-2"
                 >
-                    <div className="flex-1 flex items-center gap-3 px-3 w-full">
-                        <Search className="w-5 h-5 text-gray-400 shrink-0" />
+                    <div className="flex-1 flex items-center gap-3 px-3.5 w-full">
+                        <Search className="w-4 h-4 text-slate-400 shrink-0" />
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder={t('searchPlaceholder')}
-                            className="w-full border-0 focus:ring-0 text-sm text-gray-800 placeholder-gray-400 py-2.5"
+                            className="w-full border-0 focus:ring-0 text-xs sm:text-sm text-slate-800 placeholder-slate-400 py-2 font-medium"
                         />
                     </div>
 
-                    <div className="h-8 w-[1px] bg-gray-200 hidden sm:block" />
+                    <div className="h-6 w-[1px] bg-slate-200 hidden sm:block" />
 
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full sm:w-48 border-0 bg-transparent text-xs font-semibold text-gray-700 py-2.5 focus:ring-0 cursor-pointer"
+                        className="w-full sm:w-44 border-0 bg-transparent text-xs font-bold text-slate-600 py-2 focus:ring-0 cursor-pointer"
                     >
                         <option value="">{t('allCategories')}</option>
                         {categories.map((c) => (
@@ -202,7 +232,7 @@ export default function Home({
 
                     <button
                         type="submit"
-                        className="w-full sm:w-auto px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 shrink-0"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-linear-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-full shadow-sm shadow-violet-500/25 transition-all active:scale-95 shrink-0"
                     >
                         {t('explore')}
                     </button>
@@ -326,50 +356,50 @@ export default function Home({
                 </div>
             </section>
 
-            {/* HOW IT WORKS SECTION */}
-            <section className="bg-white py-16 border-y border-gray-100 my-8">
+            {/* HOW IT WORKS SECTION (Minimal & Icon-rich) */}
+            <section className="bg-white py-14 border-y border-slate-100 my-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
-                        <span className="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full">
-                            Simple & Fast
+                    <div className="text-center max-w-xl mx-auto space-y-2 mb-10">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-violet-600 bg-violet-50 px-3 py-1 rounded-full border border-violet-100">
+                            Fast & Effortless
                         </span>
-                        <h2 className="text-2xl sm:text-3xl font-black text-gray-900">How FrameFusion Works</h2>
-                        <p className="text-sm text-gray-500">
-                            Three simple steps to create, personalize, and share high-impact visual campaigns
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">How FrameFusion Works</h2>
+                        <p className="text-xs text-slate-500">
+                            Three simple steps to celebrate and share your visual photo frame
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-center">
                         {/* Step 1 */}
-                        <div className="p-6 rounded-3xl bg-[#F8F9FC] border border-gray-100 space-y-4">
-                            <div className="w-14 h-14 mx-auto rounded-2xl bg-brand-500 text-white font-black text-lg flex items-center justify-center shadow-md shadow-brand-500/25">
-                                1
+                        <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-100 space-y-3 hover:bg-white hover:shadow-card-hover transition-all group">
+                            <div className="w-12 h-12 mx-auto rounded-2xl bg-violet-100/70 text-violet-600 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                                <Compass className="w-6 h-6 stroke-[2]" />
                             </div>
-                            <h3 className="text-base font-bold text-gray-900">Choose a Campaign</h3>
-                            <p className="text-xs text-gray-500 leading-relaxed">
-                                Explore trending national events, university graduations, sports, and cultural festivals.
+                            <h3 className="text-sm font-black text-slate-900">1. Choose Frame</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+                                Pick from trending national events, cultural festivals, or community causes.
                             </p>
                         </div>
 
                         {/* Step 2 */}
-                        <div className="p-6 rounded-3xl bg-[#F8F9FC] border border-gray-100 space-y-4">
-                            <div className="w-14 h-14 mx-auto rounded-2xl bg-purple-500 text-white font-black text-lg flex items-center justify-center shadow-md shadow-purple-500/25">
-                                2
+                        <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-100 space-y-3 hover:bg-white hover:shadow-card-hover transition-all group">
+                            <div className="w-12 h-12 mx-auto rounded-2xl bg-indigo-100/70 text-indigo-600 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                                <Upload className="w-6 h-6 stroke-[2]" />
                             </div>
-                            <h3 className="text-base font-bold text-gray-900">Upload & Position Photo</h3>
-                            <p className="text-xs text-gray-500 leading-relaxed">
-                                Upload your photo, scale, zoom, rotate, and adjust brightness to fit perfectly under the transparent frame.
+                            <h3 className="text-sm font-black text-slate-900">2. Fit Your Photo</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+                                Instant touch controls: zoom, rotate, and center your portrait effortlessly.
                             </p>
                         </div>
 
                         {/* Step 3 */}
-                        <div className="p-6 rounded-3xl bg-[#F8F9FC] border border-gray-100 space-y-4">
-                            <div className="w-14 h-14 mx-auto rounded-2xl bg-accent text-white font-black text-lg flex items-center justify-center shadow-md shadow-accent/25">
-                                3
+                        <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-100 space-y-3 hover:bg-white hover:shadow-card-hover transition-all group">
+                            <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                                <Download className="w-6 h-6 stroke-[2]" />
                             </div>
-                            <h3 className="text-base font-bold text-gray-900">Download & Share</h3>
-                            <p className="text-xs text-gray-500 leading-relaxed">
-                                Export in crisp PNG, JPG, or WebP. Set as your social profile picture and inspire others.
+                            <h3 className="text-sm font-black text-slate-900">3. Save & Celebrate</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+                                Download in crystal-clear Ultra HD PNG and set as your profile picture.
                             </p>
                         </div>
                     </div>

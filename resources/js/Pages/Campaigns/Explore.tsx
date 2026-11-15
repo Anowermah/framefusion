@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
-import { Search, Filter, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, FolderSearch } from 'lucide-react';
 
 interface CategoryItem {
     id: number;
@@ -64,67 +64,85 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
         <MainLayout>
             <Head title={language === 'bn' ? 'ক্যাম্পেইন এক্সপ্লোর করুন' : 'Explore Campaigns'} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 sm:space-y-8">
                 {/* Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
-                        {t('exploreCampaigns')}
-                    </h1>
-                    <p className="text-sm text-gray-500">
-                        Discover and join thousands of active photo frame campaigns around the globe
-                    </p>
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                    <div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-brand-50 text-brand-600 border border-brand-100 mb-2">
+                            <Sparkles className="w-3.5 h-3.5 text-brand-500" />
+                            <span>{language === 'bn' ? 'সকল ফ্রেম কালেকশন' : 'All Frame Collections'}</span>
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                            {t('exploreCampaigns')}
+                        </h1>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                            {language === 'bn' 
+                                ? 'হাজারো ট্রেন্ডিং ফটো ফ্রেম ও সোশ্যাল ক্যাম্পেইন অন্বেষণ করুন' 
+                                : 'Discover and join thousands of active photo frame campaigns'}
+                        </p>
+                    </div>
+
+                    {campaigns?.total !== undefined && (
+                        <div className="text-xs font-bold text-gray-500 self-start sm:self-auto px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100">
+                            <span className="text-brand-600 font-extrabold">{campaigns.total}</span> {language === 'bn' ? 'টি ক্যাম্পেইন পাওয়া গেছে' : 'campaigns found'}
+                        </div>
+                    )}
                 </div>
 
                 {/* Filter & Search Bar Controls */}
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs space-y-4">
+                <div className="bg-white p-4 sm:p-5 rounded-3xl border border-gray-100 shadow-xs space-y-4">
                     <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
-                        <div className="flex-1 flex items-center gap-2.5 px-3 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                        {/* Search Input Capsule */}
+                        <div className="flex-1 flex items-center gap-2.5 px-4 py-2.5 bg-gray-50/80 hover:bg-gray-50 focus-within:bg-white rounded-2xl border border-gray-200/80 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/10 transition-all">
                             <Search className="w-4 h-4 text-gray-400 shrink-0" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder={t('searchPlaceholder')}
-                                className="w-full bg-transparent border-0 text-xs text-gray-800 placeholder-gray-400 focus:ring-0 p-0"
+                                className="w-full bg-transparent border-0 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:ring-0 p-0 font-medium"
                             />
                         </div>
 
-                        {/* Sort Selector */}
+                        {/* Controls (Sort + Submit) */}
                         <div className="flex items-center gap-2">
-                            <select
-                                value={selectedSort}
-                                onChange={(e) => {
-                                    setSelectedSort(e.target.value);
-                                    handleApplyFilters(undefined, e.target.value);
-                                }}
-                                className="px-3 py-2 bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-700 rounded-xl focus:ring-0 cursor-pointer"
-                            >
-                                <option value="trending">{t('sortTrending')}</option>
-                                <option value="supported">{t('sortMostSupported')}</option>
-                                <option value="newest">{t('sortNewest')}</option>
-                                <option value="oldest">{t('sortOldest')}</option>
-                                <option value="featured">{t('sortFeatured')}</option>
-                            </select>
+                            <div className="relative flex items-center">
+                                <select
+                                    value={selectedSort}
+                                    onChange={(e) => {
+                                        setSelectedSort(e.target.value);
+                                        handleApplyFilters(undefined, e.target.value);
+                                    }}
+                                    className="px-4 py-2.5 bg-gray-50 border border-gray-200/80 text-xs font-semibold text-gray-700 rounded-2xl focus:ring-0 cursor-pointer pr-8 hover:bg-gray-100 transition-colors"
+                                >
+                                    <option value="trending">{t('sortTrending')}</option>
+                                    <option value="supported">{t('sortMostSupported')}</option>
+                                    <option value="newest">{t('sortNewest')}</option>
+                                    <option value="oldest">{t('sortOldest')}</option>
+                                    <option value="featured">{t('sortFeatured')}</option>
+                                </select>
+                            </div>
 
                             <button
                                 type="submit"
-                                className="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+                                className="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold text-xs rounded-2xl shadow-xs transition-all active:scale-95 shrink-0"
                             >
                                 {t('explore')}
                             </button>
                         </div>
                     </form>
 
-                    {/* Category Filter Pills */}
+                    {/* Category Filter Pills (Horizontal Scroll) */}
                     <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none text-xs">
                         <button
+                            type="button"
                             onClick={() => {
                                 setSelectedCat('');
                                 handleApplyFilters('', undefined);
                             }}
-                            className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 ${selectedCat === ''
+                            className={`px-4 py-2 rounded-full font-bold transition-all shrink-0 text-xs ${selectedCat === ''
                                 ? 'bg-brand-500 text-white shadow-xs'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                : 'bg-gray-100/80 text-gray-600 hover:bg-gray-200/80 hover:text-gray-900'
                                 }`}
                         >
                             {t('allCategories')}
@@ -133,13 +151,14 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                         {categoryList.map((c) => (
                             <button
                                 key={c.id}
+                                type="button"
                                 onClick={() => {
                                     setSelectedCat(c.slug);
                                     handleApplyFilters(c.slug, undefined);
                                 }}
-                                className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 ${selectedCat === c.slug
+                                className={`px-4 py-2 rounded-full font-bold transition-all shrink-0 text-xs ${selectedCat === c.slug
                                     ? 'bg-brand-500 text-white shadow-xs'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    : 'bg-gray-100/80 text-gray-600 hover:bg-gray-200/80 hover:text-gray-900'
                                     }`}
                             >
                                 {language === 'bn' && c.name_bn ? c.name_bn : c.name}
@@ -157,12 +176,16 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                     </div>
                 ) : (
                     <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center space-y-3">
-                        <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 text-gray-400 flex items-center justify-center">
-                            <Search className="w-8 h-8" />
+                        <div className="w-14 h-14 mx-auto rounded-2xl bg-gray-50 border border-gray-100 text-gray-400 flex items-center justify-center">
+                            <FolderSearch className="w-7 h-7 text-gray-400" />
                         </div>
-                        <h3 className="text-base font-bold text-gray-800">No campaigns found</h3>
+                        <h3 className="text-base font-bold text-gray-800">
+                            {language === 'bn' ? 'কোন ক্যাম্পেইন পাওয়া যায়নি' : 'No campaigns found'}
+                        </h3>
                         <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                            Try adjusting your search terms or selecting another category.
+                            {language === 'bn' 
+                                ? 'অন্য কোন সার্চ কি-ওয়ার্ড লিখুন অথবা অন্য ক্যাটাগরি নির্বাচন করুন।'
+                                : 'Try adjusting your search terms or selecting another category.'}
                         </p>
                     </div>
                 )}
@@ -189,4 +212,3 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
         </MainLayout>
     );
 }
-

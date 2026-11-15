@@ -12,6 +12,7 @@ use App\Models\Report;
 use App\Models\SavedCampaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -108,7 +109,18 @@ class CampaignController extends Controller
      */
     public function show(string $slug)
     {
-        $campaign = Campaign::with(['creator', 'category', 'primaryFrame', 'galleryPosts.user', 'galleryPosts.comments.user'])
+        $with = ['creator', 'category'];
+        if (Schema::hasTable('campaign_frames')) {
+            $with[] = 'primaryFrame';
+        }
+        if (Schema::hasTable('gallery_posts')) {
+            $with[] = 'galleryPosts.user';
+            if (Schema::hasTable('comments')) {
+                $with[] = 'galleryPosts.comments.user';
+            }
+        }
+
+        $campaign = Campaign::with($with)
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -116,7 +128,7 @@ class CampaignController extends Controller
         $campaign->increment('views_count');
 
         $isSaved = false;
-        if (Auth::check()) {
+        if (Auth::check() && Schema::hasTable('saved_campaigns')) {
             $isSaved = SavedCampaign::where('user_id', Auth::id())
                 ->where('campaign_id', $campaign->id)
                 ->exists();
@@ -157,13 +169,15 @@ class CampaignController extends Controller
         $campaign = Campaign::findOrFail($id);
         $campaign->increment('supporters_count');
 
-        CampaignSupporter::create([
-            'campaign_id' => $campaign->id,
-            'user_id' => Auth::id(),
-            'supporter_name' => Auth::check() ? Auth::user()->name : 'Anonymous Supporter',
-        ]);
+        if (Schema::hasTable('campaign_supporters')) {
+            CampaignSupporter::create([
+                'campaign_id' => $campaign->id,
+                'user_id' => Auth::id(),
+                'supporter_name' => Auth::check() ? Auth::user()->name : 'Anonymous Supporter',
+            ]);
+        }
 
-        if (Auth::check()) {
+        if (Auth::check() && Schema::hasTable('generated_photos')) {
             GeneratedPhoto::create([
                 'user_id' => Auth::id(),
                 'campaign_id' => $campaign->id,
@@ -187,6 +201,10 @@ class CampaignController extends Controller
         $user = Auth::user();
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if (!Schema::hasTable('saved_campaigns')) {
+            return response()->json(['saved' => false]);
         }
 
         $existing = SavedCampaign::where('user_id', $user->id)
@@ -418,13 +436,15 @@ class CampaignController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Report::create([
-            'reporter_id' => Auth::id(),
-            'campaign_id' => $id,
-            'reason' => $request->reason,
-            'description' => $request->description,
-            'status' => 'pending',
-        ]);
+        if (Schema::hasTable('reports')) {
+            Report::create([
+                'reporter_id' => Auth::id(),
+                'campaign_id' => $id,
+                'reason' => $request->reason,
+                'description' => $request->description,
+                'status' => 'pending',
+            ]);
+        }
 
         return response()->json(['success' => true]);
     }

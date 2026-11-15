@@ -30,5 +30,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        // Auto-heal missing database tables (MySQL / SQLite)
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('gallery_posts') || !\Illuminate\Support\Facades\Schema::hasTable('generated_photos')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            }
+        } catch (\Throwable $e) {
+            // Silently continue
+        }
     }
 }

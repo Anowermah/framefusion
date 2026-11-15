@@ -180,7 +180,9 @@ class AdminController extends Controller implements HasMiddleware
      */
     public function reports()
     {
-        $reports = Report::with(['campaign', 'reporter'])->latest()->paginate(15);
+        $reports = Schema::hasTable('reports')
+            ? Report::with(['campaign', 'reporter'])->latest()->paginate(15)
+            : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
 
         return Inertia::render('Admin/Reports', [
             'reports' => $reports,
@@ -232,8 +234,8 @@ class AdminController extends Controller implements HasMiddleware
         $stats = [
             'totalUsers' => User::count(),
             'totalCampaigns' => Campaign::count(),
-            'totalPhotos' => GeneratedPhoto::count(),
-            'totalSupporters' => Campaign::sum('supporters_count'),
+            'totalPhotos' => Schema::hasTable('generated_photos') ? GeneratedPhoto::count() : 0,
+            'totalSupporters' => (int) (Campaign::sum('supporters_count') ?? 0),
             'topCampaigns' => Campaign::orderByDesc('supporters_count')->take(5)->get(),
         ];
 

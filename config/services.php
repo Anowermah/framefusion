@@ -36,9 +36,11 @@ return [
     ],
 
     'google' => [
-        'client_id' => env('GOOGLE_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') ? rtrim(env('APP_URL'), '/') . '/auth/google/callback' : '/auth/google/callback'),
+        'client_id' => env('GOOGLE_CLIENT_ID') ? trim(env('GOOGLE_CLIENT_ID'), " \t\n\r\0\x0B\"'") : null,
+        'client_secret' => env('GOOGLE_CLIENT_SECRET') ? trim(env('GOOGLE_CLIENT_SECRET'), " \t\n\r\0\x0B\"'") : null,
+        'redirect' => env('GOOGLE_REDIRECT_URI')
+            ? trim(env('GOOGLE_REDIRECT_URI'), " \t\n\r\0\x0B\"'")
+            : (env('APP_URL') ? rtrim(trim(env('APP_URL'), " \t\n\r\0\x0B\"'"), '/') . '/auth/google/callback' : '/auth/google/callback'),
     ],
 
 ];

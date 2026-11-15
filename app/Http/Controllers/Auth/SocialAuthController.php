@@ -20,14 +20,21 @@ class SocialAuthController extends Controller
      */
     public function redirectToGoogle(): RedirectResponse
     {
-        $clientId = config('services.google.client_id');
-        $clientSecret = config('services.google.client_secret');
+        $clientId = trim((string) config('services.google.client_id'), " \t\n\r\0\x0B\"'");
+        $clientSecret = trim((string) config('services.google.client_secret'), " \t\n\r\0\x0B\"'");
+        $redirect = trim((string) config('services.google.redirect'), " \t\n\r\0\x0B\"'");
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('login')->withErrors([
                 'email' => 'Google Login is not configured yet. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your environment file.',
             ]);
         }
+
+        config([
+            'services.google.client_id' => $clientId,
+            'services.google.client_secret' => $clientSecret,
+            'services.google.redirect' => $redirect,
+        ]);
 
         return Socialite::driver('google')->redirect();
     }
@@ -38,6 +45,11 @@ class SocialAuthController extends Controller
     public function handleGoogleCallback(Request $request): RedirectResponse
     {
         try {
+            $redirect = trim((string) config('services.google.redirect'), " \t\n\r\0\x0B\"'");
+            if (!empty($redirect)) {
+                config(['services.google.redirect' => $redirect]);
+            }
+
             $googleUser = Socialite::driver('google')->user();
 
             if (!$googleUser || empty($googleUser->getEmail())) {

@@ -16,6 +16,9 @@ interface CampaignShowProps {
         description_bn?: string;
         start_date?: string;
         tags?: string;
+        og_image_url?: string;
+        direct_frame_url?: string;
+        canonical_url?: string;
         primary_frame?: {
             aspect_ratio?: string;
         };
@@ -108,9 +111,31 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
             });
     };
 
+    const shareImageUrl = campaign.og_image_url || (typeof window !== 'undefined' ? `${window.location.origin}/campaigns/${campaign.slug}/og-image` : '');
+
     return (
         <MainLayout>
-            <Head title={title} />
+            <Head>
+                <title>{`${title} | ${categoryName ? categoryName + ' | ' : ''}FrameFusion`}</title>
+                <meta name="description" content={description || 'Create and customize this campaign photo frame on FrameFusion.'} />
+                <meta name="keywords" content={`${campaign.tags || ''}, ${title}, photo frame, twibbon, campaign`} />
+                <link rel="canonical" href={campaign.canonical_url || currentUrl} />
+
+                {/* Open Graph / Facebook / WhatsApp */}
+                <meta property="og:type" content="article" />
+                <meta property="og:title" content={`${title} | FrameFusion`} />
+                <meta property="og:description" content={description || 'Create and customize this campaign photo frame on FrameFusion.'} />
+                <meta property="og:url" content={campaign.canonical_url || currentUrl} />
+                <meta property="og:image" content={shareImageUrl} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+
+                {/* Twitter / X */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`${title} | FrameFusion`} />
+                <meta name="twitter:description" content={description || 'Create and customize this campaign photo frame on FrameFusion.'} />
+                <meta name="twitter:image" content={shareImageUrl} />
+            </Head>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">
                 {/* Campaign Hero Showcase */}

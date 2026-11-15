@@ -46,6 +46,9 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
         meta_title: settings.meta_title || 'FrameFusion - Custom Photo Campaign & Twibbon Platform',
         meta_description: settings.meta_description || 'Create, customize, and celebrate visual photo campaigns and twibbons effortlessly.',
         meta_keywords: settings.meta_keywords || 'twibbon, photo frame, campaign, profile frame, photo editor',
+        og_default_image: settings.og_default_image || '',
+        twitter_handle: settings.twitter_handle || '@FrameFusion',
+        google_site_verification: settings.google_site_verification || '',
         google_analytics_id: settings.google_analytics_id || '',
         custom_header_scripts: settings.custom_header_scripts || '',
         custom_footer_scripts: settings.custom_footer_scripts || '',
@@ -513,6 +516,44 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                                                 onChange={e => handleChange('meta_keywords', e.target.value)}
                                                 className="w-full p-2.5 rounded-xl border border-gray-200"
                                             />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-1">
+                                                <label className="font-bold text-gray-700">Default Share Banner / OG Image URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.og_default_image}
+                                                    onChange={e => handleChange('og_default_image', e.target.value)}
+                                                    className="w-full p-2.5 rounded-xl border border-gray-200"
+                                                    placeholder="https://... or /apple-touch-icon.png"
+                                                />
+                                                <span className="text-[10px] text-gray-400">Used as feature image when sharing homepage or static pages</span>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className="font-bold text-gray-700">Twitter / X Handle</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.twitter_handle}
+                                                    onChange={e => handleChange('twitter_handle', e.target.value)}
+                                                    className="w-full p-2.5 rounded-xl border border-gray-200"
+                                                    placeholder="@FrameFusion"
+                                                />
+                                                <span className="text-[10px] text-gray-400">Used for twitter:site and twitter:creator tags</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className="font-bold text-gray-700">Google Search Console Verification Token</label>
+                                            <input
+                                                type="text"
+                                                value={formData.google_site_verification}
+                                                onChange={e => handleChange('google_site_verification', e.target.value)}
+                                                className="w-full p-2.5 rounded-xl border border-gray-200 font-mono text-[11px]"
+                                                placeholder="google-site-verification token or code"
+                                            />
+                                            <span className="text-[10px] text-gray-400">Pasted into &lt;meta name="google-site-verification"&gt;</span>
                                         </div>
 
                                         <div className="space-y-1">

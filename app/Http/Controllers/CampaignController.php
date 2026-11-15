@@ -141,8 +141,16 @@ class CampaignController extends Controller
             ->take(3)
             ->get();
 
+        $ogImageUrl = route('campaigns.og-image', $campaign->slug);
+        $directFrameUrl = !empty($campaign->frame_url) ? url($campaign->frame_url) : (!empty($campaign->thumbnail_url) ? url($campaign->thumbnail_url) : null);
+
         return Inertia::render('Campaigns/Show', [
-            'campaign' => array_merge($campaign->toArray(), ['is_saved' => $isSaved]),
+            'campaign' => array_merge($campaign->toArray(), [
+                'is_saved' => $isSaved,
+                'og_image_url' => $ogImageUrl,
+                'direct_frame_url' => $directFrameUrl,
+                'canonical_url' => route('campaigns.show', $campaign->slug),
+            ]),
             'relatedCampaigns' => $relatedCampaigns,
         ]);
     }
@@ -159,6 +167,160 @@ class CampaignController extends Controller
         return Inertia::render('Campaigns/Editor', [
             'campaign' => $campaign,
         ]);
+    }
+
+    /**
+     * Generate or serve Open Graph / Twitter feature image for social share cards
+     */
+    public function ogImage(string $slug)
+    {
+        $campaign = Campaign::with('category')->where('slug', $slug)->first();
+        if (!$campaign) {
+            return redirect(asset('/apple-touch-icon.png'));
+        }
+
+        // Cache directory
+        $cacheDir = storage_path('app/public/og-cache');
+        if (!file_exists($cacheDir)) {
+            @mkdir($cacheDir, 0755, true);
+        }
+        $cacheFile = $cacheDir . '/' . $campaign->slug . '.png';
+
+        // Serve cached version if fresh
+        $lastModified = $campaign->updated_at ? $campaign->updated_at->timestamp : 0;
+        if (file_exists($cacheFile) && filemtime($cacheFile) >= $lastModified) {
+            return response()->file($cacheFile, [
+                'Content-Type' => 'image/png',
+                'Cache-Control' => 'public, max-age=604800, immutable',
+            ]);
+        }
+
+        // Locate frame file
+        $framePath = null;
+        if (!empty($campaign->frame_url)) {
+            $cleaned = ltrim(str_replace('/storage/', '', $campaign->frame_url), '/');
+            if (file_exists(storage_path('app/public/' . $cleaned))) {
+                $framePath = storage_path('app/public/' . $cleaned);
+            } elseif (file_exists(public_path($campaign->frame_url))) {
+                $framePath = public_path($campaign->frame_url);
+            }
+        }
+
+        if (!$framePath && !empty($campaign->thumbnail_url)) {
+            $cleaned = ltrim(str_replace('/storage/', '', $campaign->thumbnail_url), '/');
+            if (file_exists(storage_path('app/public/' . $cleaned))) {
+                $framePath = storage_path('app/public/' . $cleaned);
+            } elseif (file_exists(public_path($campaign->thumbnail_url))) {
+                $framePath = public_path($campaign->thumbnail_url);
+            }
+        }
+
+        // If GD is available and frame file exists, generate high-resolution share card (1200x630)
+        if ($framePath && file_exists($framePath) && function_exists('imagecreatetruecolor')) {
+            try {
+                $width = 1200;
+                $height = 630;
+                $img = imagecreatetruecolor($width, $height);
+
+                imagealphablending($img, true);
+
+                // Background: #F8F9FC
+                $bgColor = imagecolorallocate($img, 248, 249, 252);
+                imagefilledrectangle($img, 0, 0, $width, $height, $bgColor);
+
+                // Top Accent Bar (Brand Purple #635BFF)
+                $brandPurple = imagecolorallocate($img, 99, 91, 255);
+                imagefilledrectangle($img, 0, 0, $width, 8, $brandPurple);
+
+                // Frame Placement (Left Column: 540x540 at 45, 45)
+                $targetSize = 540;
+                $targetX = 45;
+                $targetY = 45;
+
+                // Frame mount white card with soft border
+                $white = imagecolorallocate($img, 255, 255, 255);
+                $cardBorder = imagecolorallocate($img, 226, 232, 240);
+                imagefilledrectangle($img, $targetX, $targetY, $targetX + $targetSize, $targetY + $targetSize, $white);
+                imagerectangle($img, $targetX, $targetY, $targetX + $targetSize, $targetY + $targetSize, $cardBorder);
+
+                // Avatar silhouette placeholder behind the frame's transparent center
+                $avatarGray = imagecolorallocate($img, 226, 232, 240);
+                $centerX = $targetX + (int)($targetSize / 2);
+                $centerY = $targetY + (int)($targetSize / 2);
+                imagefilledellipse($img, $centerX, $centerY - 30, 140, 140, $avatarGray);
+                imagefilledellipse($img, $centerX, $centerY + 120, 260, 170, $avatarGray);
+
+                // Overlay the campaign frame onto the canvas
+                $frameData = @file_get_contents($framePath);
+                $frameImg = $frameData ? @imagecreatefromstring($frameData) : null;
+
+                if ($frameImg) {
+                    $fw = imagesx($frameImg);
+                    $fh = imagesy($frameImg);
+                    imagealphablending($frameImg, true);
+                    imagecopyresampled($img, $frameImg, $targetX, $targetY, 0, 0, $targetSize, $targetSize, $fw, $fh);
+                    imagedestroy($frameImg);
+
+                    // Right Column Content (x: 630 to 1150)
+                    $textColor = imagecolorallocate($img, 17, 24, 39);
+                    $subtextColor = imagecolorallocate($img, 107, 114, 128);
+                    $siteName = PlatformSetting::get('site_name', 'FrameFusion');
+
+                    // Category Pill Badge
+                    $catName = strtoupper($campaign->category ? $campaign->category->name : 'FEATURED FRAME');
+                    $badgeBg = imagecolorallocate($img, 238, 242, 255);
+                    $badgeText = imagecolorallocate($img, 99, 91, 255);
+                    $badgeWidth = min(400, strlen($catName) * 10 + 30);
+                    imagefilledrectangle($img, 630, 65, 630 + $badgeWidth, 98, $badgeBg);
+                    imagestring($img, 5, 645, 74, $catName, $badgeText);
+
+                    // Campaign Title (Word wrap up to 3 lines)
+                    $titleLines = explode("\n", wordwrap($campaign->title, 32, "\n"));
+                    $y = 130;
+                    foreach (array_slice($titleLines, 0, 3) as $line) {
+                        imagestring($img, 5, 630, $y, $line, $textColor);
+                        $y += 32;
+                    }
+
+                    // Call To Action Box
+                    $ctaY = max($y + 25, 310);
+                    $ctaBoxBg = imagecolorallocate($img, 255, 255, 255);
+                    $ctaBoxBorder = imagecolorallocate($img, 229, 231, 235);
+                    imagefilledrectangle($img, 630, $ctaY, 1145, $ctaY + 120, $ctaBoxBg);
+                    imagerectangle($img, 630, $ctaY, 1145, $ctaY + 120, $ctaBoxBorder);
+
+                    $ctaTitle = imagecolorallocate($img, 31, 41, 55);
+                    $ctaAction = imagecolorallocate($img, 99, 91, 255);
+                    imagestring($img, 5, 650, $ctaY + 22, "Add your photo into this frame!", $ctaTitle);
+                    imagestring($img, 4, 650, $ctaY + 54, "100% Free - Instant 1-Click Twibbon Creator", $ctaAction);
+                    imagestring($img, 3, 650, $ctaY + 84, "Join thousands supporting this campaign.", $subtextColor);
+
+                    // Footer branding
+                    imagestring($img, 4, 630, 545, "Powered by " . $siteName . " | Twibbon & Photo Campaign Platform", $subtextColor);
+
+                    // Save to cache
+                    imagepng($img, $cacheFile, 8);
+                    imagedestroy($img);
+
+                    return response()->file($cacheFile, [
+                        'Content-Type' => 'image/png',
+                        'Cache-Control' => 'public, max-age=604800, immutable',
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // Ignore rendering error and fallback
+            }
+        }
+
+        // Direct fallback: serve frame file
+        if ($framePath && file_exists($framePath)) {
+            return response()->file($framePath, [
+                'Content-Type' => 'image/png',
+                'Cache-Control' => 'public, max-age=604800',
+            ]);
+        }
+
+        return redirect(asset('/apple-touch-icon.png'));
     }
 
     /**

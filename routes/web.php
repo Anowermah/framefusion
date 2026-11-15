@@ -20,6 +20,7 @@ Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('ca
 Route::post('/campaigns', [CampaignController::class, 'store'])->name('campaigns.store');
 Route::get('/campaigns/{slug}', [CampaignController::class, 'show'])->name('campaigns.show');
 Route::get('/campaigns/{slug}/editor', [CampaignController::class, 'editor'])->name('campaigns.editor');
+Route::get('/campaigns/{slug}/og-image', [CampaignController::class, 'ogImage'])->name('campaigns.og-image');
 
 // Campaign Edit & Update (Requires Auth)
 Route::middleware(['auth'])->group(function () {
@@ -31,9 +32,87 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/campaign/{slug}', fn($slug) => redirect()->route('campaigns.show', ['slug' => $slug]));
 Route::get('/campaign/{slug}/editor', fn($slug) => redirect()->route('campaigns.editor', ['slug' => $slug]));
 Route::get('/campaign/{slug}/edit', fn($slug) => redirect()->route('campaigns.edit', ['id' => $slug]));
+Route::get('/campaign/{slug}/og-image', fn($slug) => redirect()->route('campaigns.og-image', ['slug' => $slug]));
 Route::get('/category/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
 Route::get('/categories/{slug}', fn($slug) => redirect()->route('campaigns.explore', ['category' => $slug]));
 Route::get('/search', fn() => redirect()->route('campaigns.explore'));
+
+// SEO Dynamic Sitemaps & Crawlers
+Route::get('/sitemap.xml', function () {
+    $campaigns = \App\Models\Campaign::where('status', 'published')
+        ->where('visibility', 'public')
+        ->latest('updated_at')
+        ->get();
+
+    $categories = \App\Models\Category::all();
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">';
+
+    $staticRoutes = [
+        ['url' => url('/'), 'priority' => '1.0', 'changefreq' => 'daily'],
+        ['url' => route('campaigns.explore'), 'priority' => '0.9', 'changefreq' => 'daily'],
+        ['url' => route('campaigns.trending'), 'priority' => '0.9', 'changefreq' => 'daily'],
+        ['url' => route('campaigns.categories'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+        ['url' => route('how-it-works'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+        ['url' => route('about'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+        ['url' => route('contact'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+        ['url' => route('privacy'), 'priority' => '0.3', 'changefreq' => 'yearly'],
+        ['url' => route('terms'), 'priority' => '0.3', 'changefreq' => 'yearly'],
+    ];
+
+    foreach ($staticRoutes as $r) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . htmlspecialchars($r['url']) . '</loc>';
+        $xml .= '<changefreq>' . $r['changefreq'] . '</changefreq>';
+        $xml .= '<priority>' . $r['priority'] . '</priority>';
+        $xml .= '</url>';
+    }
+
+    foreach ($categories as $cat) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . htmlspecialchars(route('campaigns.explore', ['category' => $cat->slug])) . '</loc>';
+        $xml .= '<changefreq>weekly</changefreq>';
+        $xml .= '<priority>0.8</priority>';
+        $xml .= '</url>';
+    }
+
+    foreach ($campaigns as $camp) {
+        $campUrl = route('campaigns.show', $camp->slug);
+        $frameUrl = route('campaigns.og-image', $camp->slug);
+        $lastmod = $camp->updated_at ? $camp->updated_at->toAtomString() : now()->toAtomString();
+
+        $xml .= '<url>';
+        $xml .= '<loc>' . htmlspecialchars($campUrl) . '</loc>';
+        $xml .= '<lastmod>' . $lastmod . '</lastmod>';
+        $xml .= '<changefreq>weekly</changefreq>';
+        $xml .= '<priority>0.85</priority>';
+        if ($frameUrl) {
+            $xml .= '<image:image>';
+            $xml .= '<image:loc>' . htmlspecialchars($frameUrl) . '</image:loc>';
+            $xml .= '<image:title>' . htmlspecialchars($camp->title) . '</image:title>';
+            $xml .= '<image:caption>' . htmlspecialchars($camp->description ? \Illuminate\Support\Str::limit($camp->description, 100) : $camp->title) . '</image:caption>';
+            $xml .= '</image:image>';
+        }
+        $xml .= '</url>';
+    }
+
+    $xml .= '</urlset>';
+
+    return response($xml, 200, [
+        'Content-Type' => 'application/xml; charset=utf-8',
+        'Cache-Control' => 'public, max-age=3600',
+    ]);
+})->name('sitemap');
+
+Route::get('/robots.txt', function () {
+    $sitemapUrl = url('/sitemap.xml');
+    $content = "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /profile/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\n\nSitemap: {$sitemapUrl}\n";
+    return response($content, 200, [
+        'Content-Type' => 'text/plain',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('robots');
 
 // Direct Storage & Uploaded Frames Handler (CPanel, LiteSpeed & Shared Hosting compatibility)
 Route::match(['get', 'head'], '/storage/{path}', function (string $path) {

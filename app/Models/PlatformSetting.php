@@ -55,7 +55,10 @@ class PlatformSetting extends Model
             // SEO & Analytics
             'meta_title' => 'FrameFusion - Custom Photo Campaign & Twibbon Platform',
             'meta_description' => 'Create, customize, and celebrate visual photo campaigns and twibbons effortlessly.',
-            'meta_keywords' => 'twibbon, photo frame, campaign, profile frame, photo editor',
+            'meta_keywords' => 'twibbon, photo frame, campaign, profile frame, photo editor, twibbon bangladesh, framefusion',
+            'og_default_image' => '',
+            'twitter_handle' => '@FrameFusion',
+            'google_site_verification' => '',
             'google_analytics_id' => '',
             'custom_header_scripts' => '',
             'custom_footer_scripts' => '',

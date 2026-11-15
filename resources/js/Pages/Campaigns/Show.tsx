@@ -185,6 +185,18 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700">
                                         {t('active')}
                                     </span>
+                                    {campaign.campaign_type === 'custom_text' && (
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-violet-50 text-violet-700 border border-violet-100 flex items-center gap-1">
+                                            <Sparkles className="w-3 h-3 text-amber-500" />
+                                            <span>{language === 'bn' ? 'কাস্টম নাম ও টেক্সট' : 'Custom Text Enabled'}</span>
+                                        </span>
+                                    )}
+                                    {campaign.campaign_type === 'greeting_card' && (
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100 flex items-center gap-1">
+                                            <Sparkles className="w-3 h-3 text-rose-500" />
+                                            <span>{language === 'bn' ? 'শুভেচ্ছা কার্ড' : 'Greeting Card'}</span>
+                                        </span>
+                                    )}
                                 </div>
 
                                 <h1 className="text-2xl sm:text-4xl font-black text-gray-900 leading-tight">

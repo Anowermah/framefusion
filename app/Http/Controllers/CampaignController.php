@@ -555,6 +555,7 @@ class CampaignController extends Controller
             'slug' => Str::slug($request->slug),
             'description' => $request->description,
             'description_bn' => $request->description_bn,
+            'campaign_type' => $request->input('campaign_type', $campaign->campaign_type),
             'frame_url' => $frameUrl,
             'thumbnail_url' => $frameUrl,
             'status' => $request->status,

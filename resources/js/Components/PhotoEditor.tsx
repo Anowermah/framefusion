@@ -4,7 +4,8 @@ import { useLanguage } from '@/Context/LanguageContext';
 import { 
     Upload, ZoomIn, ZoomOut, RotateCcw, RotateCw, 
     RefreshCw, Download, Sliders, Move, Sparkles, 
-    CheckCircle2, Share2, ArrowLeft, Eye, ShieldCheck
+    CheckCircle2, Share2, ArrowLeft, Eye, ShieldCheck,
+    Type
 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
@@ -63,7 +64,22 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [shareToGallery, setShareToGallery] = useState(false);
 
     // Tab view for mobile sidebar
-    const [activeTab, setActiveTab] = useState<'transform' | 'filters' | 'export'>('transform');
+    const [activeTab, setActiveTab] = useState<'transform' | 'text' | 'filters' | 'export'>(
+        (campaign.campaign_type === 'custom_text' || campaign.campaign_type === 'greeting_card') ? 'text' : 'transform'
+    );
+
+    // Custom Text & Advanced Customization States
+    const [enableText, setEnableText] = useState(
+        campaign.campaign_type === 'custom_text' || campaign.campaign_type === 'greeting_card'
+    );
+    const [primaryText, setPrimaryText] = useState('');
+    const [secondaryText, setSecondaryText] = useState('');
+    const [textPosition, setTextPosition] = useState<'bottom' | 'top' | 'center' | 'custom'>('bottom');
+    const [textYOffset, setTextYOffset] = useState(86);
+    const [textColor, setTextColor] = useState('#FFFFFF');
+    const [textShadow, setTextShadow] = useState(true);
+    const [textBgStyle, setTextBgStyle] = useState<'dark_pill' | 'gold_ribbon' | 'brand_pill' | 'transparent'>('dark_pill');
+    const [textSize, setTextSize] = useState<'sm' | 'md' | 'lg'>('md');
 
     // 1. Load Campaign Transparent Frame
     useEffect(() => {
@@ -211,7 +227,119 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
 
             ctx.restore();
         }
-    }, [userImage, frameImage, zoom, position, rotation, brightness, contrast, saturation, grayscale, sepia, aspectRatio, t]);
+
+        // LAYER 3: Draw Custom Text / Supporter Name / Custom Message
+        if (enableText && primaryText.trim()) {
+            ctx.save();
+            ctx.filter = 'none';
+
+            const pText = primaryText.trim();
+            const sText = secondaryText.trim();
+
+            // Responsive font sizing based on canvas width
+            const sizeMap = {
+                sm: { base: width * 0.040, sub: width * 0.026 },
+                md: { base: width * 0.052, sub: width * 0.032 },
+                lg: { base: width * 0.066, sub: width * 0.040 },
+            };
+            const currentSize = sizeMap[textSize] || sizeMap.md;
+            const baseFontSize = currentSize.base;
+            const subFontSize = currentSize.sub;
+
+            // Universal multilingual font stack
+            const fontStack = '"Hind Siliguri", "Noto Sans Bengali", "SolaimanLipi", "Inter", -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Calculate Y position
+            let yPos = (textYOffset / 100) * height;
+            if (textPosition === 'bottom') yPos = height * 0.86;
+            if (textPosition === 'top') yPos = height * 0.14;
+            if (textPosition === 'center') yPos = height * 0.50;
+
+            const xPos = width / 2;
+
+            // Measure text for background pill / ribbon
+            ctx.font = `bold ${Math.round(baseFontSize)}px ${fontStack}`;
+            const pMetrics = ctx.measureText(pText);
+            ctx.font = `500 ${Math.round(subFontSize)}px ${fontStack}`;
+            const sMetrics = sText ? ctx.measureText(sText) : { width: 0 };
+            const maxTextWidth = Math.max(pMetrics.width, sMetrics.width);
+
+            const pillPaddingX = baseFontSize * 0.95;
+            const pillPaddingY = sText ? baseFontSize * 0.55 : baseFontSize * 0.40;
+            const pillW = Math.min(width * 0.88, maxTextWidth + pillPaddingX * 2);
+            const pillH = sText ? (baseFontSize + subFontSize + pillPaddingY * 2) : (baseFontSize + pillPaddingY * 2);
+
+            // Draw background pill / ribbon if selected
+            if (textBgStyle !== 'transparent') {
+                ctx.save();
+                const rx = xPos - pillW / 2;
+                const ry = yPos - pillH / 2;
+                const radius = Math.round(pillH / 2);
+
+                if (textBgStyle === 'dark_pill') {
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                    ctx.lineWidth = Math.max(1, 1.5 * scaleMultiplier);
+                } else if (textBgStyle === 'gold_ribbon') {
+                    const grad = ctx.createLinearGradient(rx, ry, rx + pillW, ry + pillH);
+                    grad.addColorStop(0, '#B45309');
+                    grad.addColorStop(0.5, '#F59E0B');
+                    grad.addColorStop(1, '#D97706');
+                    ctx.fillStyle = grad;
+                    ctx.strokeStyle = '#FDE68A';
+                    ctx.lineWidth = Math.max(1, 1.5 * scaleMultiplier);
+                } else if (textBgStyle === 'brand_pill') {
+                    const grad = ctx.createLinearGradient(rx, ry, rx + pillW, ry + pillH);
+                    grad.addColorStop(0, '#635BFF');
+                    grad.addColorStop(1, '#8B5CF6');
+                    ctx.fillStyle = grad;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = Math.max(1, 1.5 * scaleMultiplier);
+                }
+
+                ctx.beginPath();
+                if (typeof ctx.roundRect === 'function') {
+                    ctx.roundRect(rx, ry, pillW, pillH, radius);
+                } else {
+                    ctx.rect(rx, ry, pillW, pillH);
+                }
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // High contrast text shadow
+            if (textShadow) {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = Math.round(6 * scaleMultiplier);
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = Math.round(2 * scaleMultiplier);
+            }
+
+            // Draw Primary Text
+            ctx.font = `bold ${Math.round(baseFontSize)}px ${fontStack}`;
+            ctx.fillStyle = textColor;
+            const primaryY = sText ? yPos - (subFontSize * 0.45) : yPos;
+            ctx.fillText(pText, xPos, primaryY);
+
+            // Draw Secondary Subtitle
+            if (sText) {
+                ctx.font = `600 ${Math.round(subFontSize)}px ${fontStack}`;
+                ctx.fillStyle = textBgStyle === 'gold_ribbon' ? '#FEF3C7' : 'rgba(255, 255, 255, 0.9)';
+                const secondaryY = yPos + (baseFontSize * 0.7);
+                ctx.fillText(sText, xPos, secondaryY);
+            }
+
+            ctx.restore();
+        }
+    }, [
+        userImage, frameImage, zoom, position, rotation, brightness, contrast, 
+        saturation, grayscale, sepia, aspectRatio, t,
+        enableText, primaryText, secondaryText, textPosition, textYOffset, 
+        textColor, textShadow, textBgStyle, textSize
+    ]);
 
     // Re-render display canvas whenever adjustments change
     useEffect(() => {
@@ -391,14 +519,25 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                     {/* LEFT SIDEBAR: Adjustments and controls */}
                     <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-100 shadow-xs p-5 space-y-6">
                         {/* Tabs */}
-                        <div className="flex p-1 bg-gray-100 rounded-xl text-xs font-bold text-gray-600">
+                        <div className="flex p-1 bg-gray-100 rounded-xl text-xs font-bold text-gray-600 gap-1">
                             <button
                                 onClick={() => setActiveTab('transform')}
                                 className={`flex-1 py-2 rounded-lg transition-all ${
                                     activeTab === 'transform' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
                                 }`}
                             >
-                                {t('zoomControls')}
+                                {language === 'bn' ? 'পজিশন' : 'Position'}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('text')}
+                                className={`flex-1 py-2 rounded-lg transition-all relative ${
+                                    activeTab === 'text' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                }`}
+                            >
+                                <span>{language === 'bn' ? 'নাম/টেক্সট' : 'Text'}</span>
+                                {enableText && primaryText && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-brand-500 absolute top-1.5 right-1.5" />
+                                )}
                             </button>
                             <button
                                 onClick={() => setActiveTab('filters')}
@@ -547,7 +686,183 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                             </div>
                         )}
 
-                        {/* TAB 2: Image Filters */}
+                        {/* TAB 2: Custom Text & Name Badge */}
+                        {activeTab === 'text' && (
+                            <div className="space-y-4 animate-in fade-in duration-200">
+                                {/* Toggle Custom Text */}
+                                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-gray-50 border border-gray-100">
+                                    <div>
+                                        <span className="text-xs font-bold text-gray-900 block">
+                                            {language === 'bn' ? 'ফ্রেমে নাম বা লেখা যোগ করুন' : 'Add Name / Text to Frame'}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500">
+                                            {language === 'bn' ? 'নিজের নাম বা বার্তা যুক্ত করে ফ্রেম পারসোনালাইজ করুন' : 'Personalize frame with your custom name or message'}
+                                        </span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEnableText(!enableText)}
+                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                                            enableText ? 'bg-brand-500' : 'bg-gray-200'
+                                        }`}
+                                    >
+                                        <span
+                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                                                enableText ? 'translate-x-5' : 'translate-x-0'
+                                            }`}
+                                        />
+                                    </button>
+                                </div>
+
+                                {enableText && (
+                                    <div className="space-y-4 pt-1">
+                                        {/* Primary Text (Name) */}
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 block">
+                                                {language === 'bn' ? 'আপনার নাম বা মূল লেখা' : 'Your Name / Main Text'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={primaryText}
+                                                onChange={(e) => setPrimaryText(e.target.value)}
+                                                placeholder={language === 'bn' ? 'যেমন: মোহাম্মদ আনোয়ার' : 'e.g. John Doe / Eid Mubarak'}
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-medium"
+                                                maxLength={45}
+                                            />
+                                        </div>
+
+                                        {/* Secondary Text (Designation / District / Slogan) */}
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 block">
+                                                {language === 'bn' ? 'পদবী / জেলা / বার্তা (ঐচ্ছিক)' : 'Designation / Slogan (Optional)'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={secondaryText}
+                                                onChange={(e) => setSecondaryText(e.target.value)}
+                                                placeholder={language === 'bn' ? 'যেমন: সদস্য, ঢাকা মহানগর' : 'e.g. Supporter, Dhaka'}
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-medium"
+                                                maxLength={55}
+                                            />
+                                        </div>
+
+                                        {/* Ribbon / Badge Style */}
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-gray-700 block">
+                                                {language === 'bn' ? 'রিবন বা ব্যাজ স্টাইল' : 'Ribbon / Badge Style'}
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {[
+                                                    { id: 'dark_pill', label: language === 'bn' ? 'ডার্ক গ্লাস' : 'Dark Glass', dot: 'bg-slate-900' },
+                                                    { id: 'gold_ribbon', label: language === 'bn' ? 'গোল্ডেন রিবন' : 'Gold Ribbon', dot: 'bg-amber-500' },
+                                                    { id: 'brand_pill', label: language === 'bn' ? 'ভায়োলেট' : 'Violet Brand', dot: 'bg-brand-500' },
+                                                    { id: 'transparent', label: language === 'bn' ? 'ক্লিন শ্যাডো' : 'Clean Text', dot: 'bg-gray-300' },
+                                                ].map((s) => (
+                                                    <button
+                                                        key={s.id}
+                                                        type="button"
+                                                        onClick={() => setTextBgStyle(s.id as any)}
+                                                        className={`px-3 py-2 rounded-xl text-xs font-semibold border flex items-center gap-2 transition-all ${
+                                                            textBgStyle === s.id
+                                                                ? 'border-brand-500 bg-brand-50/50 text-brand-700 font-bold shadow-xs'
+                                                                : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        <span className={`w-3 h-3 rounded-full shrink-0 ${s.dot}`} />
+                                                        <span className="truncate">{s.label}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Position Presets + Y-Offset Slider */}
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-xs font-bold text-gray-700">
+                                                <span>{language === 'bn' ? 'অবস্থান নির্বাচন' : 'Position'}</span>
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { setTextPosition('bottom'); setTextYOffset(86); }}
+                                                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
+                                                            textPosition === 'bottom' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        }`}
+                                                    >
+                                                        {language === 'bn' ? 'নিচে' : 'Bottom'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { setTextPosition('top'); setTextYOffset(14); }}
+                                                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
+                                                            textPosition === 'top' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        }`}
+                                                    >
+                                                        {language === 'bn' ? 'উপরে' : 'Top'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { setTextPosition('center'); setTextYOffset(50); }}
+                                                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
+                                                            textPosition === 'center' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        }`}
+                                                    >
+                                                        {language === 'bn' ? 'মাঝে' : 'Center'}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Fine-tune Vertical Slider */}
+                                            <div className="space-y-1">
+                                                <div className="flex justify-between text-[11px] text-gray-400">
+                                                    <span>{language === 'bn' ? 'সূক্ষ্ম অবস্থান সামঞ্জস্য' : 'Fine-tune Y-Offset'}</span>
+                                                    <span>{textYOffset}%</span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min="10"
+                                                    max="92"
+                                                    step="1"
+                                                    value={textYOffset}
+                                                    onChange={(e) => {
+                                                        setTextYOffset(parseInt(e.target.value));
+                                                        setTextPosition('custom');
+                                                    }}
+                                                    className="w-full accent-brand-500 cursor-pointer"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Text Size */}
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 block">
+                                                {language === 'bn' ? 'লেখার সাইজ' : 'Font Size'}
+                                            </label>
+                                            <div className="grid grid-cols-3 gap-2 text-xs font-semibold">
+                                                {[
+                                                    { id: 'sm', label: language === 'bn' ? 'ছোট' : 'Small' },
+                                                    { id: 'md', label: language === 'bn' ? 'মাঝারি' : 'Medium' },
+                                                    { id: 'lg', label: language === 'bn' ? 'বড়' : 'Large' },
+                                                ].map((sz) => (
+                                                    <button
+                                                        key={sz.id}
+                                                        type="button"
+                                                        onClick={() => setTextSize(sz.id as any)}
+                                                        className={`py-1.5 rounded-xl border text-center transition-all ${
+                                                            textSize === sz.id
+                                                                ? 'border-brand-500 bg-brand-50 text-brand-700 font-bold'
+                                                                : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        {sz.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* TAB 3: Image Filters */}
                         {activeTab === 'filters' && (
                             <div className="space-y-4 animate-in fade-in duration-200">
                                 {/* Brightness */}

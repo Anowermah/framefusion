@@ -25,6 +25,7 @@ interface CampaignEditProps {
         description_bn?: string;
         frame_url: string;
         thumbnail_url?: string;
+        campaign_type?: string;
         visibility: 'public' | 'unlisted' | 'private';
         status: 'published' | 'draft';
         tags?: string;
@@ -52,6 +53,7 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
     const [tags, setTags] = useState(campaign.tags || '');
     const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private'>(campaign.visibility || 'public');
     const [status, setStatus] = useState<'published' | 'draft'>(campaign.status || 'published');
+    const [campaignType, setCampaignType] = useState<string>(campaign.campaign_type || 'frame');
     const [aspectRatio, setAspectRatio] = useState<'1:1' | '4:5' | '9:16'>(
         (campaign.primary_frame?.aspect_ratio as any) || '1:1'
     );
@@ -91,6 +93,7 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
         formData.append('title_bn', titleBn);
         formData.append('slug', slug);
         formData.append('category_id', String(categoryId));
+        formData.append('campaign_type', campaignType);
         formData.append('description', description);
         formData.append('description_bn', descriptionBn);
         formData.append('tags', tags);
@@ -230,6 +233,24 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
                                     ))}
                                 </select>
                             </div>
+                        </div>
+
+                        {/* Campaign Type Selector */}
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 mb-1">
+                                {language === 'bn' ? 'ক্যাম্পেইনের ধরণ (Campaign Type)' : 'Campaign Type'}
+                            </label>
+                            <select
+                                value={campaignType}
+                                onChange={(e) => setCampaignType(e.target.value)}
+                                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                            >
+                                <option value="frame">{language === 'bn' ? 'ক্লাসিক ফ্রেম টুইবন (স্বচ্ছ কাটআউট)' : 'Classic Frame Twibbon (Standard Cutout)'}</option>
+                                <option value="custom_text">{language === 'bn' ? 'কাস্টম নাম ও লেখা ফ্রেম (অ্যাডভান্সড টেক্সট)' : 'Name & Custom Text Frame (Advanced)'}</option>
+                                <option value="greeting_card">{language === 'bn' ? 'শুভেচ্ছা ও উৎসব কার্ড (উৎসব ও কার্ড)' : 'Greeting & Celebration Card (Festive)'}</option>
+                                <option value="sticker_badge">{language === 'bn' ? 'ক্যাম্পেইন সিল ও ব্যাজ (লোগো/সিল)' : 'Supporter Seal & Badge'}</option>
+                                <option value="background">{language === 'bn' ? 'ব্যাকগ্রাউন্ড ক্যানভাস' : 'Background Canvas'}</option>
+                            </select>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

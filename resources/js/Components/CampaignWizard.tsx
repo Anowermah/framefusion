@@ -4,7 +4,7 @@ import { useLanguage } from '@/Context/LanguageContext';
 import { 
     Layers, Image as ImageIcon, FileText, Sliders, 
     Eye, CheckCircle2, Upload, ArrowRight, ArrowLeft, 
-    Sparkles, AlertCircle, Info 
+    Sparkles, AlertCircle, Info, Type, Gift, Award
 } from 'lucide-react';
 
 interface CategoryItem {
@@ -23,7 +23,7 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
     const [step, setStep] = useState(1);
 
     // Form State
-    const [campaignType, setCampaignType] = useState<'frame' | 'background'>('frame');
+    const [campaignType, setCampaignType] = useState<'frame' | 'custom_text' | 'greeting_card' | 'sticker_badge' | 'background'>('frame');
     const [frameFile, setFrameFile] = useState<File | null>(null);
     const [framePreviewUrl, setFramePreviewUrl] = useState<string | null>(null);
 
@@ -172,42 +172,133 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                 <div className="space-y-6 animate-in fade-in duration-200">
                     <div>
                         <h2 className="text-xl font-black text-gray-900">{t('step1')}</h2>
-                        <p className="text-xs text-gray-500 mt-1">Select how user photos will composite with your design</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            {language === 'bn' 
+                                ? 'আপনার ফ্রেমের ধরণ নির্বাচন করুন (সাধারণ ফ্রেম অথবা কাস্টম নাম/বার্তা যুক্ত অ্যাডভান্সড ফ্রেম)' 
+                                : 'Select how supporters will interact and composite their photos with your design'}
+                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {/* 1. Classic Frame */}
                         <div
                             onClick={() => setCampaignType('frame')}
-                            className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${
+                            className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
                                 campaignType === 'frame'
-                                    ? 'border-brand-500 bg-brand-50/50 shadow-xs'
+                                    ? 'border-brand-500 bg-brand-50/40 shadow-xs ring-2 ring-brand-100'
                                     : 'border-gray-200 hover:border-gray-300 bg-white'
                             }`}
                         >
-                            <div className="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center mb-4">
-                                <Layers className="w-6 h-6" />
+                            <div>
+                                <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 border border-brand-100 flex items-center justify-center mb-3 shadow-xs">
+                                    <Layers className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-gray-900">{t('frameTwibbon')}</h3>
+                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    {t('frameTwibbonDesc')}
+                                </p>
                             </div>
-                            <h3 className="text-base font-bold text-gray-900">{t('frameTwibbon')}</h3>
-                            <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                                {t('frameTwibbonDesc')}
-                            </p>
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-brand-600">
+                                <span>{language === 'bn' ? 'স্ট্যান্ডার্ড কাটআউট' : 'Standard Cutout'}</span>
+                            </div>
                         </div>
 
+                        {/* 2. Custom Text & Name Badge (Advanced) */}
                         <div
-                            onClick={() => setCampaignType('background')}
-                            className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${
-                                campaignType === 'background'
-                                    ? 'border-brand-500 bg-brand-50/50 shadow-xs'
+                            onClick={() => setCampaignType('custom_text')}
+                            className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between relative ${
+                                campaignType === 'custom_text'
+                                    ? 'border-violet-600 bg-violet-50/40 shadow-xs ring-2 ring-violet-100'
                                     : 'border-gray-200 hover:border-gray-300 bg-white'
                             }`}
                         >
-                            <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-4">
-                                <ImageIcon className="w-6 h-6" />
+                            <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-violet-100 text-violet-700 border border-violet-200">
+                                {language === 'bn' ? 'অ্যাডভান্সড' : 'Advanced'}
+                            </span>
+                            <div>
+                                <div className="w-12 h-12 rounded-2xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center mb-3 shadow-xs">
+                                    <Type className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-gray-900">{t('customTextType')}</h3>
+                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    {t('customTextTypeDesc')}
+                                </p>
                             </div>
-                            <h3 className="text-base font-bold text-gray-900">{t('backgroundTwibbon')}</h3>
-                            <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                                {t('backgroundTwibbonDesc')}
-                            </p>
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-violet-600">
+                                <span>{language === 'bn' ? 'ইন্টারেক্টিভ নাম ও টেক্সট' : 'Interactive Custom Text'}</span>
+                            </div>
+                        </div>
+
+                        {/* 3. Greeting & Festival Card (Advanced) */}
+                        <div
+                            onClick={() => setCampaignType('greeting_card')}
+                            className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between relative ${
+                                campaignType === 'greeting_card'
+                                    ? 'border-rose-500 bg-rose-50/40 shadow-xs ring-2 ring-rose-100'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
+                        >
+                            <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-100 text-rose-700 border border-rose-200">
+                                {language === 'bn' ? 'উৎসব ও কার্ড' : 'Festive'}
+                            </span>
+                            <div>
+                                <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center mb-3 shadow-xs">
+                                    <Gift className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-gray-900">{t('greetingCardType')}</h3>
+                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    {t('greetingCardTypeDesc')}
+                                </p>
+                            </div>
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-rose-600">
+                                <span>{language === 'bn' ? 'শুভেচ্ছা বার্তা' : 'Wishes & Greeting'}</span>
+                            </div>
+                        </div>
+
+                        {/* 4. Supporter Badge & Seal */}
+                        <div
+                            onClick={() => setCampaignType('sticker_badge')}
+                            className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                                campaignType === 'sticker_badge'
+                                    ? 'border-emerald-500 bg-emerald-50/40 shadow-xs ring-2 ring-emerald-100'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
+                        >
+                            <div>
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-3 shadow-xs">
+                                    <Award className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-gray-900">{t('stickerBadgeType')}</h3>
+                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    {t('stickerBadgeTypeDesc')}
+                                </p>
+                            </div>
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-emerald-600">
+                                <span>{language === 'bn' ? 'সিল ও ক্রেস্ট' : 'Seal & Badge'}</span>
+                            </div>
+                        </div>
+
+                        {/* 5. Background Canvas */}
+                        <div
+                            onClick={() => setCampaignType('background')}
+                            className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                                campaignType === 'background'
+                                    ? 'border-amber-500 bg-amber-50/40 shadow-xs ring-2 ring-amber-100'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
+                        >
+                            <div>
+                                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center mb-3 shadow-xs">
+                                    <ImageIcon className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-gray-900">{t('backgroundTwibbon')}</h3>
+                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    {t('backgroundTwibbonDesc')}
+                                </p>
+                            </div>
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-amber-600">
+                                <span>{language === 'bn' ? 'ব্যাকড্রপ আর্টওয়ার্ক' : 'Backdrop Canvas'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -423,6 +514,24 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                                 className="w-full accent-brand-500"
                             />
                         </div>
+
+                        {(campaignType === 'custom_text' || campaignType === 'greeting_card') && (
+                            <div className="p-4 rounded-2xl bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100/80 flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0 mt-0.5">
+                                    <Sparkles className="w-4 h-4" />
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-bold text-violet-900 block">
+                                        {language === 'bn' ? 'অ্যাডভান্সড কাস্টম টেক্সট সক্রিয়' : 'Advanced Interactive Text Active'}
+                                    </span>
+                                    <span className="text-violet-700/80 mt-0.5 block leading-relaxed">
+                                        {language === 'bn' 
+                                            ? 'সাপোর্টাররা ফটো স্টুডিওতে তাদের নিজের নাম, পদবী, জেলা বা শুভেচ্ছা বার্তা লিখে ফ্রেমের সাথে অ্যাডজাস্ট করে ডাউনলোড করতে পারবেন।'
+                                            : 'Supporters will be able to type and customize their own name, designation, district, or personal message directly on this frame.'}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

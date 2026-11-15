@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function Guest({ children }: PropsWithChildren) {
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-brand-50/50 via-white to-[#F8F9FC] py-8 sm:py-12 px-4 sm:px-6">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-brand-50/50 via-white to-[#F8F9FC] py-8 sm:py-12 px-4 sm:px-6">
             <div className="mb-6 flex flex-col items-center">
                 <Link href="/" className="mb-2">
                     <ApplicationLogo size="lg" showTagline={true} />

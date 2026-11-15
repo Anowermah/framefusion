@@ -33,18 +33,18 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
     return (
         <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] transition-all">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-14 sm:h-16">
+                <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
                     {/* Brand Logo & Desktop Nav */}
-                    <div className="flex items-center gap-7">
+                    <div className="flex items-center gap-3 lg:gap-6 min-w-0">
                         <Link href="/" className="flex items-center active:scale-95 transition-transform shrink-0">
                             <ApplicationLogo size="md" />
                         </Link>
 
                         {/* Minimal Desktop Capsule Navigation */}
-                        <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/50">
+                        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/50 shrink-0">
                             <Link 
                                 href="/explore" 
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all shrink-0 ${
                                     isLinkActive('/explore') 
                                         ? 'bg-slate-900 text-white shadow-xs' 
                                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -54,7 +54,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </Link>
                             <Link 
                                 href="/categories" 
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all shrink-0 ${
                                     isLinkActive('/categories') 
                                         ? 'bg-slate-900 text-white shadow-xs' 
                                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -64,7 +64,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </Link>
                             <Link 
                                 href="/trending" 
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all shrink-0 ${
                                     isLinkActive('/trending') 
                                         ? 'bg-slate-900 text-white shadow-xs' 
                                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -74,7 +74,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </Link>
                             <Link 
                                 href="/how-it-works" 
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all ${
+                                className={`hidden xl:inline-flex px-3 py-1.5 rounded-full text-xs font-semibold tracking-tight transition-all shrink-0 ${
                                     isLinkActive('/how-it-works') 
                                         ? 'bg-slate-900 text-white shadow-xs' 
                                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -86,11 +86,11 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                     </div>
 
                     {/* Right Side Desktop Controls */}
-                    <div className="hidden md:flex items-center gap-2.5">
+                    <div className="hidden md:flex items-center gap-2 lg:gap-2.5 shrink-0">
                         {/* Minimalist Search Pill with ⌘K Keycap */}
                         <Link
                             href="/explore"
-                            className="group flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-slate-100/80 hover:bg-slate-100 border border-slate-200/60 text-xs text-slate-400 transition-all hover:border-slate-300"
+                            className="hidden xl:flex group items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-slate-100/80 hover:bg-slate-100 border border-slate-200/60 text-xs text-slate-400 transition-all hover:border-slate-300 shrink-0"
                             title={t('searchPlaceholder')}
                         >
                             <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 transition-colors" />
@@ -103,7 +103,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         </Link>
 
                         {/* Segmented 1-Click Language Switcher Pill */}
-                        <div className="bg-slate-100/90 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[11px] font-bold">
+                        <div className="bg-slate-100/90 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[11px] font-bold shrink-0">
                             <button
                                 onClick={() => setLanguage('bn')}
                                 className={`px-2.5 py-1 rounded-full transition-all ${
@@ -129,7 +129,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         {/* Ultra-Premium Create Campaign CTA */}
                         <Link
                             href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"}
-                            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-extrabold text-white bg-linear-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-sm shadow-violet-500/25 active:scale-95 transition-all"
+                            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 text-xs font-extrabold text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-sm shadow-violet-500/25 active:scale-95 transition-all shrink-0"
                         >
                             <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse" />
                             <span>{t('createCampaign')}</span>
@@ -137,12 +137,12 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
 
                         {/* User Authentication state */}
                         {user ? (
-                            <div className="relative">
+                            <div className="relative shrink-0">
                                 <button
                                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                                     className="flex items-center gap-2 p-1 pl-2 rounded-full border border-slate-200/80 hover:border-violet-300 hover:bg-slate-50 transition-all active:scale-95"
                                 >
-                                    <div className="w-7 h-7 rounded-full bg-linear-to-tr from-violet-500 to-indigo-600 text-white font-extrabold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100">
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-violet-500 to-indigo-600 text-white font-extrabold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100">
                                         {user.avatar_url ? (
                                             <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                                         ) : (
@@ -253,16 +253,16 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                                 )}
                             </div>
                         ) : (
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 shrink-0">
                                 <Link
                                     href="/login"
-                                    className="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-violet-600 rounded-full hover:bg-slate-100 transition-colors"
+                                    className="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-violet-600 rounded-full hover:bg-slate-100 transition-colors shrink-0"
                                 >
                                     {t('login')}
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="px-4 py-1.5 text-xs font-bold text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-full transition-all"
+                                    className="px-4 py-1.5 text-xs font-bold text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-full transition-all shrink-0"
                                 >
                                     {t('register')}
                                 </Link>
@@ -305,7 +305,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         {user ? (
                             <Link
                                 href="/dashboard"
-                                className="w-7 h-7 rounded-full bg-linear-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100 active:scale-90 transition-transform"
+                                className="w-7 h-7 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100 active:scale-90 transition-transform"
                             >
                                 {user.avatar_url ? (
                                     <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -316,7 +316,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         ) : (
                             <Link
                                 href="/login"
-                                className="px-3 py-1 text-xs font-bold text-white bg-linear-to-r from-violet-600 to-indigo-600 rounded-full shadow-xs active:scale-95 transition-all"
+                                className="px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full shadow-xs active:scale-95 transition-all"
                             >
                                 {t('login')}
                             </Link>
@@ -356,7 +356,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         <Link 
                             href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"} 
                             onClick={() => setMobileMenuOpen(false)}
-                            className="py-2.5 px-3 rounded-xl bg-linear-to-r from-violet-600 to-indigo-600 text-white font-extrabold flex items-center justify-center gap-2 shadow-sm shadow-violet-500/25"
+                            className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-extrabold flex items-center justify-center gap-2 shadow-sm shadow-violet-500/25"
                         >
                             <Sparkles className="w-4 h-4 text-amber-300" />
                             <span>{t('createCampaign')}</span>

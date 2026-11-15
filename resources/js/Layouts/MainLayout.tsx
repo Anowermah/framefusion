@@ -21,7 +21,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             {hasAnnouncement && (
                 <aside 
                     aria-label="Announcement"
-                    className="bg-linear-to-r from-purple-700 via-brand-600 to-indigo-700 text-white text-xs font-semibold px-4 py-2 flex items-center justify-between shadow-xs sticky top-0 z-60"
+                    className="bg-gradient-to-r from-purple-700 via-brand-600 to-indigo-700 text-white text-xs font-semibold px-4 py-2 flex items-center justify-between shadow-xs sticky top-0 z-60"
                 >
                     <div className="flex-1 flex items-center justify-center gap-2 text-center">
                         <Megaphone className="w-3.5 h-3.5 animate-bounce shrink-0 text-amber-300" />

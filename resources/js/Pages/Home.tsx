@@ -7,7 +7,7 @@ import {
     Search, Sparkles, Flame, Star, ArrowRight,
     Upload, Sliders, Download, CheckCircle, Shield,
     Users, HeartHandshake, Flag, GraduationCap, Cpu,
-    Trophy, Briefcase, ChevronRight
+    Trophy, Briefcase, ChevronRight, Compass
 } from 'lucide-react';
 
 interface CategoryData {
@@ -93,9 +93,9 @@ export default function Home({
             <Head title="Visual Campaign Platform" />
 
             {/* HERO SECTION */}
-            <section className="relative overflow-hidden pt-8 pb-16 lg:pt-16 lg:pb-24 bg-linear-to-b from-brand-50/60 via-white to-[#F8F9FC]">
+            <section className="relative overflow-hidden pt-8 pb-16 lg:pt-16 lg:pb-24 bg-gradient-to-b from-brand-50/60 via-white to-[#F8F9FC]">
                 {/* Decorative background glows */}
-                <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-linear-to-tr from-brand-500/10 via-purple-500/10 to-accent/10 blur-3xl -z-10 rounded-full" />
+                <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-tr from-brand-500/10 via-purple-500/10 to-accent/10 blur-3xl -z-10 rounded-full" />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -118,7 +118,7 @@ export default function Home({
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
                                 <Link
                                     href="/explore"
-                                    className="w-full sm:w-auto px-7 py-3 text-xs font-black text-white bg-linear-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-md shadow-violet-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
+                                    className="w-full sm:w-auto px-7 py-3 text-xs font-black text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-md shadow-violet-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
                                 >
                                     <span>{platform_settings?.hero_cta_text || t('exploreCampaigns')}</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -232,7 +232,7 @@ export default function Home({
 
                     <button
                         type="submit"
-                        className="w-full sm:w-auto px-6 py-2.5 bg-linear-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-full shadow-sm shadow-violet-500/25 transition-all active:scale-95 shrink-0"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-full shadow-sm shadow-violet-500/25 transition-all active:scale-95 shrink-0"
                     >
                         {t('explore')}
                     </button>
@@ -255,7 +255,7 @@ export default function Home({
                     {/* 1. Trending shortcut */}
                     <Link
                         href="/trending"
-                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-linear-to-b from-amber-50 to-white border border-amber-100/80 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-amber-50 to-white border border-amber-100/80 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
                     >
                         <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm shadow-amber-500/25 mb-1.5">
                             <Flame className="w-5 h-5 fill-white" />
@@ -268,9 +268,9 @@ export default function Home({
                     {/* 2. Create Frame shortcut */}
                     <Link
                         href="/campaigns/create"
-                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-linear-to-b from-purple-50 to-white border border-purple-100/80 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
+                        className="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-purple-50 to-white border border-purple-100/80 shadow-xs shrink-0 w-22 text-center active:scale-95 transition-transform"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-sm shadow-purple-600/25 mb-1.5">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-sm shadow-purple-600/25 mb-1.5">
                             <Sparkles className="w-5 h-5" />
                         </div>
                         <span className="text-[11px] font-bold text-gray-800 line-clamp-1">
@@ -434,7 +434,7 @@ export default function Home({
 
             {/* CTA SECTION FOR CREATORS */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="relative rounded-3xl overflow-hidden bg-linear-to-r from-brand-600 via-brand-500 to-purple-600 p-8 sm:p-14 text-white shadow-xl">
+                <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-brand-600 via-brand-500 to-purple-600 p-8 sm:p-14 text-white shadow-xl">
                     <div className="relative z-10 max-w-xl space-y-4">
                         <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold tracking-wider uppercase">
                             Empowering Organizations & Creators

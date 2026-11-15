@@ -161,7 +161,7 @@ export default function MobileBottomNav() {
                                 <div className="flex-1 flex items-center justify-center -mt-6">
                                     <Link
                                         href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"}
-                                        className="relative group flex items-center justify-center w-13 h-13 rounded-full bg-linear-to-tr from-brand-600 via-brand-500 to-purple-600 text-white shadow-lg shadow-brand-500/40 ring-4 ring-white active:scale-90 transition-transform"
+                                        className="relative group flex items-center justify-center w-13 h-13 rounded-full bg-gradient-to-tr from-brand-600 via-brand-500 to-purple-600 text-white shadow-lg shadow-brand-500/40 ring-4 ring-white active:scale-90 transition-transform"
                                         title={t('createCampaign')}
                                     >
                                         <Plus className="w-6 h-6 stroke-[2.5]" />
@@ -255,9 +255,9 @@ export default function MobileBottomNav() {
 
                         {/* User Profile Card (if logged in) */}
                         {user ? (
-                            <div className="mt-4 p-4 rounded-2xl bg-linear-to-br from-brand-50/80 via-white to-purple-50/60 border border-brand-100/80 shadow-xs">
+                            <div className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-brand-50/80 via-white to-purple-50/60 border border-brand-100/80 shadow-xs">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-brand-500 to-purple-600 text-white font-extrabold flex items-center justify-center text-lg shadow-md shadow-brand-500/20 overflow-hidden shrink-0">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-purple-600 text-white font-extrabold flex items-center justify-center text-lg shadow-md shadow-brand-500/20 overflow-hidden shrink-0">
                                         {user.avatar_url ? (
                                             <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                                         ) : (
@@ -296,7 +296,7 @@ export default function MobileBottomNav() {
                             </div>
                         ) : (
                             /* Guest Auth Prompt Card */
-                            <div className="mt-4 p-4 rounded-2xl bg-linear-to-br from-brand-500 to-purple-600 text-white shadow-lg shadow-brand-500/25">
+                            <div className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 text-white shadow-lg shadow-brand-500/25">
                                 <h4 className="text-base font-black">
                                     {language === 'bn' ? 'ফ্রেমফিউশনে স্বাগতম! ✨' : 'Welcome to FrameFusion! ✨'}
                                 </h4>

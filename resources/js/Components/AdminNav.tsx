@@ -30,7 +30,7 @@ export default function AdminNav() {
                             href={item.href}
                             className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl transition-all shrink-0 active:scale-95 ${
                                 isActive
-                                    ? 'bg-linear-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/20 font-black'
+                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/20 font-black'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/80'
                             }`}
                         >

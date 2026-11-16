@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { useLanguage } from '@/Context/LanguageContext';
-import { Heart, Mail, Phone, MapPin } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 export default function Footer() {
     const { platform_settings } = (usePage?.()?.props || {}) as any;
@@ -20,10 +20,6 @@ export default function Footer() {
     const whatsappUrl = whatsappRaw
         ? (whatsappRaw.startsWith('http') ? whatsappRaw : `https://wa.me/${whatsappRaw.replace(/[^0-9]/g, '')}`)
         : null;
-
-    const contactEmail = platform_settings?.contact_email;
-    const contactPhone = platform_settings?.contact_phone;
-    const contactAddress = platform_settings?.contact_address;
 
     return (
         <footer className="bg-white border-t border-slate-200/70 mt-10 sm:mt-20 w-full">
@@ -124,25 +120,6 @@ export default function Footer() {
                             </a>
                         )}
                     </div>
-
-                    {/* Direct Contact info if set */}
-                    {(contactEmail || contactPhone) && (
-                        <div className="flex items-center justify-center gap-2 pt-0.5 text-[11px] text-slate-500">
-                            {contactEmail && (
-                                <a href={`mailto:${contactEmail}`} className="inline-flex items-center gap-1 hover:text-brand-600 transition-colors">
-                                    <Mail className="w-3 h-3 text-slate-400" />
-                                    <span>{contactEmail}</span>
-                                </a>
-                            )}
-                            {contactEmail && contactPhone && <span>•</span>}
-                            {contactPhone && (
-                                <a href={`tel:${contactPhone}`} className="inline-flex items-center gap-1 hover:text-brand-600 transition-colors">
-                                    <Phone className="w-3 h-3 text-slate-400" />
-                                    <span>{contactPhone}</span>
-                                </a>
-                            )}
-                        </div>
-                    )}
 
                     {/* Mini Language Switcher */}
                     <div className="pt-1 flex items-center justify-center">
@@ -250,40 +227,6 @@ export default function Footer() {
                                     </a>
                                 )}
                             </div>
-
-                            {/* Optional Direct Contact Details from Admin */}
-                            {(contactEmail || contactPhone || contactAddress) && (
-                                <div className="flex flex-wrap items-center gap-2 pt-2 text-[11px] text-slate-500">
-                                    {contactEmail && (
-                                        <a 
-                                            href={`mailto:${contactEmail}`} 
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/60 transition-colors max-w-full truncate"
-                                            title={contactEmail}
-                                        >
-                                            <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                            <span className="truncate">{contactEmail}</span>
-                                        </a>
-                                    )}
-                                    {contactPhone && (
-                                        <a 
-                                            href={`tel:${contactPhone}`} 
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/60 transition-colors shrink-0"
-                                        >
-                                            <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                            <span>{contactPhone}</span>
-                                        </a>
-                                    )}
-                                    {contactAddress && (
-                                        <span 
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200/60 truncate max-w-full"
-                                            title={contactAddress}
-                                        >
-                                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                            <span className="truncate">{contactAddress}</span>
-                                        </span>
-                                    )}
-                                </div>
-                            )}
                         </div>
 
                         {/* Desktop Multi-Column Links */}

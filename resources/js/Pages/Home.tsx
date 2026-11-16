@@ -106,19 +106,19 @@ export default function Home({
                                 <span>{platform_settings?.hero_badge || t('trustedBy')}</span>
                             </div>
 
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-[1.15]">
+                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight leading-tight sm:leading-[1.15]">
                                 {platform_settings?.hero_title || t('heroTitle')}
                             </h1>
 
-                            <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                            <p className="text-xs sm:text-base text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
                                 {platform_settings?.hero_subtitle || t('heroSubtitle')}
                             </p>
 
                             {/* Hero Action Buttons */}
-                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-1 sm:pt-2 w-full max-w-sm mx-auto lg:mx-0">
                                 <Link
                                     href="/explore"
-                                    className="w-full sm:w-auto px-7 py-3 text-xs font-black text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-md shadow-violet-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
+                                    className="w-full sm:w-auto px-6 sm:px-7 py-2.5 sm:py-3 text-xs font-black text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-full shadow-md shadow-violet-500/25 active:scale-95 transition-all text-center flex items-center justify-center gap-2"
                                 >
                                     <span>{platform_settings?.hero_cta_text || t('exploreCampaigns')}</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function Home({
 
                                 <Link
                                     href="/campaigns/create"
-                                    className="w-full sm:w-auto px-7 py-3 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full shadow-xs active:scale-95 transition-all text-center"
+                                    className="w-full sm:w-auto px-6 sm:px-7 py-2.5 sm:py-3 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-full shadow-xs active:scale-95 transition-all text-center"
                                 >
                                     {platform_settings?.hero_secondary_cta_text || t('startCampaign')}
                                 </Link>
@@ -150,7 +150,7 @@ export default function Home({
                         </div>
 
                         {/* Hero Visual Collage */}
-                        <div className="lg:col-span-5 relative flex items-center justify-center overflow-hidden py-4 max-w-full">
+                        <div className="hidden sm:flex lg:col-span-5 relative items-center justify-center overflow-hidden py-4 max-w-full">
                             <div className="relative w-full max-w-[420px] aspect-square">
                                 {/* Sample Floating Twibbon Cards Collage */}
                                 <div className="absolute top-0 right-4 w-52 sm:w-60 aspect-square rounded-3xl bg-white p-3 shadow-2xl border border-gray-100 rotate-6 hover:rotate-0 transition-transform duration-300 z-20">

@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import CampaignCard, { CampaignData } from '@/Components/CampaignCard';
 import { useLanguage } from '@/Context/LanguageContext';
-import { Flame } from 'lucide-react';
+import { Flame, Sparkles } from 'lucide-react';
 
 interface PaginationData<T> {
     data: T[];
@@ -41,19 +41,31 @@ export default function Trending({ campaigns }: { campaigns: PaginationData<Camp
 
                 {/* Campaign Grid */}
                 {campaignList.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {campaignList.map((c) => (
                             <CampaignCard key={c.id} campaign={c} />
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-3xl border border-gray-100 p-10 text-center space-y-3">
+                    <div className="bg-white rounded-3xl border border-gray-100 p-8 sm:p-12 text-center space-y-3">
                         <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center border border-amber-100">
                             <Flame className="w-6 h-6 fill-amber-400" />
                         </div>
                         <h3 className="text-sm font-bold text-gray-800">
                             {language === 'bn' ? 'কোন ট্রেন্ডিং ফ্রেম পাওয়া যায়নি' : 'No trending campaigns yet'}
                         </h3>
+                        <p className="text-xs text-gray-400 max-w-xs mx-auto">
+                            {language === 'bn' ? 'এখনই একটি নতুন ফ্রেম ক্যাম্পেইন প্রকাশ করুন ও ট্রেন্ডিংয়ে স্থান নিন।' : 'Create and publish a new photo campaign to get trending.'}
+                        </p>
+                        <div className="pt-2">
+                            <Link
+                                href="/campaigns/create"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-600 to-purple-600 text-white font-extrabold text-xs shadow-md shadow-brand-500/25 active:scale-95 transition-all"
+                            >
+                                <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                                <span>{t('createCampaign')}</span>
+                            </Link>
+                        </div>
                     </div>
                 )}
 

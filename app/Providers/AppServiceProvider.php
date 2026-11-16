@@ -141,6 +141,41 @@ class AppServiceProvider extends ServiceProvider
                     });
                 }
             } catch (\Throwable $e) {}
+
+            // Auto-heal default event poster campaign if missing
+            try {
+                if (Schema::hasTable('campaigns') && !\App\Models\Campaign::where('slug', 'jumar-khutbah-event-poster')->exists()) {
+                    $creator = \App\Models\User::first();
+                    $category = \App\Models\Category::first();
+                    $frameUrl = '/storage/frames/juma-khutbah-template.png';
+
+                    if ($creator && $category) {
+                        \App\Models\Campaign::create([
+                            'creator_id' => $creator->id,
+                            'category_id' => $category->id,
+                            'title' => 'Juma\'ar Khutbah & Event Poster',
+                            'title_bn' => 'পবিত্র জুম\'আর খুতবা ও মাহফিল পোস্টার ফ্রেম',
+                            'slug' => 'jumar-khutbah-event-poster',
+                            'description' => 'Official event and Friday Khutbah poster frame. Customize your date, time, venue, topic, designation, and name with your photo.',
+                            'description_bn' => 'পবিত্র জুম\'আর খুতবা, মাহফিল ও বিশেষ অনুষ্ঠানের পোস্টার ফ্রেম। তারিখ, সময়, স্থান, আলোচ্য বিষয়, পদবি ও নিজের নাম যুক্ত করে ছবি তৈরি করুন।',
+                            'campaign_type' => 'event_notice',
+                            'frame_url' => $frameUrl,
+                            'thumbnail_url' => $frameUrl,
+                            'status' => 'published',
+                            'visibility' => 'public',
+                            'is_featured' => true,
+                            'is_trending' => true,
+                            'supporters_count' => 1250,
+                            'views_count' => 4500,
+                            'start_date' => now()->subDays(2),
+                            'end_date' => now()->addDays(90),
+                            'tags' => 'juma,khutbah,islamic,event,poster,notice,mahfil',
+                            'caption_template' => 'আমি পবিত্র জুম\'আর খুতবা ও মাহফিল পোস্টার ফ্রেমে নিজের ছবি ও তথ্য যুক্ত করে পোস্টার তৈরি করেছি! আপনিও তৈরি করুন: ',
+                            'action_link_text' => 'খুতবার পোস্টার ফ্রেম তৈরি করুন',
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {}
         }
     }
 }

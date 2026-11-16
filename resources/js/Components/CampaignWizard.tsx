@@ -4,7 +4,7 @@ import { useLanguage } from '@/Context/LanguageContext';
 import { 
     Layers, Image as ImageIcon, FileText, Sliders, 
     Eye, CheckCircle2, Upload, ArrowRight, ArrowLeft, 
-    Sparkles, AlertCircle, Info, Type, Gift, Award
+    Sparkles, AlertCircle, Info, Type, Gift, Award, Calendar
 } from 'lucide-react';
 
 interface CategoryItem {
@@ -23,7 +23,7 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
     const [step, setStep] = useState(1);
 
     // Form State
-    const [campaignType, setCampaignType] = useState<'frame' | 'custom_text' | 'greeting_card' | 'sticker_badge' | 'background'>('frame');
+    const [campaignType, setCampaignType] = useState<'frame' | 'custom_text' | 'event_notice' | 'greeting_card' | 'sticker_badge' | 'background'>('frame');
     const [frameFile, setFrameFile] = useState<File | null>(null);
     const [framePreviewUrl, setFramePreviewUrl] = useState<string | null>(null);
 
@@ -239,7 +239,33 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                             </div>
                         </div>
 
-                        {/* 3. Greeting & Festival Card (Advanced) */}
+                        {/* 3. Event & Notice Poster (Juma'ar Khutbah, Mahfil, Seminars) */}
+                        <div
+                            onClick={() => setCampaignType('event_notice')}
+                            className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between relative ${
+                                campaignType === 'event_notice'
+                                    ? 'border-blue-600 bg-blue-50/40 shadow-xs ring-2 ring-blue-100'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
+                        >
+                            <span className="absolute top-3.5 right-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-100 text-blue-700 border border-blue-200">
+                                {language === 'bn' ? 'পোস্টার ও খুতবা' : 'Event Poster'}
+                            </span>
+                            <div>
+                                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mb-3 shadow-xs">
+                                    <Calendar className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-gray-900">{t('eventNoticeType')}</h3>
+                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    {t('eventNoticeTypeDesc')}
+                                </p>
+                            </div>
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+                                <span>{language === 'bn' ? 'তারিখ, সময়, স্থান, নাম ও নোটিশ' : 'Date, Time, Venue, Name & Notice'}</span>
+                            </div>
+                        </div>
+
+                        {/* 4. Greeting & Festival Card (Advanced) */}
                         <div
                             onClick={() => setCampaignType('greeting_card')}
                             className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex flex-col justify-between relative ${

@@ -255,6 +255,7 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
                                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                             >
                                 <option value="frame">{language === 'bn' ? 'ক্লাসিক ফ্রেম টুইবন (স্বচ্ছ কাটআউট)' : 'Classic Frame Twibbon (Standard Cutout)'}</option>
+                                <option value="event_notice">{language === 'bn' ? 'ইভেন্ট, মাহফিল ও নোটিশ পোস্টার (তারিখ, সময়, স্থান, নাম ও পদবি)' : 'Event, Mahfil & Notice Poster (Date, Time, Venue, Name, Title)'}</option>
                                 <option value="custom_text">{language === 'bn' ? 'কাস্টম নাম ও লেখা ফ্রেম (অ্যাডভান্সড টেক্সট)' : 'Name & Custom Text Frame (Advanced)'}</option>
                                 <option value="greeting_card">{language === 'bn' ? 'শুভেচ্ছা ও উৎসব কার্ড (উৎসব ও কার্ড)' : 'Greeting & Celebration Card (Festive)'}</option>
                                 <option value="sticker_badge">{language === 'bn' ? 'ক্যাম্পেইন সিল ও ব্যাজ (লোগো/সিল)' : 'Supporter Seal & Badge'}</option>

@@ -128,6 +128,12 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
                             <span>{language === 'bn' ? 'কাস্টম নাম' : 'Custom Text'}</span>
                         </span>
                     )}
+                    {campaign.campaign_type === 'event_notice' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600/90 text-white backdrop-blur-xs shadow-xs">
+                            <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+                            <span>{language === 'bn' ? 'পোস্টার ও নোটিশ' : 'Notice Poster'}</span>
+                        </span>
+                    )}
                     {campaign.campaign_type === 'greeting_card' && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-600/90 text-white backdrop-blur-xs shadow-xs">
                             <Sparkles className="w-2.5 h-2.5 text-white" />

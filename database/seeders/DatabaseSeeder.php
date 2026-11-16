@@ -223,6 +223,21 @@ class DatabaseSeeder extends Seeder
                 'is_featured' => true,
                 'tags' => 'eid,mubarak,celebration,festive,islamic',
             ],
+            [
+                'title' => 'Juma\'ar Khutbah & Event Poster',
+                'title_bn' => 'পবিত্র জুম\'আর খুতবা ও মাহফিল পোস্টার ফ্রেম',
+                'slug' => 'jumar-khutbah-event-poster',
+                'category_slug' => 'national-festivals',
+                'frame_file' => 'juma-khutbah-template.png',
+                'campaign_type' => 'event_notice',
+                'description' => 'Official event and Friday Khutbah poster frame. Customize your date, time, venue, topic, designation, and name with your photo.',
+                'description_bn' => 'পবিত্র জুম\'আর খুতবা, মাহফিল ও বিশেষ অনুষ্ঠানের পোস্টার ফ্রেম। তারিখ, সময়, স্থান, আলোচ্য বিষয়, পদবি ও নিজের নাম যুক্ত করে ছবি তৈরি করুন।',
+                'supporters_count' => 1250,
+                'views_count' => 4500,
+                'is_trending' => true,
+                'is_featured' => true,
+                'tags' => 'juma,khutbah,islamic,event,poster,notice,mahfil',
+            ],
         ];
 
         foreach ($campaignData as $camp) {
@@ -238,7 +253,7 @@ class DatabaseSeeder extends Seeder
                     'title_bn' => $camp['title_bn'],
                     'description' => $camp['description'],
                     'description_bn' => $camp['description_bn'],
-                    'campaign_type' => 'frame',
+                    'campaign_type' => $camp['campaign_type'] ?? 'frame',
                     'frame_url' => $frameUrl,
                     'thumbnail_url' => $frameUrl,
                     'status' => 'published',

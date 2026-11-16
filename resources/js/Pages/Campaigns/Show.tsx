@@ -268,6 +268,12 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                             <span>{language === 'bn' ? 'কাস্টম নাম ও টেক্সট' : 'Custom Text Enabled'}</span>
                                         </span>
                                     )}
+                                    {campaign.campaign_type === 'event_notice' && (
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                                            <Calendar className="w-3 h-3 text-blue-600" />
+                                            <span>{language === 'bn' ? 'পোস্টার ও নোটিশ' : 'Poster & Notice'}</span>
+                                        </span>
+                                    )}
                                     {campaign.campaign_type === 'greeting_card' && (
                                         <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100 flex items-center gap-1">
                                             <Sparkles className="w-3 h-3 text-rose-500" />

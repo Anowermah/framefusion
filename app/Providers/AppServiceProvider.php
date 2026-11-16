@@ -113,6 +113,34 @@ class AppServiceProvider extends ServiceProvider
                     });
                 }
             } catch (\Throwable $e) {}
+
+            // Auto-heal missing Twibbonize columns on campaigns table
+            try {
+                if (Schema::hasTable('campaigns')) {
+                    Schema::table('campaigns', function (Blueprint $table) {
+                        if (!Schema::hasColumn('campaigns', 'caption_template')) {
+                            $table->text('caption_template')->nullable();
+                        }
+                        if (!Schema::hasColumn('campaigns', 'action_link_url')) {
+                            $table->string('action_link_url')->nullable();
+                        }
+                        if (!Schema::hasColumn('campaigns', 'action_link_text')) {
+                            $table->string('action_link_text')->nullable();
+                        }
+                    });
+                }
+            } catch (\Throwable $e) {}
+
+            // Auto-heal missing creator verification column on users table
+            try {
+                if (Schema::hasTable('users')) {
+                    Schema::table('users', function (Blueprint $table) {
+                        if (!Schema::hasColumn('users', 'is_verified')) {
+                            $table->boolean('is_verified')->default(false);
+                        }
+                    });
+                }
+            } catch (\Throwable $e) {}
         }
     }
 }

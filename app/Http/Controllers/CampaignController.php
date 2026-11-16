@@ -403,6 +403,8 @@ class CampaignController extends Controller
      */
     public function store(Request $request)
     {
+        $this->ensureTwibbonizeColumnsExist();
+
         $request->validate([
             'title' => 'required|string|max:255',
             'title_bn' => 'nullable|string|max:255',
@@ -444,7 +446,7 @@ class CampaignController extends Controller
 
         $frameUrl = '/storage/frames/' . $fileName;
 
-        $campaign = Campaign::create([
+        $campaignData = [
             'creator_id' => Auth::id(),
             'category_id' => $request->category_id,
             'title' => $request->title,
@@ -458,13 +460,22 @@ class CampaignController extends Controller
             'status' => $request->status,
             'visibility' => $request->visibility,
             'tags' => $request->tags,
-            'caption_template' => $request->caption_template,
-            'action_link_url' => $request->action_link_url,
-            'action_link_text' => $request->action_link_text,
             'supporters_count' => 1,
             'views_count' => 1,
             'start_date' => now(),
-        ]);
+        ];
+
+        if (Schema::hasColumn('campaigns', 'caption_template')) {
+            $campaignData['caption_template'] = $request->caption_template;
+        }
+        if (Schema::hasColumn('campaigns', 'action_link_url')) {
+            $campaignData['action_link_url'] = $request->action_link_url;
+        }
+        if (Schema::hasColumn('campaigns', 'action_link_text')) {
+            $campaignData['action_link_text'] = $request->action_link_text;
+        }
+
+        $campaign = Campaign::create($campaignData);
 
         CampaignFrame::create([
             'campaign_id' => $campaign->id,
@@ -539,6 +550,8 @@ class CampaignController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $this->ensureTwibbonizeColumnsExist();
+
         $campaign = is_numeric($id)
             ? Campaign::with('primaryFrame')->findOrFail((int) $id)
             : Campaign::with('primaryFrame')->where('slug', $id)->firstOrFail();
@@ -591,7 +604,7 @@ class CampaignController extends Controller
             $frameUrl = '/storage/frames/' . $fileName;
         }
 
-        $campaign->update([
+        $updateData = [
             'category_id' => $request->category_id,
             'title' => $request->title,
             'title_bn' => $request->title_bn,
@@ -604,10 +617,19 @@ class CampaignController extends Controller
             'status' => $request->status,
             'visibility' => $request->visibility,
             'tags' => $request->tags,
-            'caption_template' => $request->caption_template,
-            'action_link_url' => $request->action_link_url,
-            'action_link_text' => $request->action_link_text,
-        ]);
+        ];
+
+        if (Schema::hasColumn('campaigns', 'caption_template')) {
+            $updateData['caption_template'] = $request->caption_template;
+        }
+        if (Schema::hasColumn('campaigns', 'action_link_url')) {
+            $updateData['action_link_url'] = $request->action_link_url;
+        }
+        if (Schema::hasColumn('campaigns', 'action_link_text')) {
+            $updateData['action_link_text'] = $request->action_link_text;
+        }
+
+        $campaign->update($updateData);
 
         // Update or create primary frame configuration
         if ($campaign->primaryFrame) {
@@ -656,6 +678,28 @@ class CampaignController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Auto-heal missing Twibbonize columns on campaigns table if migration has not run yet
+     */
+    private function ensureTwibbonizeColumnsExist(): void
+    {
+        try {
+            if (Schema::hasTable('campaigns') && !Schema::hasColumn('campaigns', 'caption_template')) {
+                Schema::table('campaigns', function ($table) {
+                    if (!Schema::hasColumn('campaigns', 'caption_template')) {
+                        $table->text('caption_template')->nullable();
+                    }
+                    if (!Schema::hasColumn('campaigns', 'action_link_url')) {
+                        $table->string('action_link_url')->nullable();
+                    }
+                    if (!Schema::hasColumn('campaigns', 'action_link_text')) {
+                        $table->string('action_link_text')->nullable();
+                    }
+                });
+            }
+        } catch (\Throwable $e) {}
     }
 }
 

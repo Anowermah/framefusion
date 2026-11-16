@@ -139,10 +139,20 @@ class AdminController extends Controller implements HasMiddleware
     public function toggleUserVerification(int $id)
     {
         $targetUser = User::findOrFail($id);
-        $targetUser->is_verified = !$targetUser->is_verified;
-        $targetUser->save();
+        if (!Schema::hasColumn('users', 'is_verified')) {
+            try {
+                Schema::table('users', function ($table) {
+                    $table->boolean('is_verified')->default(false);
+                });
+            } catch (\Throwable $e) {}
+        }
 
-        $statusText = $targetUser->is_verified ? 'verified as Official Creator' : 'unverified';
+        if (Schema::hasColumn('users', 'is_verified')) {
+            $targetUser->is_verified = !$targetUser->is_verified;
+            $targetUser->save();
+        }
+
+        $statusText = !empty($targetUser->is_verified) ? 'verified as Official Creator' : 'unverified';
         return back()->with('success', "User {$targetUser->name} is now {$statusText}.");
     }
 

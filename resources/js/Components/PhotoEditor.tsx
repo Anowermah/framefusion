@@ -10,7 +10,7 @@ import {
     Palette, Minus, Plus
 } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
-import { DEFAULT_SLOTS_CONFIG, SlotsConfig } from './SlotConfigurator';
+import { DEFAULT_SLOTS_CONFIG, SlotsConfig, getShapeBorderRadius } from './SlotConfigurator';
 
 interface CampaignProps {
     id: number;
@@ -147,11 +147,6 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [eventTopic, setEventTopic] = useState('বিষয়: জুম\'আর গুরুত্ব ও তাৎপর্য');
     const [speakerTitle, setSpeakerTitle] = useState('খতীব');
     const [speakerName, setSpeakerName] = useState('মাওলানা মুফতি আব্দুল্লাহ');
-    const [eventFontFamily, setEventFontFamily] = useState<'Hind Siliguri' | 'Noto Serif Bengali' | 'Anek Bangla' | 'Inter'>('Hind Siliguri');
-    const [eventFontSizeScale, setEventFontSizeScale] = useState(1.0);
-    const [eventTextShadow, setEventTextShadow] = useState(true);
-    const [eventPrimaryColor, setEventPrimaryColor] = useState('#FFFFFF');
-    const [eventCardColor, setEventCardColor] = useState('#0B2559');
 
     // Custom Text & Advanced Customization States
     const [enableText, setEnableText] = useState(
@@ -426,8 +421,6 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             ctx.save();
             ctx.filter = 'none';
 
-            const fontBase = `"${eventFontFamily}", "Hind Siliguri", "Noto Serif Bengali", "Anek Bangla", sans-serif`;
-
             // ZONE 1: Date Slot
             if (effectiveSlots.date_slot.enabled !== false && eventDate.trim()) {
                 ctx.save();
@@ -436,16 +429,18 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                 const dateX = (effectiveSlots.date_slot.x / 100) * width;
                 const dateY = (effectiveSlots.date_slot.y / 100) * height;
 
-                if (effectiveSlots.date_slot.shadow ?? eventTextShadow) {
+                if (effectiveSlots.date_slot.shadow ?? true) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
                     ctx.shadowBlur = Math.round(5 * scaleMultiplier);
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = Math.round(1.5 * scaleMultiplier);
                 }
 
-                const dateFontSize = Math.round((effectiveSlots.date_slot.font_size || 18) * scaleMultiplier * eventFontSizeScale);
-                ctx.font = `bold ${dateFontSize}px ${fontBase}`;
-                ctx.fillStyle = effectiveSlots.date_slot.color || eventPrimaryColor;
+                const dateFontSize = Math.round((effectiveSlots.date_slot.font_size || 18) * scaleMultiplier);
+                const dateFont = `"${effectiveSlots.date_slot.font_family || 'Hind Siliguri'}", "Noto Serif Bengali", sans-serif`;
+                const dateWeight = effectiveSlots.date_slot.font_weight || 'bold';
+                ctx.font = `${dateWeight} ${dateFontSize}px ${dateFont}`;
+                ctx.fillStyle = effectiveSlots.date_slot.color || '#FFFFFF';
                 ctx.fillText(eventDate.trim(), dateX, dateY);
                 ctx.restore();
             }
@@ -458,15 +453,17 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                 const timeX = (effectiveSlots.time_slot.x / 100) * width;
                 const timeY = (effectiveSlots.time_slot.y / 100) * height;
 
-                if (effectiveSlots.time_slot.shadow ?? eventTextShadow) {
+                if (effectiveSlots.time_slot.shadow ?? true) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
                     ctx.shadowBlur = Math.round(5 * scaleMultiplier);
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = Math.round(1.5 * scaleMultiplier);
                 }
 
-                const timeFontSize = Math.round((effectiveSlots.time_slot.font_size || 15) * scaleMultiplier * eventFontSizeScale);
-                ctx.font = `600 ${timeFontSize}px ${fontBase}`;
+                const timeFontSize = Math.round((effectiveSlots.time_slot.font_size || 15) * scaleMultiplier);
+                const timeFont = `"${effectiveSlots.time_slot.font_family || 'Hind Siliguri'}", "Noto Serif Bengali", sans-serif`;
+                const timeWeight = effectiveSlots.time_slot.font_weight || '600';
+                ctx.font = `${timeWeight} ${timeFontSize}px ${timeFont}`;
                 ctx.fillStyle = effectiveSlots.time_slot.color || '#FEF3C7';
                 ctx.fillText(eventTime.trim(), timeX, timeY);
                 ctx.restore();
@@ -486,9 +483,11 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                     ctx.shadowBlur = Math.round(4 * scaleMultiplier);
                 }
 
-                const venueFontSize = Math.round((effectiveSlots.venue_slot.font_size || 19) * scaleMultiplier * eventFontSizeScale);
-                ctx.font = `bold ${venueFontSize}px ${fontBase}`;
-                ctx.fillStyle = effectiveSlots.venue_slot.color || eventCardColor;
+                const venueFontSize = Math.round((effectiveSlots.venue_slot.font_size || 19) * scaleMultiplier);
+                const venueFont = `"${effectiveSlots.venue_slot.font_family || 'Hind Siliguri'}", "Noto Serif Bengali", sans-serif`;
+                const venueWeight = effectiveSlots.venue_slot.font_weight || 'bold';
+                ctx.font = `${venueWeight} ${venueFontSize}px ${venueFont}`;
+                ctx.fillStyle = effectiveSlots.venue_slot.color || '#0B2559';
                 ctx.fillText(eventVenue.trim(), venueX, venueY, venueMaxW);
                 ctx.restore();
             }
@@ -507,8 +506,10 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                     ctx.shadowBlur = Math.round(4 * scaleMultiplier);
                 }
 
-                const topicFontSize = Math.round((effectiveSlots.topic_slot.font_size || 17) * scaleMultiplier * eventFontSizeScale);
-                ctx.font = `600 ${topicFontSize}px ${fontBase}`;
+                const topicFontSize = Math.round((effectiveSlots.topic_slot.font_size || 17) * scaleMultiplier);
+                const topicFont = `"${effectiveSlots.topic_slot.font_family || 'Hind Siliguri'}", "Noto Serif Bengali", sans-serif`;
+                const topicWeight = effectiveSlots.topic_slot.font_weight || '600';
+                ctx.font = `${topicWeight} ${topicFontSize}px ${topicFont}`;
                 ctx.fillStyle = effectiveSlots.topic_slot.color || '#1E3A8A';
                 
                 const words = eventTopic.trim().split(' ');
@@ -544,14 +545,16 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                 const badgeX = (effectiveSlots.badge_slot.x / 100) * width;
                 const badgeY = (effectiveSlots.badge_slot.y / 100) * height;
 
-                if (effectiveSlots.badge_slot.shadow ?? eventTextShadow) {
+                if (effectiveSlots.badge_slot.shadow ?? true) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
                     ctx.shadowBlur = Math.round(3 * scaleMultiplier);
                     ctx.shadowOffsetY = Math.round(1 * scaleMultiplier);
                 }
 
-                const badgeFontSize = Math.round((effectiveSlots.badge_slot.font_size || 17) * scaleMultiplier * eventFontSizeScale);
-                ctx.font = `bold ${badgeFontSize}px ${fontBase}`;
+                const badgeFontSize = Math.round((effectiveSlots.badge_slot.font_size || 17) * scaleMultiplier);
+                const badgeFont = `"${effectiveSlots.badge_slot.font_family || 'Anek Bangla'}", "Hind Siliguri", sans-serif`;
+                const badgeWeight = effectiveSlots.badge_slot.font_weight || '800';
+                ctx.font = `${badgeWeight} ${badgeFontSize}px ${badgeFont}`;
                 ctx.fillStyle = effectiveSlots.badge_slot.color || '#FFFFFF';
                 ctx.fillText(speakerTitle.trim(), badgeX, badgeY);
                 ctx.restore();
@@ -566,16 +569,18 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                 const nameY = (effectiveSlots.name_slot.y / 100) * height;
                 const nameMaxW = ((effectiveSlots.name_slot.max_width || 42) / 100) * width;
 
-                if (effectiveSlots.name_slot.shadow ?? eventTextShadow) {
+                if (effectiveSlots.name_slot.shadow ?? true) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
                     ctx.shadowBlur = Math.round(6 * scaleMultiplier);
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = Math.round(2 * scaleMultiplier);
                 }
 
-                const nameFontSize = Math.round((effectiveSlots.name_slot.font_size || 33) * scaleMultiplier * eventFontSizeScale);
-                ctx.font = `bold ${nameFontSize}px ${fontBase}`;
-                ctx.fillStyle = effectiveSlots.name_slot.color || eventPrimaryColor;
+                const nameFontSize = Math.round((effectiveSlots.name_slot.font_size || 33) * scaleMultiplier);
+                const nameFont = `"${effectiveSlots.name_slot.font_family || 'Hind Siliguri'}", "Noto Serif Bengali", sans-serif`;
+                const nameWeight = effectiveSlots.name_slot.font_weight || 'bold';
+                ctx.font = `${nameWeight} ${nameFontSize}px ${nameFont}`;
+                ctx.fillStyle = effectiveSlots.name_slot.color || '#FFFFFF';
                 ctx.fillText(speakerName.trim(), nameX, nameY, nameMaxW);
                 ctx.restore();
             }
@@ -628,7 +633,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
         enableWatermark, watermarkText, watermarkPosition,
         campaign.campaign_type,
         eventDate, eventTime, eventVenue, eventTopic, speakerTitle, speakerName,
-        eventFontFamily, eventFontSizeScale, eventTextShadow, eventPrimaryColor, eventCardColor
+        effectiveSlots
     ]);
 
     // Re-render display canvas whenever adjustments change
@@ -1067,129 +1072,16 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                         </div>
                                     )}
 
-                                    {/* 7. Bangla Premium Typography Selector */}
-                                    <div className="pt-2 border-t border-gray-100 space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-                                                <Type className="w-3.5 h-3.5 text-blue-600" />
-                                                <span>{language === 'bn' ? 'বাংলা প্রিমিয়াম ফন্ট স্টাইল' : 'Bangla Premium Typography'}</span>
-                                            </label>
-                                            <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                                                {eventFontFamily}
+                                    {/* Pre-calibrated Admin Typography Badge */}
+                                    <div className="pt-2 border-t border-gray-100">
+                                        <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 flex items-center gap-2.5 text-blue-900">
+                                            <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                                            <span className="text-[11px] leading-tight font-medium">
+                                                {language === 'bn' 
+                                                    ? 'সব লেখার ফন্ট, সাইজ ও কালার ফ্রেমের সাথে শতভাগ নিখুঁতভাবে অ্যাডমিন নির্ধারণ করে দিয়েছেন।' 
+                                                    : 'Typography, font size, colors, and layouts are calibrated by the admin.'}
                                             </span>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {[
-                                                { id: 'Hind Siliguri', name: 'হিন্দ শিলিগুড়ি', sub: 'স্পষ্ট ও স্ট্যান্ডার্ড', font: '"Hind Siliguri", sans-serif' },
-                                                { id: 'Noto Serif Bengali', name: 'নোটো সেরিফ', sub: 'ক্লাসিক ও মার্জিত', font: '"Noto Serif Bengali", serif' },
-                                                { id: 'Anek Bangla', name: 'অনেকা বাংলা', sub: 'আধুনিক ও স্টাইলিশ', font: '"Anek Bangla", sans-serif' },
-                                                { id: 'Inter', name: 'সিম্পল সান্স', sub: 'English / Clean', font: 'Inter, sans-serif' },
-                                            ].map((f) => (
-                                                <button
-                                                    key={f.id}
-                                                    type="button"
-                                                    onClick={() => setEventFontFamily(f.id as any)}
-                                                    className={`p-2.5 rounded-xl border text-left transition-all ${
-                                                        eventFontFamily === f.id
-                                                            ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-100 shadow-xs'
-                                                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                                                    }`}
-                                                >
-                                                    <span 
-                                                        className="block text-xs font-bold text-gray-900" 
-                                                        style={{ fontFamily: f.font }}
-                                                    >
-                                                        {f.name}
-                                                    </span>
-                                                    <span className="block text-[10px] text-gray-400 mt-0.5">
-                                                        {f.sub}
-                                                    </span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* 8. Font Size Scaling (লেখা ছোট / বড় করার কন্ট্রোল) */}
-                                    <div className="pt-2 border-t border-gray-100 space-y-2">
-                                        <div className="flex items-center justify-between text-xs font-bold text-gray-700">
-                                            <span className="flex items-center gap-1.5">
-                                                <span>{language === 'bn' ? 'লেখা ছোট / বড় করুন (Font Size)' : 'Text Size Scale'}</span>
-                                            </span>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                                                    {Math.round(eventFontSizeScale * 100)}%
-                                                </span>
-                                                {eventFontSizeScale !== 1.0 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setEventFontSizeScale(1.0)}
-                                                        className="text-[10px] text-gray-400 hover:text-gray-700 underline"
-                                                    >
-                                                        Reset
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-2.5">
-                                            {/* A- (Smaller) */}
-                                            <button
-                                                type="button"
-                                                onClick={() => setEventFontSizeScale(s => Math.max(0.70, +(s - 0.05).toFixed(2)))}
-                                                className="px-2.5 py-1.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-xs font-black text-gray-700 flex items-center gap-1 shrink-0"
-                                                title="ছোট করুন"
-                                            >
-                                                <Minus className="w-3 h-3" />
-                                                <span>A-</span>
-                                            </button>
-
-                                            {/* Slider */}
-                                            <input
-                                                type="range"
-                                                min="0.70"
-                                                max="1.35"
-                                                step="0.05"
-                                                value={eventFontSizeScale}
-                                                onChange={(e) => setEventFontSizeScale(parseFloat(e.target.value))}
-                                                className="flex-1 accent-blue-600 cursor-pointer"
-                                            />
-
-                                            {/* A+ (Larger) */}
-                                            <button
-                                                type="button"
-                                                onClick={() => setEventFontSizeScale(s => Math.min(1.35, +(s + 0.05).toFixed(2)))}
-                                                className="px-2.5 py-1.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-xs font-black text-gray-700 flex items-center gap-1 shrink-0"
-                                                title="বড় করুন"
-                                            >
-                                                <Plus className="w-3 h-3" />
-                                                <span>A+</span>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* 9. Text Shadow & Readability */}
-                                    <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
-                                        <div>
-                                            <span className="text-xs font-bold text-gray-800 block">
-                                                {language === 'bn' ? 'লেখার স্পষ্ট ছায়া (Shadow)' : 'Drop Shadow'}
-                                            </span>
-                                            <span className="text-[10px] text-gray-400">
-                                                {language === 'bn' ? 'ব্যাকগ্রাউন্ডে লেখা স্পষ্ট ফুটিয়ে তোলে' : 'Enhances contrast over image'}
-                                            </span>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setEventTextShadow(!eventTextShadow)}
-                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                                                eventTextShadow ? 'bg-blue-600' : 'bg-gray-200'
-                                            }`}
-                                        >
-                                            <span
-                                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                                                    eventTextShadow ? 'translate-x-5' : 'translate-x-0'
-                                                }`}
-                                            />
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1709,12 +1601,9 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                                 top: `calc(50% + ${(effectiveSlots.photo_slot.y / 1080) * 100}% - ${(effectiveSlots.photo_slot.height || 60) / 2}%)`,
                                                 width: `${effectiveSlots.photo_slot.width || 40.5}%`,
                                                 height: `${effectiveSlots.photo_slot.height || 60}%`,
+                                                borderRadius: getShapeBorderRadius(effectiveSlots.photo_slot.shape, effectiveSlots.photo_slot.border_radius),
                                             }}
-                                            className={`absolute flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-all hover:bg-blue-50/50 border-2 border-dashed border-blue-400 bg-blue-50/30 backdrop-blur-2xs group shadow-inner ${
-                                                effectiveSlots.photo_slot.shape === 'circle'
-                                                    ? 'rounded-full'
-                                                    : (effectiveSlots.photo_slot.shape === 'arch' ? 'rounded-t-[120px] rounded-b-2xl' : 'rounded-2xl')
-                                            }`}
+                                            className="absolute flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-all hover:bg-blue-50/50 border-2 border-dashed border-blue-400 bg-blue-50/30 backdrop-blur-2xs group shadow-inner overflow-hidden"
                                         >
                                             <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-2 shadow-md group-hover:scale-110 transition-transform">
                                                 <Upload className="w-5 h-5" />

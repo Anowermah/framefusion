@@ -157,10 +157,10 @@
             </script>
         @endif
 
-        <!-- Google Fonts: Inter, Hind Siliguri, Noto Serif Bengali, Anek Bangla -->
+        <!-- Google Fonts: Inter, Hind Siliguri, Noto Serif Bengali, Anek Bangla, Tiro Bangla -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
 
         <!-- Google Analytics Tracking (Controlled from Admin) -->
         @if($gaId = \App\Models\PlatformSetting::get('google_analytics_id'))

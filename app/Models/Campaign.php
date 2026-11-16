@@ -35,6 +35,7 @@ class Campaign extends Model
         'caption_template',
         'action_link_url',
         'action_link_text',
+        'slots_config',
     ];
 
     protected $casts = [
@@ -44,6 +45,7 @@ class Campaign extends Model
         'views_count' => 'integer',
         'start_date' => 'date',
         'end_date' => 'date',
+        'slots_config' => 'array',
     ];
 
     public function creator(): BelongsTo

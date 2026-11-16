@@ -10,6 +10,7 @@ import {
     Palette, Minus, Plus
 } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
+import { DEFAULT_SLOTS_CONFIG, SlotsConfig } from './SlotConfigurator';
 
 interface CampaignProps {
     id: number;
@@ -19,10 +20,12 @@ interface CampaignProps {
     frame_url: string;
     campaign_type: string;
     caption_template?: string;
+    slots_config?: any;
     frames?: {
         id: number;
         frame_url: string;
         aspect_ratio?: string;
+        slots_config?: any;
     }[];
     category?: {
         name: string;
@@ -54,7 +57,29 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [activeFrameIndex, setActiveFrameIndex] = useState(
         initialFrameIdx >= 0 && initialFrameIdx < allFrames.length ? initialFrameIdx : 0
     );
-    const activeFrameUrl = allFrames[activeFrameIndex]?.frame_url || campaign.frame_url;
+    const activeFrame = allFrames[activeFrameIndex];
+    const activeFrameUrl = activeFrame?.frame_url || campaign.frame_url;
+
+    // Resolve Dynamic Admin Slots Configuration with Fallback
+    const effectiveSlots: SlotsConfig = React.useMemo(() => {
+        let conf = activeFrame?.slots_config || campaign.slots_config;
+        if (typeof conf === 'string') {
+            try {
+                conf = JSON.parse(conf);
+            } catch (e) {
+                conf = null;
+            }
+        }
+        return {
+            photo_slot: { ...DEFAULT_SLOTS_CONFIG.photo_slot, ...(conf?.photo_slot || {}) },
+            date_slot: { ...DEFAULT_SLOTS_CONFIG.date_slot, ...(conf?.date_slot || {}) },
+            time_slot: { ...DEFAULT_SLOTS_CONFIG.time_slot, ...(conf?.time_slot || {}) },
+            venue_slot: { ...DEFAULT_SLOTS_CONFIG.venue_slot, ...(conf?.venue_slot || {}) },
+            topic_slot: { ...DEFAULT_SLOTS_CONFIG.topic_slot, ...(conf?.topic_slot || {}) },
+            badge_slot: { ...DEFAULT_SLOTS_CONFIG.badge_slot, ...(conf?.badge_slot || {}) },
+            name_slot: { ...DEFAULT_SLOTS_CONFIG.name_slot, ...(conf?.name_slot || {}) },
+        };
+    }, [activeFrame, campaign.slots_config]);
 
     // Watermark Configuration
     const enableWatermark = !!platform_settings?.enable_watermark;
@@ -75,9 +100,20 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [frameLoaded, setFrameLoaded] = useState(false);
 
     // Transform State
-    const [zoom, setZoom] = useState(1);
-    const [position, setPosition] = useState(campaign.campaign_type === 'event_notice' ? { x: 260, y: -70 } : { x: 0, y: 0 });
+    const isEventNotice = campaign.campaign_type === 'event_notice';
+    const [zoom, setZoom] = useState(isEventNotice ? (effectiveSlots.photo_slot.zoom || 1) : 1);
+    const [position, setPosition] = useState(isEventNotice ? { x: effectiveSlots.photo_slot.x, y: effectiveSlots.photo_slot.y } : { x: 0, y: 0 });
     const [rotation, setRotation] = useState(0);
+
+    // Sync position when frame changes in event_notice mode
+    useEffect(() => {
+        if (isEventNotice && effectiveSlots.photo_slot) {
+            setPosition({ x: effectiveSlots.photo_slot.x, y: effectiveSlots.photo_slot.y });
+            if (effectiveSlots.photo_slot.zoom) {
+                setZoom(effectiveSlots.photo_slot.zoom);
+            }
+        }
+    }, [activeFrameIndex, isEventNotice, effectiveSlots]);
 
     // Dragging state
     const [isDragging, setIsDragging] = useState(false);
@@ -100,7 +136,6 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [shareToGallery, setShareToGallery] = useState(false);
 
     // Tab view for mobile sidebar
-    const isEventNotice = campaign.campaign_type === 'event_notice';
     const [activeTab, setActiveTab] = useState<'transform' | 'text' | 'event' | 'filters' | 'export'>(
         isEventNotice ? 'event' : ((campaign.campaign_type === 'custom_text' || campaign.campaign_type === 'greeting_card') ? 'text' : 'transform')
     );
@@ -176,9 +211,9 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             const img = new Image();
             img.onload = () => {
                 setUserImage(img);
-                // Reset defaults on new image load
-                setZoom(1);
-                setPosition(campaign.campaign_type === 'event_notice' ? { x: 260, y: -70 } : { x: 0, y: 0 });
+                // Reset defaults on new image load according to Admin Slot settings
+                setZoom(isEventNotice ? (effectiveSlots.photo_slot.zoom || 1) : 1);
+                setPosition(isEventNotice ? { x: effectiveSlots.photo_slot.x, y: effectiveSlots.photo_slot.y } : { x: 0, y: 0 });
                 setRotation(0);
             };
             img.src = e.target?.result as string;
@@ -386,134 +421,162 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             ctx.restore();
         }
 
-        // LAYER 3B: Event & Notice Poster Dynamic Typography
+        // LAYER 3B: Event & Notice Poster Dynamic Typography (Admin Controlled Slots)
         if (campaign.campaign_type === 'event_notice') {
             ctx.save();
             ctx.filter = 'none';
 
             const fontBase = `"${eventFontFamily}", "Hind Siliguri", "Noto Serif Bengali", "Anek Bangla", sans-serif`;
 
-            // ZONE 1: Date & Time in the blue capsule (Calendar icon area on left)
-            if (eventDate.trim() || eventTime.trim()) {
+            // ZONE 1: Date Slot
+            if (effectiveSlots.date_slot.enabled !== false && eventDate.trim()) {
                 ctx.save();
-                ctx.textAlign = 'center';
+                ctx.textAlign = effectiveSlots.date_slot.align || 'center';
                 ctx.textBaseline = 'middle';
-                const capsuleCenterX = width * 0.295;
+                const dateX = (effectiveSlots.date_slot.x / 100) * width;
+                const dateY = (effectiveSlots.date_slot.y / 100) * height;
 
-                if (eventTextShadow) {
+                if (effectiveSlots.date_slot.shadow ?? eventTextShadow) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
                     ctx.shadowBlur = Math.round(5 * scaleMultiplier);
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = Math.round(1.5 * scaleMultiplier);
                 }
 
-                // Date line
-                if (eventDate.trim()) {
-                    const dateFontSize = Math.round(18 * scaleMultiplier * eventFontSizeScale);
-                    ctx.font = `bold ${dateFontSize}px ${fontBase}`;
-                    ctx.fillStyle = eventPrimaryColor;
-                    const dateY = eventTime.trim() ? (height * 0.448) : (height * 0.465);
-                    ctx.fillText(eventDate.trim(), capsuleCenterX, dateY);
-                }
-
-                // Time line
-                if (eventTime.trim()) {
-                    const timeFontSize = Math.round(15 * scaleMultiplier * eventFontSizeScale);
-                    ctx.font = `600 ${timeFontSize}px ${fontBase}`;
-                    ctx.fillStyle = '#FEF3C7'; // Elegant warm gold/cream for time
-                    const timeY = eventDate.trim() ? (height * 0.485) : (height * 0.465);
-                    ctx.fillText(eventTime.trim(), capsuleCenterX, timeY);
-                }
+                const dateFontSize = Math.round((effectiveSlots.date_slot.font_size || 18) * scaleMultiplier * eventFontSizeScale);
+                ctx.font = `bold ${dateFontSize}px ${fontBase}`;
+                ctx.fillStyle = effectiveSlots.date_slot.color || eventPrimaryColor;
+                ctx.fillText(eventDate.trim(), dateX, dateY);
                 ctx.restore();
             }
 
-            // ZONE 2: Venue & Topic in the white card
-            if (eventVenue.trim() || eventTopic.trim()) {
+            // ZONE 1B: Time Slot
+            if (effectiveSlots.time_slot.enabled !== false && eventTime.trim()) {
                 ctx.save();
-                ctx.textAlign = 'center';
+                ctx.textAlign = effectiveSlots.time_slot.align || 'center';
                 ctx.textBaseline = 'middle';
-                const cardCenterX = width * 0.288;
-                const cardMaxW = width * 0.41;
+                const timeX = (effectiveSlots.time_slot.x / 100) * width;
+                const timeY = (effectiveSlots.time_slot.y / 100) * height;
 
-                // Venue Line
-                if (eventVenue.trim()) {
-                    const venueFontSize = Math.round(19 * scaleMultiplier * eventFontSizeScale);
-                    ctx.font = `bold ${venueFontSize}px ${fontBase}`;
-                    ctx.fillStyle = eventCardColor;
-                    const venueY = eventTopic.trim() ? (height * 0.582) : (height * 0.630);
-                    ctx.fillText(eventVenue.trim(), cardCenterX, venueY, cardMaxW);
+                if (effectiveSlots.time_slot.shadow ?? eventTextShadow) {
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+                    ctx.shadowBlur = Math.round(5 * scaleMultiplier);
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = Math.round(1.5 * scaleMultiplier);
                 }
 
-                // Topic / Notice Line (with auto word wrap)
-                if (eventTopic.trim()) {
-                    const topicFontSize = Math.round(17 * scaleMultiplier * eventFontSizeScale);
-                    ctx.font = `600 ${topicFontSize}px ${fontBase}`;
-                    ctx.fillStyle = '#1E3A8A';
-                    
-                    const words = eventTopic.trim().split(' ');
-                    let line = '';
-                    const lines: string[] = [];
-                    for (let n = 0; n < words.length; n++) {
-                        const testLine = line + words[n] + ' ';
-                        const metrics = ctx.measureText(testLine);
-                        if (metrics.width > cardMaxW && n > 0) {
-                            lines.push(line.trim());
-                            line = words[n] + ' ';
-                        } else {
-                            line = testLine;
-                        }
+                const timeFontSize = Math.round((effectiveSlots.time_slot.font_size || 15) * scaleMultiplier * eventFontSizeScale);
+                ctx.font = `600 ${timeFontSize}px ${fontBase}`;
+                ctx.fillStyle = effectiveSlots.time_slot.color || '#FEF3C7';
+                ctx.fillText(eventTime.trim(), timeX, timeY);
+                ctx.restore();
+            }
+
+            // ZONE 2: Venue Slot
+            if (effectiveSlots.venue_slot.enabled !== false && eventVenue.trim()) {
+                ctx.save();
+                ctx.textAlign = effectiveSlots.venue_slot.align || 'center';
+                ctx.textBaseline = 'middle';
+                const venueX = (effectiveSlots.venue_slot.x / 100) * width;
+                const venueY = (effectiveSlots.venue_slot.y / 100) * height;
+                const venueMaxW = ((effectiveSlots.venue_slot.max_width || 41) / 100) * width;
+
+                if (effectiveSlots.venue_slot.shadow) {
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+                    ctx.shadowBlur = Math.round(4 * scaleMultiplier);
+                }
+
+                const venueFontSize = Math.round((effectiveSlots.venue_slot.font_size || 19) * scaleMultiplier * eventFontSizeScale);
+                ctx.font = `bold ${venueFontSize}px ${fontBase}`;
+                ctx.fillStyle = effectiveSlots.venue_slot.color || eventCardColor;
+                ctx.fillText(eventVenue.trim(), venueX, venueY, venueMaxW);
+                ctx.restore();
+            }
+
+            // ZONE 2B: Topic / Notice Slot (with auto word wrap at max_width)
+            if (effectiveSlots.topic_slot.enabled !== false && eventTopic.trim()) {
+                ctx.save();
+                ctx.textAlign = effectiveSlots.topic_slot.align || 'center';
+                ctx.textBaseline = 'middle';
+                const topicX = (effectiveSlots.topic_slot.x / 100) * width;
+                const topicY = (effectiveSlots.topic_slot.y / 100) * height;
+                const topicMaxW = ((effectiveSlots.topic_slot.max_width || 41) / 100) * width;
+
+                if (effectiveSlots.topic_slot.shadow) {
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+                    ctx.shadowBlur = Math.round(4 * scaleMultiplier);
+                }
+
+                const topicFontSize = Math.round((effectiveSlots.topic_slot.font_size || 17) * scaleMultiplier * eventFontSizeScale);
+                ctx.font = `600 ${topicFontSize}px ${fontBase}`;
+                ctx.fillStyle = effectiveSlots.topic_slot.color || '#1E3A8A';
+                
+                const words = eventTopic.trim().split(' ');
+                let line = '';
+                const lines: string[] = [];
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + ' ';
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > topicMaxW && n > 0) {
+                        lines.push(line.trim());
+                        line = words[n] + ' ';
+                    } else {
+                        line = testLine;
                     }
-                    lines.push(line.trim());
-
-                    const topicStartY = eventVenue.trim() ? (height * 0.648) : (height * 0.615);
-                    const lineHeight = topicFontSize * 1.35;
-                    lines.slice(0, 2).forEach((l, i) => {
-                        ctx.fillText(l, cardCenterX, topicStartY + (i * lineHeight), cardMaxW);
-                    });
                 }
+                lines.push(line.trim());
+
+                const lineHeight = topicFontSize * 1.35;
+                const displayLines = lines.slice(0, 3);
+                const startY = topicY - ((displayLines.length - 1) * lineHeight) / 2;
+
+                displayLines.forEach((l, i) => {
+                    ctx.fillText(l, topicX, startY + (i * lineHeight), topicMaxW);
+                });
                 ctx.restore();
             }
 
-            // ZONE 3: Designation Orange Badge ("খতীব" / "প্রধান আলোচক")
-            if (speakerTitle.trim()) {
+            // ZONE 3: Designation Badge Slot ("খতীব" / "প্রধান আলোচক")
+            if (effectiveSlots.badge_slot.enabled !== false && speakerTitle.trim()) {
                 ctx.save();
-                ctx.textAlign = 'center';
+                ctx.textAlign = effectiveSlots.badge_slot.align || 'center';
                 ctx.textBaseline = 'middle';
-                const badgeCenterX = width * 0.528;
-                const badgeCenterY = height * 0.772;
-                const badgeFontSize = Math.round(17 * scaleMultiplier * eventFontSizeScale);
+                const badgeX = (effectiveSlots.badge_slot.x / 100) * width;
+                const badgeY = (effectiveSlots.badge_slot.y / 100) * height;
 
-                if (eventTextShadow) {
+                if (effectiveSlots.badge_slot.shadow ?? eventTextShadow) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
                     ctx.shadowBlur = Math.round(3 * scaleMultiplier);
                     ctx.shadowOffsetY = Math.round(1 * scaleMultiplier);
                 }
 
+                const badgeFontSize = Math.round((effectiveSlots.badge_slot.font_size || 17) * scaleMultiplier * eventFontSizeScale);
                 ctx.font = `bold ${badgeFontSize}px ${fontBase}`;
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillText(speakerTitle.trim(), badgeCenterX, badgeCenterY);
+                ctx.fillStyle = effectiveSlots.badge_slot.color || '#FFFFFF';
+                ctx.fillText(speakerTitle.trim(), badgeX, badgeY);
                 ctx.restore();
             }
 
-            // ZONE 4: Speaker / Supporter Name Ribbon
-            if (speakerName.trim()) {
+            // ZONE 4: Speaker / Supporter Name Slot
+            if (effectiveSlots.name_slot.enabled !== false && speakerName.trim()) {
                 ctx.save();
-                ctx.textAlign = 'center';
+                ctx.textAlign = effectiveSlots.name_slot.align || 'center';
                 ctx.textBaseline = 'middle';
-                const nameCenterX = width * 0.755;
-                const nameCenterY = height * 0.875;
-                const nameFontSize = Math.round(33 * scaleMultiplier * eventFontSizeScale);
+                const nameX = (effectiveSlots.name_slot.x / 100) * width;
+                const nameY = (effectiveSlots.name_slot.y / 100) * height;
+                const nameMaxW = ((effectiveSlots.name_slot.max_width || 42) / 100) * width;
 
-                if (eventTextShadow) {
+                if (effectiveSlots.name_slot.shadow ?? eventTextShadow) {
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
                     ctx.shadowBlur = Math.round(6 * scaleMultiplier);
                     ctx.shadowOffsetX = 0;
                     ctx.shadowOffsetY = Math.round(2 * scaleMultiplier);
                 }
 
+                const nameFontSize = Math.round((effectiveSlots.name_slot.font_size || 33) * scaleMultiplier * eventFontSizeScale);
                 ctx.font = `bold ${nameFontSize}px ${fontBase}`;
-                ctx.fillStyle = eventPrimaryColor;
-                ctx.fillText(speakerName.trim(), nameCenterX, nameCenterY, width * 0.42);
+                ctx.fillStyle = effectiveSlots.name_slot.color || eventPrimaryColor;
+                ctx.fillText(speakerName.trim(), nameX, nameY, nameMaxW);
                 ctx.restore();
             }
 
@@ -612,8 +675,8 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
 
     // Reset position & zoom
     const handleResetTransform = () => {
-        setZoom(1);
-        setPosition({ x: 0, y: 0 });
+        setZoom(isEventNotice ? (effectiveSlots.photo_slot.zoom || 1) : 1);
+        setPosition(isEventNotice ? { x: effectiveSlots.photo_slot.x, y: effectiveSlots.photo_slot.y } : { x: 0, y: 0 });
         setRotation(0);
     };
 
@@ -881,116 +944,128 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                 {/* Form Fields */}
                                 <div className="space-y-3.5">
                                     {/* 1. Date */}
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                            <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                                            <span>{language === 'bn' ? 'তারিখ (Date)' : 'Event Date'}</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={eventDate}
-                                            onChange={(e) => setEventDate(e.target.value)}
-                                            placeholder="যেমন: ২১ নভেম্বর ২০২৬, শুক্রবার"
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-                                        />
-                                    </div>
+                                    {effectiveSlots.date_slot.enabled !== false && (
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                                                <span>{language === 'bn' ? 'তারিখ (Date)' : 'Event Date'}</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={eventDate}
+                                                onChange={(e) => setEventDate(e.target.value)}
+                                                placeholder="যেমন: ২১ নভেম্বর ২০২৬, শুক্রবার"
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* 2. Time */}
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                            <Clock className="w-3.5 h-3.5 text-amber-600" />
-                                            <span>{language === 'bn' ? 'সময় (Time)' : 'Event Time'}</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={eventTime}
-                                            onChange={(e) => setEventTime(e.target.value)}
-                                            placeholder="যেমন: দুপুর ১:৩০ মিনিট"
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-                                        />
-                                    </div>
+                                    {effectiveSlots.time_slot.enabled !== false && (
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                                                <span>{language === 'bn' ? 'সময় (Time)' : 'Event Time'}</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={eventTime}
+                                                onChange={(e) => setEventTime(e.target.value)}
+                                                placeholder="যেমন: দুপুর ১:৩০ মিনিট"
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* 3. Venue */}
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                            <MapPin className="w-3.5 h-3.5 text-rose-500" />
-                                            <span>{language === 'bn' ? 'স্থান / মসজিদ / ভেন্যু' : 'Venue / Mosque / Location'}</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={eventVenue}
-                                            onChange={(e) => setEventVenue(e.target.value)}
-                                            placeholder="যেমন: বায়তুল মোকাররম জাতীয় মসজিদ, ঢাকা"
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-                                        />
-                                    </div>
+                                    {effectiveSlots.venue_slot.enabled !== false && (
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                                                <span>{language === 'bn' ? 'স্থান / মসজিদ / ভেন্যু' : 'Venue / Mosque / Location'}</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={eventVenue}
+                                                onChange={(e) => setEventVenue(e.target.value)}
+                                                placeholder="যেমন: বায়তুল মোকাররম জাতীয় মসজিদ, ঢাকা"
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* 4. Topic / Notice */}
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                            <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                                            <span>{language === 'bn' ? 'বিষয় / নোটিশ বিবরণ' : 'Topic / Notice Details'}</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={eventTopic}
-                                            onChange={(e) => setEventTopic(e.target.value)}
-                                            placeholder="যেমন: বিষয়: জুম'আর গুরুত্ব ও তাৎপর্য"
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-                                        />
-                                    </div>
+                                    {effectiveSlots.topic_slot.enabled !== false && (
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                                                <span>{language === 'bn' ? 'বিষয় / নোটিশ বিবরণ' : 'Topic / Notice Details'}</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={eventTopic}
+                                                onChange={(e) => setEventTopic(e.target.value)}
+                                                placeholder="যেমন: বিষয়: জুম'আর গুরুত্ব ও তাৎপর্য"
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* 5. Designation / Badge */}
-                                    <div className="space-y-1.5">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                                <Award className="w-3.5 h-3.5 text-amber-500" />
-                                                <span>{language === 'bn' ? 'পদবি (Designation Badge)' : 'Designation Badge'}</span>
-                                            </label>
-                                            <span className="text-[10px] text-gray-400">কমলারঙা ব্যাজ</span>
+                                    {effectiveSlots.badge_slot.enabled !== false && (
+                                        <div className="space-y-1.5">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                    <Award className="w-3.5 h-3.5 text-amber-500" />
+                                                    <span>{language === 'bn' ? 'পদবি (Designation Badge)' : 'Designation Badge'}</span>
+                                                </label>
+                                                <span className="text-[10px] text-gray-400">ব্যাজ</span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={speakerTitle}
+                                                onChange={(e) => setSpeakerTitle(e.target.value)}
+                                                placeholder="যেমন: খতীব"
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-bold text-amber-700 bg-amber-50/40"
+                                                maxLength={25}
+                                            />
+                                            {/* Quick Badge Suggestions */}
+                                            <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                                {['খতীব', 'প্রধান আলোচক', 'বিশেষ মেহমান', 'সভাপতি', 'আমন্ত্রিত অতিথি'].map((b) => (
+                                                    <button
+                                                        key={b}
+                                                        type="button"
+                                                        onClick={() => setSpeakerTitle(b)}
+                                                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${
+                                                            speakerTitle === b
+                                                                ? 'bg-amber-500 text-white shadow-xs'
+                                                                : 'bg-gray-100 text-gray-600 hover:bg-amber-100 hover:text-amber-800'
+                                                        }`}
+                                                    >
+                                                        {b}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <input
-                                            type="text"
-                                            value={speakerTitle}
-                                            onChange={(e) => setSpeakerTitle(e.target.value)}
-                                            placeholder="যেমন: খতীব"
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-bold text-amber-700 bg-amber-50/40"
-                                            maxLength={25}
-                                        />
-                                        {/* Quick Badge Suggestions */}
-                                        <div className="flex flex-wrap gap-1.5 pt-0.5">
-                                            {['খতীব', 'প্রধান আলোচক', 'বিশেষ মেহমান', 'সভাপতি', 'আমন্ত্রিত অতিথি'].map((b) => (
-                                                <button
-                                                    key={b}
-                                                    type="button"
-                                                    onClick={() => setSpeakerTitle(b)}
-                                                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${
-                                                        speakerTitle === b
-                                                            ? 'bg-amber-500 text-white shadow-xs'
-                                                            : 'bg-gray-100 text-gray-600 hover:bg-amber-100 hover:text-amber-800'
-                                                    }`}
-                                                >
-                                                    {b}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    )}
 
                                     {/* 6. Speaker / Your Name */}
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                            <User className="w-3.5 h-3.5 text-indigo-600" />
-                                            <span>{language === 'bn' ? 'বক্তা বা আপনার নাম (Name)' : 'Speaker / Your Name'}</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={speakerName}
-                                            onChange={(e) => setSpeakerName(e.target.value)}
-                                            placeholder="যেমন: মাওলানা মুফতি আব্দুল্লাহ"
-                                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-black text-gray-900"
-                                            maxLength={40}
-                                        />
-                                    </div>
+                                    {effectiveSlots.name_slot.enabled !== false && (
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                <User className="w-3.5 h-3.5 text-indigo-600" />
+                                                <span>{language === 'bn' ? 'বক্তা বা আপনার নাম (Name)' : 'Speaker / Your Name'}</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={speakerName}
+                                                onChange={(e) => setSpeakerName(e.target.value)}
+                                                placeholder="যেমন: মাওলানা মুফতি আব্দুল্লাহ"
+                                                className="w-full px-3.5 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-black text-gray-900"
+                                                maxLength={40}
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* 7. Bangla Premium Typography Selector */}
                                     <div className="pt-2 border-t border-gray-100 space-y-2">
@@ -1628,7 +1703,19 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                 {/* Upload Prompt Overlay if no user photo loaded yet */}
                                 {!userImage && (
                                     isEventNotice ? (
-                                        <label className="absolute top-[13%] right-[3.5%] w-[40.5%] h-[60%] flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-all hover:bg-blue-50/50 rounded-t-[120px] rounded-b-2xl border-2 border-dashed border-blue-400 bg-blue-50/30 backdrop-blur-2xs group shadow-inner">
+                                        <label 
+                                            style={{
+                                                left: `calc(50% + ${(effectiveSlots.photo_slot.x / 1080) * 100}% - ${(effectiveSlots.photo_slot.width || 40.5) / 2}%)`,
+                                                top: `calc(50% + ${(effectiveSlots.photo_slot.y / 1080) * 100}% - ${(effectiveSlots.photo_slot.height || 60) / 2}%)`,
+                                                width: `${effectiveSlots.photo_slot.width || 40.5}%`,
+                                                height: `${effectiveSlots.photo_slot.height || 60}%`,
+                                            }}
+                                            className={`absolute flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-all hover:bg-blue-50/50 border-2 border-dashed border-blue-400 bg-blue-50/30 backdrop-blur-2xs group shadow-inner ${
+                                                effectiveSlots.photo_slot.shape === 'circle'
+                                                    ? 'rounded-full'
+                                                    : (effectiveSlots.photo_slot.shape === 'arch' ? 'rounded-t-[120px] rounded-b-2xl' : 'rounded-2xl')
+                                            }`}
+                                        >
                                             <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-2 shadow-md group-hover:scale-110 transition-transform">
                                                 <Upload className="w-5 h-5" />
                                             </div>
@@ -1636,7 +1723,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                                 {language === 'bn' ? 'ছবি আপলোড করুন' : 'Upload Photo'}
                                             </h4>
                                             <p className="text-[10px] text-blue-800 mt-0.5 max-w-[130px] leading-tight">
-                                                {language === 'bn' ? 'খিলানের মাঝে বসাতে ছবি নির্বাচন করুন' : 'Click to select photo for cutout'}
+                                                {language === 'bn' ? (effectiveSlots.photo_slot.hint || 'ছবি নির্বাচন করতে ক্লিক করুন') : 'Click to select photo for cutout'}
                                             </p>
                                             <span className="mt-2.5 px-3 py-1 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-xs group-hover:bg-blue-700">
                                                 Select Photo

@@ -6,6 +6,7 @@ import {
     Layers, Image as ImageIcon, FileText, Sliders, 
     Upload, ArrowLeft, CheckCircle2, AlertCircle, Save 
 } from 'lucide-react';
+import SlotConfigurator, { DEFAULT_SLOTS_CONFIG, SlotsConfig } from '@/Components/SlotConfigurator';
 
 interface CategoryItem {
     id: number;
@@ -29,6 +30,7 @@ interface CampaignEditProps {
         caption_template?: string;
         action_link_url?: string;
         action_link_text?: string;
+        slots_config?: any;
         visibility: 'public' | 'unlisted' | 'private';
         status: 'published' | 'draft';
         tags?: string;
@@ -66,6 +68,26 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
     const [defaultZoom, setDefaultZoom] = useState<number>(
         campaign.primary_frame?.photo_area_config?.zoom || 1
     );
+
+    const [slotsConfig, setSlotsConfig] = useState<SlotsConfig>(() => {
+        let conf = campaign.slots_config;
+        if (typeof conf === 'string') {
+            try {
+                conf = JSON.parse(conf);
+            } catch (e) {
+                conf = null;
+            }
+        }
+        return {
+            photo_slot: { ...DEFAULT_SLOTS_CONFIG.photo_slot, ...(conf?.photo_slot || {}) },
+            date_slot: { ...DEFAULT_SLOTS_CONFIG.date_slot, ...(conf?.date_slot || {}) },
+            time_slot: { ...DEFAULT_SLOTS_CONFIG.time_slot, ...(conf?.time_slot || {}) },
+            venue_slot: { ...DEFAULT_SLOTS_CONFIG.venue_slot, ...(conf?.venue_slot || {}) },
+            topic_slot: { ...DEFAULT_SLOTS_CONFIG.topic_slot, ...(conf?.topic_slot || {}) },
+            badge_slot: { ...DEFAULT_SLOTS_CONFIG.badge_slot, ...(conf?.badge_slot || {}) },
+            name_slot: { ...DEFAULT_SLOTS_CONFIG.name_slot, ...(conf?.name_slot || {}) },
+        };
+    });
 
     // Frame replacement file
     const [frameFile, setFrameFile] = useState<File | null>(null);
@@ -110,6 +132,9 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
         formData.append('status', status);
         formData.append('aspect_ratio', aspectRatio);
         formData.append('default_zoom', String(defaultZoom));
+        if (campaignType === 'event_notice') {
+            formData.append('slots_config', JSON.stringify(slotsConfig));
+        }
 
         if (frameFile) {
             formData.append('frame_file', frameFile);
@@ -477,6 +502,17 @@ export default function Edit({ campaign, categories }: CampaignEditProps) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Event & Notice Slot Configuration */}
+                    {campaignType === 'event_notice' && (
+                        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-xs space-y-6">
+                            <SlotConfigurator
+                                frameUrl={previewUrl || ''}
+                                config={slotsConfig}
+                                onChange={(newConf) => setSlotsConfig(newConf)}
+                            />
+                        </div>
+                    )}
 
                     {/* Bottom Save Action */}
                     <div className="flex items-center justify-end gap-3 pt-4">

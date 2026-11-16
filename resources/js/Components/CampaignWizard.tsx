@@ -6,6 +6,7 @@ import {
     Eye, CheckCircle2, Upload, ArrowRight, ArrowLeft, 
     Sparkles, AlertCircle, Info, Type, Gift, Award, Calendar
 } from 'lucide-react';
+import SlotConfigurator, { DEFAULT_SLOTS_CONFIG, SlotsConfig } from './SlotConfigurator';
 
 interface CategoryItem {
     id: number;
@@ -40,9 +41,10 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
     const [extraFrames, setExtraFrames] = useState<File[]>([]);
     const [visibility, setVisibility] = useState<'public' | 'unlisted' | 'private'>('public');
 
-    // Photo Area Config
+    // Photo Area & Slots Config
     const [aspectRatio, setAspectRatio] = useState<'1:1' | '4:5' | '9:16'>('1:1');
     const [defaultZoom, setDefaultZoom] = useState(1);
+    const [slotsConfig, setSlotsConfig] = useState<SlotsConfig>(DEFAULT_SLOTS_CONFIG);
 
     // Submission & Errors
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,6 +116,9 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
         formData.append('status', status);
         formData.append('aspect_ratio', aspectRatio);
         formData.append('default_zoom', String(defaultZoom));
+        if (campaignType === 'event_notice') {
+            formData.append('slots_config', JSON.stringify(slotsConfig));
+        }
 
         router.post('/campaigns', formData, {
             onSuccess: () => {
@@ -660,6 +665,16 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                                             : 'Supporters will be able to type and customize their own name, designation, district, or personal message directly on this frame.'}
                                     </span>
                                 </div>
+                            </div>
+                        )}
+
+                        {campaignType === 'event_notice' && (
+                            <div className="pt-6 border-t border-gray-100">
+                                <SlotConfigurator
+                                    frameUrl={framePreviewUrl || ''}
+                                    config={slotsConfig}
+                                    onChange={(newConf) => setSlotsConfig(newConf)}
+                                />
                             </div>
                         )}
                     </div>

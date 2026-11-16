@@ -17,12 +17,14 @@ class CampaignFrame extends Model
         'canvas_height',
         'aspect_ratio',
         'photo_area_config',
+        'slots_config',
     ];
 
     protected $casts = [
         'canvas_width' => 'integer',
         'canvas_height' => 'integer',
         'photo_area_config' => 'array',
+        'slots_config' => 'array',
     ];
 
     public function campaign(): BelongsTo

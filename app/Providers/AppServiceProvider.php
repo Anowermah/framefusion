@@ -127,6 +127,19 @@ class AppServiceProvider extends ServiceProvider
                         if (!Schema::hasColumn('campaigns', 'action_link_text')) {
                             $table->string('action_link_text')->nullable();
                         }
+                        if (!Schema::hasColumn('campaigns', 'slots_config')) {
+                            $table->json('slots_config')->nullable();
+                        }
+                    });
+                }
+            } catch (\Throwable $e) {}
+
+            try {
+                if (Schema::hasTable('campaign_frames')) {
+                    Schema::table('campaign_frames', function (Blueprint $table) {
+                        if (!Schema::hasColumn('campaign_frames', 'slots_config')) {
+                            $table->json('slots_config')->nullable();
+                        }
                     });
                 }
             } catch (\Throwable $e) {}

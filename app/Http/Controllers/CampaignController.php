@@ -475,6 +475,15 @@ class CampaignController extends Controller
             $campaignData['action_link_text'] = $request->action_link_text;
         }
 
+        $slotsConfig = null;
+        if ($request->filled('slots_config')) {
+            $rawSlots = $request->input('slots_config');
+            $slotsConfig = is_string($rawSlots) ? json_decode($rawSlots, true) : $rawSlots;
+            if (Schema::hasColumn('campaigns', 'slots_config')) {
+                $campaignData['slots_config'] = $slotsConfig;
+            }
+        }
+
         $campaign = Campaign::create($campaignData);
 
         CampaignFrame::create([
@@ -486,6 +495,7 @@ class CampaignController extends Controller
             'photo_area_config' => [
                 'zoom' => (float) $request->input('default_zoom', 1),
             ],
+            'slots_config' => $slotsConfig,
         ]);
 
         // Upload extra frame variations if provided
@@ -629,6 +639,15 @@ class CampaignController extends Controller
             $updateData['action_link_text'] = $request->action_link_text;
         }
 
+        $slotsConfig = null;
+        if ($request->filled('slots_config')) {
+            $rawSlots = $request->input('slots_config');
+            $slotsConfig = is_string($rawSlots) ? json_decode($rawSlots, true) : $rawSlots;
+            if (Schema::hasColumn('campaigns', 'slots_config')) {
+                $updateData['slots_config'] = $slotsConfig;
+            }
+        }
+
         $campaign->update($updateData);
 
         // Update or create primary frame configuration
@@ -639,6 +658,7 @@ class CampaignController extends Controller
                 'photo_area_config' => [
                     'zoom' => (float) $request->input('default_zoom', 1),
                 ],
+                'slots_config' => $slotsConfig ?? $campaign->primaryFrame->slots_config,
             ]);
         } else {
             CampaignFrame::create([
@@ -650,6 +670,7 @@ class CampaignController extends Controller
                 'photo_area_config' => [
                     'zoom' => (float) $request->input('default_zoom', 1),
                 ],
+                'slots_config' => $slotsConfig,
             ]);
         }
 

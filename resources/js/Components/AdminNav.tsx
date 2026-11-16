@@ -19,7 +19,7 @@ export default function AdminNav() {
     ];
 
     return (
-        <div className="bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-purple-100 shadow-xs">
+        <div className="bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-purple-100 shadow-xs w-full max-w-full overflow-hidden">
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 text-xs font-bold scroll-smooth">
                 {links.map((item) => {
                     const Icon = item.icon;

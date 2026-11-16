@@ -590,7 +590,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
 
                 {/* Multi-Frame Variations Switcher Ribbon */}
                 {allFrames.length > 1 && (
-                    <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center justify-between gap-4 overflow-x-auto">
+                    <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center justify-between gap-4 overflow-x-auto w-full max-w-full scrollbar-none">
                         <div className="flex items-center gap-2 shrink-0">
                             <div className="w-7 h-7 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
                                 <Layers className="w-4 h-4" />

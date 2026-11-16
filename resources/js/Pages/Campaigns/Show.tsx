@@ -221,7 +221,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                                             {selectedFrameIndex + 1} / {allFrames.length}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-thin">
+                                    <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none w-full max-w-full">
                                         {allFrames.map((f, idx) => (
                                             <button
                                                 key={f.id || idx}

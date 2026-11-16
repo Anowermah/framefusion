@@ -150,7 +150,7 @@ export default function Home({
                         </div>
 
                         {/* Hero Visual Collage */}
-                        <div className="lg:col-span-5 relative flex items-center justify-center">
+                        <div className="lg:col-span-5 relative flex items-center justify-center overflow-hidden py-4 max-w-full">
                             <div className="relative w-full max-w-[420px] aspect-square">
                                 {/* Sample Floating Twibbon Cards Collage */}
                                 <div className="absolute top-0 right-4 w-52 sm:w-60 aspect-square rounded-3xl bg-white p-3 shadow-2xl border border-gray-100 rotate-6 hover:rotate-0 transition-transform duration-300 z-20">
@@ -240,7 +240,7 @@ export default function Home({
             </section>
 
             {/* MOBILE QUICK-ACTION APP STRIP (bKash & MyGP style) */}
-            <section className="block sm:hidden max-w-7xl mx-auto px-4 mt-6">
+            <section className="block sm:hidden max-w-7xl mx-auto px-4 mt-6 w-full max-w-full overflow-hidden">
                 <div className="flex items-center justify-between mb-2.5 px-0.5">
                     <span className="text-xs font-black text-gray-900 tracking-tight">
                         {language === 'bn' ? '🔥 ট্রেন্ডিং ও জনপ্রিয় ফ্রেম' : '🔥 Popular Quick Actions'}

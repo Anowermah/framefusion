@@ -86,7 +86,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                 </div>
 
                 {/* Filter & Search Bar Controls */}
-                <div className="bg-white p-4 sm:p-5 rounded-3xl border border-gray-100 shadow-xs space-y-4">
+                <div className="bg-white p-4 sm:p-5 rounded-3xl border border-gray-100 shadow-xs space-y-4 w-full max-w-full overflow-hidden">
                     <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
                         {/* Search Input Capsule */}
                         <div className="flex-1 flex items-center gap-2.5 px-4 py-2.5 bg-gray-50/80 hover:bg-gray-50 focus-within:bg-white rounded-2xl border border-gray-200/80 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/10 transition-all">

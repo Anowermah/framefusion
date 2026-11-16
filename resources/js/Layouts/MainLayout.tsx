@@ -16,7 +16,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     const hasAnnouncement = platform_settings?.announcement_enabled && platform_settings?.announcement_text && !bannerDismissed;
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#F8F9FC] font-sans antialiased text-[#171923]">
+        <div className="min-h-screen flex flex-col bg-[#F8F9FC] font-sans antialiased text-[#171923] w-full max-w-full overflow-x-hidden min-w-0">
             {/* Top Announcement Banner (Controlled from Admin) */}
             {hasAnnouncement && (
                 <aside 
@@ -38,7 +38,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             )}
 
             <Navbar />
-            <main className="flex-1 pb-20 md:pb-0">
+            <main className="flex-1 w-full max-w-full min-w-0">
                 {children}
             </main>
             <Footer />

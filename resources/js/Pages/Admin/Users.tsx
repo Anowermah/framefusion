@@ -77,26 +77,26 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
         <MainLayout>
             <Head title="User Management - Admin FrameFusion" />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 sm:space-y-8">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">User Account Administration</h1>
-                    <p className="text-xs text-gray-500 mt-0.5">Control registered accounts, permissions, roles, passwords, and status</p>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">User Account Administration</h1>
+                    <p className="text-xs text-slate-500 mt-0.5">Control registered accounts, permissions, roles, passwords, and status</p>
                 </div>
 
                 <AdminNav />
 
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-xs p-6 space-y-4">
-                    {/* Filters bar */}
-                    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-                        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                            <div className="relative flex-1 sm:w-64">
-                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4 sm:p-6 space-y-4">
+                    {/* Responsive Filters bar */}
+                    <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-2.5 lg:items-center justify-between pb-2 border-b border-slate-100">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex items-center gap-2 w-full lg:w-auto">
+                            <div className="relative w-full sm:col-span-2 lg:w-64">
+                                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                                 <input
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="Search by name, email, username..."
-                                    className="w-full text-xs pl-9 pr-3.5 py-2 rounded-xl border border-gray-200"
+                                    className="w-full text-xs pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 focus:border-slate-400 focus:ring-0"
                                 />
                             </div>
 
@@ -106,7 +106,7 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                                     setRole(e.target.value);
                                     applyFilters({ search, role: e.target.value, status });
                                 }}
-                                className="text-xs p-2 rounded-xl border-gray-200"
+                                className="text-xs p-2 rounded-xl border-slate-200 bg-white"
                             >
                                 <option value="">All Roles</option>
                                 <option value="user">User</option>
@@ -121,7 +121,7 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
                                     setStatus(e.target.value);
                                     applyFilters({ search, role, status: e.target.value });
                                 }}
-                                className="text-xs p-2 rounded-xl border-gray-200"
+                                className="text-xs p-2 rounded-xl border-slate-200 bg-white"
                             >
                                 <option value="">All Statuses</option>
                                 <option value="active">Active</option>
@@ -130,19 +130,19 @@ export default function UsersPage({ users, filters = {} }: { users: any; filters
 
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all"
+                                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all sm:col-span-2 lg:col-span-1"
                             >
                                 Search
                             </button>
                         </div>
 
-                        <span className="text-xs text-gray-500 font-medium">
-                            Total Users: {users.total ?? users.data?.length ?? 0}
+                        <span className="text-xs text-slate-500 font-medium">
+                            Total Users: <strong className="text-slate-800 font-bold">{users.total ?? users.data?.length ?? 0}</strong>
                         </span>
                     </form>
 
                     {/* MOBILE CARD VIEW (Phone screens - bKash/Nagad style) */}
-                    <div className="block sm:hidden space-y-3 p-3">
+                    <div className="block sm:hidden space-y-3">
                         {users.data?.map((u: UserItem) => (
                             <div key={u.id} className="p-4 bg-gray-50/70 rounded-2xl border border-gray-200/70 space-y-3 shadow-2xs">
                                 <div className="flex items-start justify-between gap-2">

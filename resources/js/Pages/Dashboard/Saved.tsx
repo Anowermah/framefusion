@@ -21,17 +21,17 @@ export default function Saved({ savedCampaigns }: { savedCampaigns: any }) {
 
                 <DashboardNav />
 
-                {savedCampaigns.data.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {savedCampaigns.data && savedCampaigns.data.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {savedCampaigns.data.map((sc: any) => (
                             <CampaignCard key={sc.id} campaign={{ ...sc.campaign, is_saved: true }} />
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center text-xs text-gray-400 space-y-3">
-                        <Bookmark className="w-10 h-10 mx-auto text-gray-300" />
-                        <p>No saved campaigns yet. Click the bookmark icon on any campaign to save it here!</p>
-                        <Link href="/explore" className="inline-block px-4 py-2 bg-brand-500 text-white font-bold rounded-xl">
+                    <div className="bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-12 text-center text-xs text-slate-400 space-y-3 shadow-2xs">
+                        <Bookmark className="w-10 h-10 mx-auto text-slate-300" />
+                        <p className="font-medium text-slate-500">No saved campaigns yet. Click the bookmark icon on any campaign to save it here!</p>
+                        <Link href="/explore" className="inline-block px-4 py-2 bg-slate-900 text-white font-bold rounded-xl shadow-xs">
                             {t('exploreCampaigns')}
                         </Link>
                     </div>

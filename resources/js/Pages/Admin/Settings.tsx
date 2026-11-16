@@ -105,26 +105,26 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
         <MainLayout>
             <Head title="Platform Control & Settings - Admin FrameFusion" />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 sm:space-y-8">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Platform Control Panel</h1>
-                        <p className="text-xs text-gray-500 mt-0.5">Manage every aspect of FrameFusion directly stored in the database</p>
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Platform Settings</h1>
+                        <p className="text-xs text-slate-500 mt-0.5">Configure system settings and branding options</p>
                     </div>
 
                     {saved && (
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
                             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                            <span>All changes saved to database!</span>
+                            <span>Saved to database!</span>
                         </div>
                     )}
                 </div>
 
                 <AdminNav />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     {/* Settings Sidebar Tabs (Horizontal swipe on mobile, vertical sidebar on desktop) */}
-                    <div className="lg:col-span-3 bg-white rounded-3xl border border-gray-100 shadow-xs p-2 lg:p-3 flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible scrollbar-none">
+                    <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-1.5 sm:p-2 lg:p-2.5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible scrollbar-none [-webkit-overflow-scrolling:touch]">
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -133,13 +133,13 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                                     key={tab.id}
                                     type="button"
                                     onClick={() => setActiveTab(tab.id as any)}
-                                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 active:scale-95 ${
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all text-left shrink-0 active:scale-95 ${
                                         isActive 
-                                            ? 'bg-purple-600 text-white shadow-xs' 
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                            ? 'bg-slate-900 text-white shadow-xs font-bold' 
+                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                                     }`}
                                 >
-                                    <Icon className="w-4 h-4 shrink-0" />
+                                    <Icon className="w-3.5 h-3.5 shrink-0" />
                                     <span className="whitespace-nowrap">{tab.label}</span>
                                 </button>
                             );
@@ -147,7 +147,7 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                     </div>
 
                     {/* Settings Form Body */}
-                    <div className="lg:col-span-9 bg-white rounded-3xl border border-gray-100 shadow-xs p-6 sm:p-8">
+                    <div className="lg:col-span-9 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4 sm:p-6 lg:p-8">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* TAB 1: Branding & Identity */}
                             {activeTab === 'branding' && (
@@ -806,12 +806,12 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                             )}
 
                             {/* Submit Button */}
-                            <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                                <span className="text-xs text-gray-400">Settings are saved in the `platform_settings` table.</span>
+                            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <span className="text-[11px] text-slate-400 text-center sm:text-left">Changes are saved directly in database settings.</span>
                                 <button
                                     type="submit"
                                     disabled={saving}
-                                    className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
+                                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
                                 >
                                     {saved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                                     <span>{saved ? 'Saved Successfully!' : saving ? 'Saving...' : 'Save Settings'}</span>

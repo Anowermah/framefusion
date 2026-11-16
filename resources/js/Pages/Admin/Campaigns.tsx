@@ -99,18 +99,18 @@ export default function AdminCampaigns({
 
                 <AdminNav />
 
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-xs p-6 space-y-4">
-                    {/* Filters bar */}
-                    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-                        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                            <div className="relative flex-1 sm:w-64">
-                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4 sm:p-6 space-y-4">
+                    {/* Responsive Filters bar */}
+                    <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-2.5 lg:items-center justify-between pb-2 border-b border-slate-100">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex items-center gap-2 w-full lg:w-auto">
+                            <div className="relative w-full sm:col-span-2 lg:w-64">
+                                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                                 <input
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="Search by title or slug..."
-                                    className="w-full text-xs pl-9 pr-3.5 py-2 rounded-xl border border-gray-200"
+                                    className="w-full text-xs pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 focus:border-slate-400 focus:ring-0"
                                 />
                             </div>
 
@@ -120,7 +120,7 @@ export default function AdminCampaigns({
                                     setStatus(e.target.value);
                                     applyFilters({ search, status: e.target.value, category_id: categoryId });
                                 }}
-                                className="text-xs p-2 rounded-xl border-gray-200"
+                                className="text-xs p-2 rounded-xl border-slate-200 bg-white"
                             >
                                 <option value="">All Statuses</option>
                                 <option value="published">Published</option>
@@ -135,7 +135,7 @@ export default function AdminCampaigns({
                                     setCategoryId(e.target.value);
                                     applyFilters({ search, status, category_id: e.target.value });
                                 }}
-                                className="text-xs p-2 rounded-xl border-gray-200"
+                                className="text-xs p-2 rounded-xl border-slate-200 bg-white"
                             >
                                 <option value="">All Categories</option>
                                 {categories.map((cat: any) => (
@@ -145,21 +145,107 @@ export default function AdminCampaigns({
 
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all"
+                                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all sm:col-span-2 lg:col-span-1"
                             >
                                 Filter
                             </button>
                         </div>
 
-                        <span className="text-xs text-gray-500 font-medium">
-                            Total: {campaigns.total ?? campaigns.data?.length ?? 0}
+                        <span className="text-xs text-slate-500 font-medium">
+                            Total: <strong className="text-slate-800 font-bold">{campaigns.total ?? campaigns.data?.length ?? 0}</strong>
                         </span>
                     </form>
 
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs text-gray-600">
-                            <thead className="bg-gray-50 text-[11px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                    {/* MOBILE CARD VIEW (Phone screens - bKash / clean app style) */}
+                    <div className="block md:hidden space-y-3">
+                        {campaigns.data?.map((c: CampaignItem) => (
+                            <div key={c.id} className="p-3.5 bg-slate-50/70 rounded-2xl border border-slate-200/70 space-y-3 shadow-2xs">
+                                <div className="flex items-start gap-3">
+                                    <img 
+                                        src={c.frame_url} 
+                                        alt="" 
+                                        className="w-12 h-12 rounded-xl object-contain bg-white border border-slate-200/80 p-0.5 shrink-0" 
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center justify-between gap-1">
+                                            <span className="font-bold text-slate-900 block truncate text-xs">{c.title}</span>
+                                            {statusBadge(c.status)}
+                                        </div>
+                                        <span className="text-[10px] text-slate-400 font-mono truncate block mt-0.5">/campaigns/{c.slug}</span>
+                                        <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
+                                            <span className="truncate">By {c.creator?.name || 'Unknown'}</span>
+                                            <span>•</span>
+                                            <span className="font-semibold text-slate-700 shrink-0">{(c.supporters_count ?? 0).toLocaleString()} users</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Status & Quick Toggles */}
+                                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/60">
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            onClick={() => handleToggleFeature(c.id)}
+                                            className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
+                                                c.is_featured ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-white text-slate-500 border border-slate-200'
+                                            }`}
+                                        >
+                                            ★ Featured
+                                        </button>
+                                        <button
+                                            onClick={() => handleToggleTrending(c.id)}
+                                            className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
+                                                c.is_trending ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-white text-slate-500 border border-slate-200'
+                                            }`}
+                                        >
+                                            🔥 Trending
+                                        </button>
+                                    </div>
+
+                                    <select
+                                        value={c.status}
+                                        onChange={(e) => handleStatusChange(c.id, e.target.value)}
+                                        className="text-xs py-1 px-2 rounded-lg border-slate-200 bg-white font-medium"
+                                    >
+                                        <option value="published">Published</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="draft">Draft</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex items-center justify-end gap-1.5 pt-1">
+                                    <Link
+                                        href={`/campaigns/${c.slug}`}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:text-brand-600"
+                                        target="_blank"
+                                    >
+                                        <Eye className="w-3.5 h-3.5" />
+                                        <span>View</span>
+                                    </Link>
+                                    <Link
+                                        href={`/campaigns/${c.id}/edit`}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:text-purple-600"
+                                    >
+                                        <Edit className="w-3.5 h-3.5" />
+                                        <span>Edit</span>
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(c)}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-rose-600 bg-white border border-rose-200 rounded-xl hover:bg-rose-50"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        <span>Delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* DESKTOP TABLE VIEW */}
+                    <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-left text-xs text-slate-600">
+                            <thead className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
                                 <tr>
                                     <th className="p-3">Campaign</th>
                                     <th className="p-3">Creator</th>
@@ -170,35 +256,35 @@ export default function AdminCampaigns({
                                     <th className="p-3 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-slate-100">
                                 {campaigns.data?.map((c: CampaignItem) => (
-                                    <tr key={c.id} className="hover:bg-gray-50/50">
+                                    <tr key={c.id} className="hover:bg-slate-50/50">
                                         <td className="p-3 flex items-center gap-3">
                                             <img 
                                                 src={c.frame_url} 
                                                 alt="" 
-                                                className="w-10 h-10 rounded-lg object-contain bg-gray-50 border p-0.5 shrink-0" 
+                                                className="w-10 h-10 rounded-lg object-contain bg-slate-50 border p-0.5 shrink-0" 
                                             />
                                             <div className="min-w-0 max-w-xs">
-                                                <span className="font-bold text-gray-900 block truncate">{c.title}</span>
-                                                <span className="text-[10px] text-gray-400 font-mono truncate block">/campaigns/{c.slug}</span>
+                                                <span className="font-bold text-slate-900 block truncate">{c.title}</span>
+                                                <span className="text-[10px] text-slate-400 font-mono truncate block">/campaigns/{c.slug}</span>
                                             </div>
                                         </td>
                                         <td className="p-3">
-                                            <span className="font-semibold text-gray-800 block">{c.creator?.name || 'Unknown'}</span>
-                                            <span className="text-[10px] text-gray-400 block">{c.creator?.email}</span>
+                                            <span className="font-semibold text-slate-800 block">{c.creator?.name || 'Unknown'}</span>
+                                            <span className="text-[10px] text-slate-400 block">{c.creator?.email}</span>
                                         </td>
-                                        <td className="p-3 font-medium text-gray-700">
+                                        <td className="p-3 font-medium text-slate-700">
                                             {c.category?.name || 'Uncategorized'}
                                         </td>
-                                        <td className="p-3 font-bold text-gray-900">
+                                        <td className="p-3 font-bold text-slate-900">
                                             {(c.supporters_count ?? 0).toLocaleString()}
                                         </td>
                                         <td className="p-3">
                                             <select
                                                 value={c.status}
                                                 onChange={(e) => handleStatusChange(c.id, e.target.value)}
-                                                className="text-xs p-1 rounded-lg border-gray-200 font-semibold"
+                                                className="text-xs p-1 rounded-lg border-slate-200 font-semibold bg-white"
                                             >
                                                 <option value="published">Published</option>
                                                 <option value="pending">Pending</option>
@@ -210,7 +296,7 @@ export default function AdminCampaigns({
                                             <button
                                                 onClick={() => handleToggleFeature(c.id)}
                                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${
-                                                    c.is_featured ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-gray-100 text-gray-400'
+                                                    c.is_featured ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-slate-100 text-slate-400'
                                                 }`}
                                             >
                                                 ★ Featured
@@ -218,7 +304,7 @@ export default function AdminCampaigns({
                                             <button
                                                 onClick={() => handleToggleTrending(c.id)}
                                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${
-                                                    c.is_trending ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-gray-100 text-gray-400'
+                                                    c.is_trending ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-400'
                                                 }`}
                                             >
                                                 🔥 Trending
@@ -227,7 +313,7 @@ export default function AdminCampaigns({
                                         <td className="p-3 text-right space-x-1 whitespace-nowrap">
                                             <Link
                                                 href={`/campaigns/${c.slug}`}
-                                                className="p-1.5 text-gray-400 hover:text-purple-600 rounded-lg inline-block"
+                                                className="p-1.5 text-slate-400 hover:text-purple-600 rounded-lg inline-block"
                                                 title="View Public Page"
                                                 target="_blank"
                                             >
@@ -235,14 +321,14 @@ export default function AdminCampaigns({
                                             </Link>
                                             <Link
                                                 href={`/campaigns/${c.id}/edit`}
-                                                className="p-1.5 text-gray-400 hover:text-purple-600 rounded-lg inline-block"
+                                                className="p-1.5 text-slate-400 hover:text-purple-600 rounded-lg inline-block"
                                                 title="Edit Campaign"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </Link>
                                             <button
                                                 onClick={() => handleDelete(c)}
-                                                className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg"
+                                                className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg"
                                                 title="Delete Campaign"
                                             >
                                                 <Trash2 className="w-4 h-4" />

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AiStudioController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -14,6 +15,9 @@ Route::get('/explore', [CampaignController::class, 'index'])->name('campaigns.ex
 Route::get('/trending', [CampaignController::class, 'trending'])->name('campaigns.trending');
 Route::get('/categories', [CampaignController::class, 'categories'])->name('campaigns.categories');
 Route::get('/how-it-works', [StaticPageController::class, 'howItWorks'])->name('how-it-works');
+Route::get('/ai-studio', [AiStudioController::class, 'index'])->name('ai.studio');
+Route::post('/api/ai/search', [AiStudioController::class, 'search'])->name('api.ai.search');
+Route::post('/api/ai/chat', [AiStudioController::class, 'chat'])->name('api.ai.chat');
 
 // Campaign Details & Interactive Photo Editor
 Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');

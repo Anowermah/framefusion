@@ -14,12 +14,15 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onSearchClick }: NavbarProps) {
-    const { auth } = usePage().props as any;
+    const { auth, platform_settings } = usePage().props as any;
     const { url } = usePage();
     const user = auth?.user;
     const { language, setLanguage, t } = useLanguage();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+    const isAiEnabled = (platform_settings?.ai_assistant_enabled !== false) && 
+                        (platform_settings?.ai_studio_page_enabled !== false);
 
     const isSuperAdmin = user?.role === 'super_admin';
     const isAdmin = ['admin', 'super_admin'].includes(user?.role);
@@ -82,6 +85,20 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             >
                                 {t('howItWorks')}
                             </Link>
+
+                            {isAiEnabled && (
+                                <Link 
+                                    href="/ai-studio" 
+                                    className={`px-3 py-1.5 rounded-full text-xs font-extrabold tracking-tight transition-all shrink-0 flex items-center gap-1 ${
+                                        isLinkActive('/ai-studio') 
+                                            ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-xs' 
+                                            : 'text-violet-700 hover:text-violet-900 hover:bg-violet-50'
+                                    }`}
+                                >
+                                    <Sparkles className="w-3 h-3 text-amber-400 fill-amber-400 animate-pulse" />
+                                    <span>{language === 'bn' ? 'এআই স্টুডিও' : 'AI Studio'}</span>
+                                </Link>
+                            )}
                         </nav>
                     </div>
 

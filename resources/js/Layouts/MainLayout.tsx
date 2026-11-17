@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react';
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import MobileBottomNav from '@/Components/MobileBottomNav';
+import AiChatWidget from '@/Components/AiChatWidget';
 import { Megaphone, X } from 'lucide-react';
 
 interface MainLayoutProps {
@@ -11,9 +12,12 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
     const { platform_settings } = usePage().props as any;
+    const { url } = usePage();
     const [bannerDismissed, setBannerDismissed] = useState(false);
 
     const hasAnnouncement = platform_settings?.announcement_enabled && platform_settings?.announcement_text && !bannerDismissed;
+    const isAiStudioPage = url.startsWith('/ai-studio');
+    const isEditorPage = url.includes('/editor');
 
     return (
         <div className="min-h-screen flex flex-col bg-[#F8F9FC] font-sans antialiased text-[#171923] w-full max-w-full min-w-0">
@@ -46,6 +50,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </main>
             <Footer />
             <MobileBottomNav />
+            {!isAiStudioPage && !isEditorPage && <AiChatWidget />}
         </div>
     );
 }

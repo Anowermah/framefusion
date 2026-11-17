@@ -78,6 +78,18 @@ class PlatformSetting extends Model
             'page_about_content' => '',
             'page_privacy_content' => '',
             'page_terms_content' => '',
+
+            // AI Assistant & Chatbot Studio Controls
+            'ai_assistant_enabled' => true,
+            'ai_chat_widget_enabled' => true,
+            'ai_studio_page_enabled' => true,
+            'ai_bot_name' => 'FrameFusion AI',
+            'ai_bot_name_bn' => 'ফ্রেমফিউশন এআই',
+            'ai_welcome_message_bn' => 'স্বাগতম! আপনি কী ধরণের ফ্রেম তৈরি বা খুঁজতে চান? আমাকে জানান (যেমন: বিজয় দিবস, জন্মদিন, মাহফিল বা রাজনৈতিক পোস্টার)।',
+            'ai_welcome_message_en' => 'Welcome! What kind of campaign frame are you looking for or creating? Tell me (e.g. Victory Day, Birthday, Notice Poster)!',
+            'ai_suggestions' => "বিজয় দিবসের ফ্রেম\nজন্মদিনের শুভেচ্ছা ফ্রেম\nমাহফিল নোটিশ পোস্টার\nসাধারণ ফ্রেম",
+            'gemini_api_key' => '',
+            'ai_auto_center_enabled' => true,
         ];
     }
 

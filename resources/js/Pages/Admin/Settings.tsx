@@ -68,9 +68,21 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
         page_about_content: settings.page_about_content || '',
         page_privacy_content: settings.page_privacy_content || '',
         page_terms_content: settings.page_terms_content || '',
+
+        // AI Studio & Chatbot Controls
+        ai_assistant_enabled: settings.ai_assistant_enabled !== false,
+        ai_chat_widget_enabled: settings.ai_chat_widget_enabled !== false,
+        ai_studio_page_enabled: settings.ai_studio_page_enabled !== false,
+        ai_bot_name: settings.ai_bot_name || 'FrameFusion AI',
+        ai_bot_name_bn: settings.ai_bot_name_bn || 'ফ্রেমফিউশন এআই',
+        ai_welcome_message_bn: settings.ai_welcome_message_bn || 'স্বাগতম! আপনি কী ধরণের ফ্রেম তৈরি বা খুঁজতে চান? আমাকে জানান (যেমন: বিজয় দিবস, জন্মদিন, মাহফিল বা রাজনৈতিক পোস্টার)।',
+        ai_welcome_message_en: settings.ai_welcome_message_en || 'Welcome! What kind of campaign frame are you looking for or creating? Tell me (e.g. Victory Day, Birthday, Notice Poster)!',
+        ai_suggestions: settings.ai_suggestions || "বিজয় দিবসের ফ্রেম\nজন্মদিনের শুভেচ্ছা ফ্রেম\nমাহফিল নোটিশ পোস্টার\nসাধারণ ফ্রেম",
+        gemini_api_key: settings.gemini_api_key || '',
+        ai_auto_center_enabled: settings.ai_auto_center_enabled !== false,
     });
 
-    const [activeTab, setActiveTab] = useState<'branding' | 'hero' | 'contact' | 'features' | 'seo' | 'pages'>('branding');
+    const [activeTab, setActiveTab] = useState<'branding' | 'hero' | 'contact' | 'features' | 'ai' | 'seo' | 'pages'>('branding');
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -97,6 +109,7 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
         { id: 'hero', label: 'Hero & Announcement', icon: Layout },
         { id: 'contact', label: 'Contact & Socials', icon: Share2 },
         { id: 'features', label: 'Platform Controls', icon: Sliders },
+        { id: 'ai', label: 'AI Studio & Chatbot', icon: Sparkles },
         { id: 'seo', label: 'SEO & Analytics', icon: Search },
         { id: 'pages', label: 'Static Pages Content', icon: FileText },
     ];
@@ -755,6 +768,189 @@ export default function AdminSettings({ settings }: { settings: Record<string, a
                                                 className="w-full p-2.5 rounded-xl border border-gray-200 font-mono text-[11px]"
                                                 placeholder="<!-- Live chat widgets, tracking snippets, etc. -->"
                                             />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* TAB: AI Studio & Chatbot Assistant */}
+                            {activeTab === 'ai' && (
+                                <div className="space-y-6 animate-in fade-in duration-200">
+                                    <div className="border-b border-gray-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div>
+                                            <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                                                <Sparkles className="w-4 h-4 text-purple-600" />
+                                                <span>AI Studio & Conversational Assistant Controls</span>
+                                            </h3>
+                                            <p className="text-xs text-gray-500">Configure AI chat widget, search suggestions, Gemini API, and auto-frame compositing</p>
+                                        </div>
+                                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold inline-block self-start sm:self-auto ${
+                                            formData.ai_assistant_enabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                        }`}>
+                                            {formData.ai_assistant_enabled ? '● AI System Active' : '○ AI Disabled'}
+                                        </span>
+                                    </div>
+
+                                    {/* Master Toggles Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {/* Master Switch */}
+                                        <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-100 flex flex-col justify-between space-y-2">
+                                            <div>
+                                                <span className="text-xs font-bold text-purple-900 block">AI System Master Switch</span>
+                                                <p className="text-[11px] text-purple-700 mt-0.5">Master toggle to enable or completely disable all AI features site-wide.</p>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer pt-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.ai_assistant_enabled}
+                                                    onChange={e => handleChange('ai_assistant_enabled', e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[10px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                                                <span className="ml-3 text-xs font-bold text-gray-700">
+                                                    {formData.ai_assistant_enabled ? 'Enabled (চালু)' : 'Disabled (বন্ধ)'}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        {/* Floating Chat Widget Switch */}
+                                        <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 flex flex-col justify-between space-y-2">
+                                            <div>
+                                                <span className="text-xs font-bold text-blue-900 block">Floating Chat Bubble</span>
+                                                <p className="text-[11px] text-blue-700 mt-0.5">Show/hide floating interactive AI chat icon on all public pages.</p>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer pt-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.ai_chat_widget_enabled}
+                                                    onChange={e => handleChange('ai_chat_widget_enabled', e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[10px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                <span className="ml-3 text-xs font-bold text-gray-700">
+                                                    {formData.ai_chat_widget_enabled ? 'Active (অন)' : 'Hidden (বন্ধ)'}
+                                                </span>
+                                            </label>
+                                        </div>
+
+                                        {/* Dedicated Page Switch */}
+                                        <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100 flex flex-col justify-between space-y-2">
+                                            <div>
+                                                <span className="text-xs font-bold text-amber-900 block">Dedicated /ai-studio Page</span>
+                                                <p className="text-[11px] text-amber-700 mt-0.5">Enable standalone full-screen conversational AI Studio route and nav link.</p>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer pt-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.ai_studio_page_enabled}
+                                                    onChange={e => handleChange('ai_studio_page_enabled', e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[10px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                                                <span className="ml-3 text-xs font-bold text-gray-700">
+                                                    {formData.ai_studio_page_enabled ? 'Accessible (অন)' : 'Disabled (বন্ধ)'}
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {/* Bot Identity & Welcome Messages */}
+                                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
+                                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">AI Assistant Identity & Messages</h4>
+                                        
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                            <div className="space-y-1">
+                                                <label className="font-bold text-gray-700">AI Assistant Name (English)</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.ai_bot_name}
+                                                    onChange={e => handleChange('ai_bot_name', e.target.value)}
+                                                    className="w-full p-2.5 rounded-xl border border-gray-200 text-xs"
+                                                    placeholder="FrameFusion AI"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="font-bold text-gray-700">সহকারীর নাম (বাংলা)</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.ai_bot_name_bn}
+                                                    onChange={e => handleChange('ai_bot_name_bn', e.target.value)}
+                                                    className="w-full p-2.5 rounded-xl border border-gray-200 text-xs"
+                                                    placeholder="ফ্রেমফিউশন এআই"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                            <div className="space-y-1">
+                                                <label className="font-bold text-gray-700">স্বাগতম বার্তা (বাংলা)</label>
+                                                <textarea
+                                                    rows={2}
+                                                    value={formData.ai_welcome_message_bn}
+                                                    onChange={e => handleChange('ai_welcome_message_bn', e.target.value)}
+                                                    className="w-full p-2.5 rounded-xl border border-gray-200 text-xs"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="font-bold text-gray-700">Welcome Message (English)</label>
+                                                <textarea
+                                                    rows={2}
+                                                    value={formData.ai_welcome_message_en}
+                                                    onChange={e => handleChange('ai_welcome_message_en', e.target.value)}
+                                                    className="w-full p-2.5 rounded-xl border border-gray-200 text-xs"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1 text-xs">
+                                            <label className="font-bold text-gray-700">কুইক সার্চ সাজেশন (এক লাইনে একটি করে প্রম্পট লিখুন)</label>
+                                            <textarea
+                                                rows={4}
+                                                value={formData.ai_suggestions}
+                                                onChange={e => handleChange('ai_suggestions', e.target.value)}
+                                                className="w-full p-2.5 rounded-xl border border-gray-200 font-mono text-xs"
+                                                placeholder="বিজয় দিবসের ফ্রেম&#10;জন্মদিনের শুভেচ্ছা ফ্রেম&#10;মাহফিল নোটিশ পোস্টার"
+                                            />
+                                            <p className="text-[11px] text-gray-400">এই সাজেশনগুলো চ্যাটবট ওপেন করলে ব্যবহারকারীর সামনে দ্রুত ক্লিকের জন্য ভেসে উঠবে।</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Gemini API Key & AI Engine Configuration */}
+                                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
+                                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Gemini API & Intelligent Processing</h4>
+
+                                        <div className="space-y-1 text-xs">
+                                            <label className="font-bold text-gray-700 flex items-center justify-between">
+                                                <span>Google Gemini API Key (ঐচ্ছিক / Optional)</span>
+                                                <span className="text-[10px] text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded">Auto Smart Fallback Built-in</span>
+                                            </label>
+                                            <input
+                                                type="password"
+                                                value={formData.gemini_api_key}
+                                                onChange={e => handleChange('gemini_api_key', e.target.value)}
+                                                className="w-full p-2.5 rounded-xl border border-gray-200 font-mono text-xs"
+                                                placeholder="AIzaSy..."
+                                            />
+                                            <p className="text-[11px] text-gray-500 leading-relaxed">
+                                                💡 <strong>টিপস:</strong> আপনি যদি Gemini API Key ফাঁকা রাখেন, তবুও সিস্টেমটি স্বয়ংক্রিয়ভাবে আমাদের তৈরি করা হাই-স্পিড বাংলা ও ইংরেজি স্মার্ট অ্যালগরিদম ব্যবহার করে ১০০% ফ্রিতে ও নির্ভুলভাবে ফ্রেম অনুসন্ধান করবে।
+                                            </p>
+                                        </div>
+
+                                        {/* Auto-Centering Switch */}
+                                        <div className="pt-2 border-t border-gray-200/60 flex items-center justify-between">
+                                            <div>
+                                                <span className="text-xs font-bold text-gray-800 block">AI Auto-Center & Smart Fitting</span>
+                                                <p className="text-[11px] text-gray-500">স্বয়ংক্রিয়ভাবে ব্যবহারকারীর আপলোড করা ছবি ফ্রেমের নির্দিষ্ট জায়গায় কেন্দ্রস্থ ও ফিট করে দেবে।</p>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.ai_auto_center_enabled}
+                                                    onChange={e => handleChange('ai_auto_center_enabled', e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>

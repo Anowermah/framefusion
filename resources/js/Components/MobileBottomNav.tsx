@@ -9,12 +9,14 @@ import {
 } from 'lucide-react';
 
 export default function MobileBottomNav() {
-    const { auth } = usePage().props as any;
+    const { auth, platform_settings } = usePage().props as any;
     const { url } = usePage();
     const user = auth?.user;
     const { language, setLanguage, t } = useLanguage();
     const [sheetOpen, setSheetOpen] = useState(false);
 
+    const isAiEnabled = (platform_settings?.ai_assistant_enabled !== false) && 
+                        (platform_settings?.ai_studio_page_enabled !== false);
     const isAdminRoute = url.startsWith('/admin');
     const isEditorRoute = url.includes('/editor');
     const isSuperAdmin = user?.role === 'super_admin';
@@ -345,6 +347,19 @@ export default function MobileBottomNav() {
                                     {language === 'bn' ? 'প্রধান সার্ভিস ও মেনু' : 'Quick Navigation'}
                                 </span>
                                 <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+                                    {isAiEnabled && (
+                                        <Link
+                                            href="/ai-studio"
+                                            onClick={() => setSheetOpen(false)}
+                                            className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl bg-gradient-to-b from-violet-50 to-white hover:bg-violet-100/70 border border-violet-200/80 text-center transition-all active:scale-95 shadow-xs"
+                                        >
+                                            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center mb-1 shadow-xs">
+                                                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-300 text-amber-300 animate-pulse" />
+                                            </div>
+                                            <span className="text-[11px] sm:text-xs font-black text-violet-900 line-clamp-1">AI Studio</span>
+                                        </Link>
+                                    )}
+
                                     <Link
                                         href="/explore"
                                         onClick={() => setSheetOpen(false)}

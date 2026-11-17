@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'campaigns/*/generate',
+            'api/ai/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

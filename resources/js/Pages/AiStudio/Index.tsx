@@ -87,6 +87,7 @@ export default function AiStudioIndex({ categories, featuredCampaigns, aiSetting
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as any)?.content || '',
                 },
                 body: JSON.stringify({
@@ -94,6 +95,11 @@ export default function AiStudioIndex({ categories, featuredCampaigns, aiSetting
                     history: messages.slice(-4).map(m => ({ sender: m.sender, text: m.text })),
                 }),
             });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => null);
+                throw new Error(errorData?.message || `Server error: ${res.status}`);
+            }
 
             const data = await res.json();
             if (data.success) {

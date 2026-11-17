@@ -26,7 +26,7 @@ class AiStudioController extends Controller
         $categories = Category::select('id', 'name', 'name_bn', 'slug', 'icon')->get();
         $featuredCampaigns = Campaign::where('status', 'published')
             ->where('is_featured', true)
-            ->with(['category:id,name,name_bn,slug', 'subFrames'])
+            ->with(['category:id,name,name_bn,slug', 'frames'])
             ->latest()
             ->take(6)
             ->get();
@@ -54,7 +54,7 @@ class AiStudioController extends Controller
         
         if (empty($query)) {
             $campaigns = Campaign::where('status', 'published')
-                ->with(['category:id,name,name_bn,slug', 'subFrames'])
+                ->with(['category:id,name,name_bn,slug', 'frames'])
                 ->orderByDesc('supporters_count')
                 ->take(6)
                 ->get();
@@ -65,7 +65,7 @@ class AiStudioController extends Controller
         $words = array_filter(explode(' ', $query), fn($w) => mb_strlen(trim($w)) > 1);
 
         $campaignQuery = Campaign::where('status', 'published')
-            ->with(['category:id,name,name_bn,slug', 'subFrames']);
+            ->with(['category:id,name,name_bn,slug', 'frames']);
 
         $campaignQuery->where(function ($q) use ($query, $words) {
             $q->where('title', 'like', "%{$query}%")

@@ -16,6 +16,7 @@ export default function MobileBottomNav() {
     const [sheetOpen, setSheetOpen] = useState(false);
 
     const isAdminRoute = url.startsWith('/admin');
+    const isEditorRoute = url.includes('/editor');
     const isSuperAdmin = user?.role === 'super_admin';
     const isAdmin = ['admin', 'super_admin'].includes(user?.role);
 
@@ -30,6 +31,11 @@ export default function MobileBottomNav() {
             document.body.style.overflow = '';
         };
     }, [sheetOpen]);
+
+    // Do not show public/admin bottom nav bar in the Photo Studio editor
+    if (isEditorRoute) {
+        return null;
+    }
 
     // Active link helper
     const isActive = (href: string, exact: boolean = false) => {

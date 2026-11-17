@@ -754,38 +754,47 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
         }
     };
 
+    const handleAutoCenter = () => {
+        if (isEventNotice && effectiveSlots.photo_slot) {
+            setPosition({ x: effectiveSlots.photo_slot.x, y: effectiveSlots.photo_slot.y });
+            setZoom(effectiveSlots.photo_slot.zoom || 1);
+        } else {
+            setPosition({ x: 0, y: 0 });
+            setZoom(1);
+        }
+        setRotation(0);
+    };
+
     const campaignTitle = language === 'bn' && campaign.title_bn ? campaign.title_bn : campaign.title;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FC] py-6 sm:py-8 px-3 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="min-h-screen bg-[#F8F9FC] py-4 sm:py-8 px-3 sm:px-6 lg:px-8 pb-32 lg:pb-12">
+            <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
                 {/* Top Bar Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-3 bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <Link
                             href={`/campaigns/${campaign.slug}`}
-                            className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+                            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors shrink-0"
                             title="Back to Campaign"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">
-                                    {t('photoEditor')}
-                                </span>
-                            </div>
-                            <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 mt-0.5 truncate max-w-md">
+                        <div className="min-w-0">
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md inline-block">
+                                {t('photoEditor')}
+                            </span>
+                            <h1 className="text-base sm:text-xl font-extrabold text-slate-900 mt-0.5 truncate max-w-[180px] sm:max-w-md">
                                 {campaignTitle}
                             </h1>
                         </div>
                     </div>
 
-                    {/* Quick Action in Header */}
-                    <div className="flex items-center gap-3">
-                        <label className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl cursor-pointer transition-all">
-                            <Upload className="w-4 h-4 text-brand-500" />
-                            <span>{userImage ? t('changePhoto') : t('uploadPhoto')}</span>
+                    {/* Desktop Action Buttons in Header */}
+                    <div className="hidden sm:flex items-center gap-2.5">
+                        <label className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl cursor-pointer transition-all border border-slate-200/70">
+                            <Upload className="w-4 h-4 text-purple-600" />
+                            <span>{userImage ? (language === 'bn' ? 'ছবি পরিবর্তন' : t('changePhoto')) : (language === 'bn' ? 'ছবি আপলোড করুন' : t('uploadPhoto'))}</span>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -799,21 +808,21 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                             disabled={isDownloading || !userImage}
                             className={`flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-md transition-all ${
                                 !userImage 
-                                    ? 'bg-gray-400 cursor-not-allowed' 
-                                    : 'bg-brand-500 hover:bg-brand-600 active:scale-95 shadow-brand-500/25'
+                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none' 
+                                    : 'bg-emerald-600 hover:bg-emerald-700 active:scale-95 shadow-emerald-600/25'
                             }`}
                         >
                             <Download className="w-4 h-4" />
-                            <span>{isDownloading ? t('processing') : t('downloadImage')}</span>
+                            <span>{isDownloading ? (language === 'bn' ? 'তৈরি হচ্ছে...' : t('processing')) : (language === 'bn' ? 'ডাউনলোড করুন' : t('downloadImage'))}</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Multi-Frame Variations Switcher Ribbon */}
                 {allFrames.length > 1 && (
-                    <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-100 shadow-xs flex items-center justify-between gap-4 overflow-x-auto w-full max-w-full scrollbar-none">
+                    <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between gap-4 overflow-x-auto w-full max-w-full scrollbar-none [-webkit-overflow-scrolling:touch]">
                         <div className="flex items-center gap-2 shrink-0">
-                            <div className="w-7 h-7 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                            <div className="w-7 h-7 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
                                 <Layers className="w-4 h-4" />
                             </div>
                             <span className="text-xs font-bold text-slate-800">
@@ -828,7 +837,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                     onClick={() => setActiveFrameIndex(idx)}
                                     className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 transition-all ${
                                         activeFrameIndex === idx
-                                            ? 'border-brand-600 bg-brand-50 text-brand-700 font-bold shadow-xs scale-102'
+                                            ? 'border-purple-600 bg-purple-50 text-purple-700 font-bold shadow-xs scale-102'
                                             : 'border-slate-200 text-slate-600 hover:border-slate-300'
                                     }`}
                                 >
@@ -841,86 +850,94 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                 )}
 
                 {/* Workspace Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    {/* LEFT SIDEBAR: Adjustments and controls */}
-                    <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-100 shadow-xs p-5 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+                    {/* LEFT SIDEBAR: Adjustments and controls (On mobile: order-2, below canvas) */}
+                    <div className="order-2 lg:order-1 lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4 sm:p-5 space-y-5 w-full">
                         {/* Tabs */}
-                        <div className="flex p-1 bg-gray-100 rounded-xl text-xs font-bold text-gray-600 gap-1">
+                        <div className="flex p-1 bg-slate-100 rounded-xl text-xs font-semibold text-slate-600 gap-1 overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch]">
                             {isEventNotice ? (
                                 <>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('event')}
-                                        className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                                            activeTab === 'event' ? 'bg-white text-blue-600 shadow-xs font-black' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[70px] py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                                            activeTab === 'event' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        <Calendar className="w-3.5 h-3.5" />
-                                        <span>{language === 'bn' ? 'পোস্টার তথ্য' : 'Poster Info'}</span>
+                                        <Calendar className="w-3.5 h-3.5 shrink-0" />
+                                        <span className="whitespace-nowrap">{language === 'bn' ? 'পোস্টার তথ্য' : 'Poster Info'}</span>
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('transform')}
-                                        className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                                            activeTab === 'transform' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[70px] py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                                            activeTab === 'transform' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        <Move className="w-3.5 h-3.5" />
-                                        <span>{language === 'bn' ? 'পজিশন' : 'Position'}</span>
+                                        <Move className="w-3.5 h-3.5 shrink-0" />
+                                        <span className="whitespace-nowrap">{language === 'bn' ? 'পজিশন' : 'Position'}</span>
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('filters')}
-                                        className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                                            activeTab === 'filters' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[70px] py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                                            activeTab === 'filters' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        <Sliders className="w-3.5 h-3.5" />
-                                        <span>{t('filters')}</span>
+                                        <Sliders className="w-3.5 h-3.5 shrink-0" />
+                                        <span className="whitespace-nowrap">{language === 'bn' ? 'ফিল্টার' : 'Filters'}</span>
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('export')}
-                                        className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                                            activeTab === 'export' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[70px] py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                                            activeTab === 'export' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        <Download className="w-3.5 h-3.5" />
-                                        <span>{t('exportSettings')}</span>
+                                        <Download className="w-3.5 h-3.5 shrink-0" />
+                                        <span className="whitespace-nowrap">{language === 'bn' ? 'ডাউনলোড' : 'Export'}</span>
                                     </button>
                                 </>
                             ) : (
                                 <>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('transform')}
-                                        className={`flex-1 py-2 rounded-lg transition-all ${
-                                            activeTab === 'transform' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[65px] py-2 rounded-lg transition-all ${
+                                            activeTab === 'transform' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
                                         {language === 'bn' ? 'পজিশন' : 'Position'}
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('text')}
-                                        className={`flex-1 py-2 rounded-lg transition-all relative ${
-                                            activeTab === 'text' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[65px] py-2 rounded-lg transition-all relative ${
+                                            activeTab === 'text' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        <span>{language === 'bn' ? 'নাম/টেক্সট' : 'Text'}</span>
+                                        <span>{language === 'bn' ? 'নাম ও লেখা' : 'Text'}</span>
                                         {enableText && primaryText && (
-                                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 absolute top-1.5 right-1.5" />
+                                            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 absolute top-1.5 right-1.5" />
                                         )}
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('filters')}
-                                        className={`flex-1 py-2 rounded-lg transition-all ${
-                                            activeTab === 'filters' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[65px] py-2 rounded-lg transition-all ${
+                                            activeTab === 'filters' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        {t('filters')}
+                                        {language === 'bn' ? 'ফিল্টার' : 'Filters'}
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('export')}
-                                        className={`flex-1 py-2 rounded-lg transition-all ${
-                                            activeTab === 'export' ? 'bg-white text-brand-600 shadow-xs' : 'hover:text-gray-900'
+                                        className={`flex-1 min-w-[65px] py-2 rounded-lg transition-all ${
+                                            activeTab === 'export' ? 'bg-white text-purple-700 shadow-xs font-bold' : 'hover:text-slate-900'
                                         }`}
                                     >
-                                        {t('exportSettings')}
+                                        {language === 'bn' ? 'ডাউনলোড' : 'Export'}
                                     </button>
                                 </>
                             )}
@@ -1092,20 +1109,21 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                             <div className="space-y-6 animate-in fade-in duration-200">
                                 {/* Zoom Control */}
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center text-xs font-semibold text-gray-700">
-                                        <span className="flex items-center gap-1.5">
-                                            <ZoomIn className="w-3.5 h-3.5 text-brand-500" />
-                                            {t('zoomControls')}
+                                    <div className="flex justify-between items-center text-xs font-semibold text-slate-700">
+                                        <span className="flex items-center gap-1.5 font-bold">
+                                            <ZoomIn className="w-3.5 h-3.5 text-purple-600" />
+                                            <span>{language === 'bn' ? 'জুম ও সাইজ' : t('zoomControls')}</span>
                                         </span>
-                                        <span className="text-gray-500">{Math.round(zoom * 100)}%</span>
+                                        <span className="text-slate-500 font-mono font-bold text-[11px] bg-slate-100 px-2 py-0.5 rounded">{Math.round(zoom * 100)}%</span>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
                                         <button
+                                            type="button"
                                             onClick={() => setZoom(Math.max(0.2, zoom - 0.1))}
-                                            className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600"
+                                            className="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-all shadow-2xs"
                                             title={t('zoomOut')}
                                         >
-                                            <ZoomOut className="w-4 h-4" />
+                                            <Minus className="w-4 h-4" />
                                         </button>
                                         <input
                                             type="range"
@@ -1114,105 +1132,80 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                             step="0.05"
                                             value={zoom}
                                             onChange={(e) => setZoom(parseFloat(e.target.value))}
-                                            className="flex-1 accent-brand-500 cursor-pointer"
+                                            className="flex-1 accent-purple-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
                                         />
                                         <button
+                                            type="button"
                                             onClick={() => setZoom(Math.min(3, zoom + 0.1))}
-                                            className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600"
+                                            className="w-9 h-9 rounded-xl border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-all shadow-2xs"
                                             title={t('zoomIn')}
                                         >
-                                            <ZoomIn className="w-4 h-4" />
+                                            <Plus className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Rotation Control */}
                                 <div className="space-y-2">
-                                    <div className="flex justify-between items-center text-xs font-semibold text-gray-700">
-                                        <span className="flex items-center gap-1.5">
-                                            <RotateCw className="w-3.5 h-3.5 text-brand-500" />
-                                            {t('rotateControls')}
+                                    <div className="flex justify-between items-center text-xs font-semibold text-slate-700">
+                                        <span className="flex items-center gap-1.5 font-bold">
+                                            <RotateCw className="w-3.5 h-3.5 text-purple-600" />
+                                            <span>{language === 'bn' ? 'ঘোরান (রোটেশন)' : t('rotateControls')}</span>
                                         </span>
-                                        <span className="text-gray-500">{rotation}°</span>
+                                        <span className="text-slate-500 font-mono font-bold text-[11px] bg-slate-100 px-2 py-0.5 rounded">{rotation}°</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
+                                            type="button"
                                             onClick={() => setRotation((prev) => (prev - 90) % 360)}
-                                            className="flex-1 py-1.5 px-3 rounded-lg border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-700 flex items-center justify-center gap-1.5"
+                                            className="flex-1 py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                                         >
-                                            <RotateCcw className="w-3.5 h-3.5" />
-                                            -90°
+                                            <RotateCcw className="w-3.5 h-3.5 text-purple-600" />
+                                            <span>-90°</span>
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={() => setRotation((prev) => (prev + 90) % 360)}
-                                            className="flex-1 py-1.5 px-3 rounded-lg border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-700 flex items-center justify-center gap-1.5"
+                                            className="flex-1 py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                                         >
-                                            <RotateCw className="w-3.5 h-3.5" />
-                                            +90°
+                                            <RotateCw className="w-3.5 h-3.5 text-purple-600" />
+                                            <span>+90°</span>
                                         </button>
                                     </div>
-                                    <input
-                                        type="range"
-                                        min="-180"
-                                        max="180"
-                                        value={rotation}
-                                        onChange={(e) => setRotation(parseInt(e.target.value))}
-                                        className="w-full accent-brand-500 cursor-pointer mt-1"
-                                    />
                                 </div>
 
-                                {/* Pan / Position pad */}
-                                <div className="space-y-2">
-                                    <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                                        <Move className="w-3.5 h-3.5 text-brand-500" />
-                                        {t('positionControls')} (or drag on canvas)
-                                    </span>
-                                    <div className="grid grid-cols-3 gap-1.5 max-w-[180px] mx-auto pt-1">
-                                        <div />
+                                {/* Pan / Direct Dragging Hint + Micro-Pad */}
+                                <div className="space-y-2.5 pt-1">
+                                    <div className="p-3 bg-purple-50/60 rounded-xl border border-purple-100 text-xs text-purple-900 flex items-start gap-2">
+                                        <Move className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                                        <p className="text-[11px] leading-relaxed">
+                                            {language === 'bn' 
+                                                ? 'সহজ উপায়: ফ্রেমের ওপর সরাসরি আঙুল বা মাউস দিয়ে ড্র্যাগ করে ছবিটি ইচ্ছেমতো বসান।' 
+                                                : 'Drag directly on the canvas to place and position your photo smoothly.'}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-2">
                                         <button
-                                            onClick={() => setPosition(p => ({ ...p, y: p.y - 15 }))}
-                                            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-center"
+                                            type="button"
+                                            onClick={handleAutoCenter}
+                                            className="flex-1 py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs rounded-xl border border-purple-200/80 flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                                         >
-                                            ↑
+                                            <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                                            <span>{language === 'bn' ? '🎯 অটো ফিট ও সেন্টার' : 'Auto Fit & Center'}</span>
                                         </button>
-                                        <div />
+
                                         <button
-                                            onClick={() => setPosition(p => ({ ...p, x: p.x - 15 }))}
-                                            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-center"
-                                        >
-                                            ←
-                                        </button>
-                                        <button
+                                            type="button"
                                             onClick={handleResetTransform}
-                                            className="p-2 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-lg text-[10px] font-bold text-center flex items-center justify-center"
-                                            title={t('resetAdjustments')}
+                                            className="py-2 px-3 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5 transition-all shrink-0"
+                                            title="Reset"
                                         >
-                                            <RefreshCw className="w-3 h-3" />
+                                            <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>{language === 'bn' ? 'রিসেট' : 'Reset'}</span>
                                         </button>
-                                        <button
-                                            onClick={() => setPosition(p => ({ ...p, x: p.x + 15 }))}
-                                            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-center"
-                                        >
-                                            →
-                                        </button>
-                                        <div />
-                                        <button
-                                            onClick={() => setPosition(p => ({ ...p, y: p.y + 15 }))}
-                                            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-center"
-                                        >
-                                            ↓
-                                        </button>
-                                        <div />
                                     </div>
                                 </div>
-
-                                <button
-                                    onClick={handleResetTransform}
-                                    className="w-full py-2 text-xs font-semibold text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5 transition-colors"
-                                >
-                                    <RefreshCw className="w-3.5 h-3.5" />
-                                    {t('resetAdjustments')}
-                                </button>
                             </div>
                         )}
 
@@ -1568,12 +1561,12 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                         )}
                     </div>
 
-                    {/* CENTER: Main Canvas Workspace */}
-                    <div className="lg:col-span-8 flex flex-col items-center">
-                        <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-xs p-4 sm:p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                    {/* CENTER: Main Canvas Workspace (On mobile: order-1, so it displays FIRST at the top!) */}
+                    <div className="order-1 lg:order-2 lg:col-span-8 flex flex-col items-center w-full">
+                        <div className="w-full bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-3 sm:p-6 flex flex-col items-center justify-center relative overflow-hidden">
                             {/* Canvas Container with Checkerboard background */}
                             <div 
-                                className="relative rounded-2xl overflow-hidden shadow-xl max-w-full touch-none select-none cursor-grab active:cursor-grabbing border-4 border-white"
+                                className="relative rounded-2xl overflow-hidden shadow-xl max-w-full touch-none select-none cursor-grab active:cursor-grabbing border-2 sm:border-4 border-white"
                                 style={{
                                     backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
                                     backgroundSize: '16px 16px',
@@ -1589,7 +1582,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                     onTouchStart={handleTouchStart}
                                     onTouchMove={handleTouchMove}
                                     onTouchEnd={handleMouseUp}
-                                    className="max-h-[560px] max-w-full object-contain mx-auto"
+                                    className="max-h-[380px] sm:max-h-[560px] max-w-full object-contain mx-auto"
                                 />
 
                                 {/* Upload Prompt Overlay if no user photo loaded yet */}
@@ -1603,18 +1596,18 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                                 height: `${effectiveSlots.photo_slot.height || 60}%`,
                                                 borderRadius: getShapeBorderRadius(effectiveSlots.photo_slot.shape, effectiveSlots.photo_slot.border_radius),
                                             }}
-                                            className="absolute flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-all hover:bg-blue-50/50 border-2 border-dashed border-blue-400 bg-blue-50/30 backdrop-blur-2xs group shadow-inner overflow-hidden"
+                                            className="absolute flex flex-col items-center justify-center p-2.5 sm:p-3 text-center cursor-pointer transition-all hover:bg-blue-50/50 border-2 border-dashed border-blue-400 bg-blue-50/40 backdrop-blur-2xs group shadow-inner overflow-hidden"
                                         >
-                                            <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-2 shadow-md group-hover:scale-110 transition-transform">
+                                            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-1.5 shadow-md group-hover:scale-110 transition-transform">
                                                 <Upload className="w-5 h-5" />
                                             </div>
                                             <h4 className="text-xs font-black text-blue-950">
                                                 {language === 'bn' ? 'ছবি আপলোড করুন' : 'Upload Photo'}
                                             </h4>
-                                            <p className="text-[10px] text-blue-800 mt-0.5 max-w-[130px] leading-tight">
+                                            <p className="text-[10px] text-blue-800 mt-0.5 max-w-[130px] leading-tight hidden sm:block">
                                                 {language === 'bn' ? (effectiveSlots.photo_slot.hint || 'ছবি নির্বাচন করতে ক্লিক করুন') : 'Click to select photo for cutout'}
                                             </p>
-                                            <span className="mt-2.5 px-3 py-1 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-xs group-hover:bg-blue-700">
+                                            <span className="mt-1.5 sm:mt-2.5 px-3 py-1 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-xs group-hover:bg-blue-700">
                                                 Select Photo
                                             </span>
                                             <input
@@ -1626,14 +1619,16 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                         </label>
                                     ) : (
                                         <label className="absolute inset-0 bg-white/75 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all hover:bg-white/60">
-                                            <div className="w-16 h-16 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-3 shadow-xs">
-                                                <Upload className="w-8 h-8" />
+                                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mb-2.5 shadow-xs">
+                                                <Upload className="w-7 h-7 sm:w-8 sm:h-8" />
                                             </div>
-                                            <h3 className="text-base font-bold text-gray-900">{t('uploadPhoto')}</h3>
-                                            <p className="text-xs text-gray-500 max-w-xs mt-1">
-                                                {t('dragDropNotice')}
+                                            <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                                                {language === 'bn' ? 'আপনার ছবি আপলোড করুন' : t('uploadPhoto')}
+                                            </h3>
+                                            <p className="text-[11px] sm:text-xs text-slate-500 max-w-xs mt-1">
+                                                {language === 'bn' ? 'এখানে ট্যাপ করে গ্যালারি থেকে ছবি যোগ করুন' : t('dragDropNotice')}
                                             </p>
-                                            <span className="mt-4 px-4 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-brand-600">
+                                            <span className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-purple-700">
                                                 Select Photo
                                             </span>
                                             <input
@@ -1647,24 +1642,142 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                 )}
                             </div>
 
-                            {/* Canvas Helper Instruction */}
-                            {userImage && (
-                                <p className="text-xs text-gray-500 mt-3 flex items-center gap-1.5 select-none text-center">
-                                    <Move className="w-3.5 h-3.5 text-brand-500 shrink-0" />
-                                    <span>
-                                        {isEventNotice
-                                            ? (language === 'bn' 
-                                                ? 'ছবিটি মাউস বা আঙুল দিয়ে ড্র্যাগ করে ডানের খিলান/মেহরাবের মাঝে সুন্দরভাবে বসান।' 
-                                                : 'Drag your photo to center it inside the arch cutout. Use Zoom and Rotate to fit.')
-                                            : (language === 'bn'
-                                                ? 'ফ্রেমের মাঝে ছবি বসাতে ড্র্যাগ করুন। পজিশন ও জুম কন্ট্রোল ব্যবহার করুন।'
-                                                : 'Drag your photo inside the frame to adjust position. Zoom and rotate from the controls.')
-                                        }
-                                    </span>
-                                </p>
-                            )}
+                            {/* Canvas Helper Instruction & Quick Action Bar */}
+                            <div className="w-full mt-3 space-y-2">
+                                {userImage ? (
+                                    <>
+                                        <p className="text-[11px] font-medium text-slate-500 flex items-center justify-center gap-1.5 select-none text-center">
+                                            <Move className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                                            <span>
+                                                {language === 'bn'
+                                                    ? '👆 ফ্রেমের ওপর আঙুল বা মাউস দিয়ে টেনে ছবি ঠিক জায়গায় বসান'
+                                                    : 'Drag your photo with touch or mouse to position it nicely'}
+                                            </span>
+                                        </p>
+
+                                        {/* Quick Action Toolbar directly under Canvas */}
+                                        <div className="p-2 bg-slate-50 rounded-2xl border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+                                            {/* Auto Fit Button */}
+                                            <button
+                                                type="button"
+                                                onClick={handleAutoCenter}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-purple-700 bg-white hover:bg-purple-50 border border-purple-200/80 rounded-xl transition-all active:scale-95 shadow-2xs"
+                                                title="Auto Center & Fit"
+                                            >
+                                                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                                                <span>{language === 'bn' ? '🎯 অটো ফিট' : 'Auto Fit'}</span>
+                                            </button>
+
+                                            {/* Quick Zoom */}
+                                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-slate-200/80 shadow-2xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setZoom(Math.max(0.2, zoom - 0.1))}
+                                                    className="w-6 h-6 rounded-lg text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold"
+                                                    title={t('zoomOut')}
+                                                >
+                                                    <Minus className="w-3.5 h-3.5" />
+                                                </button>
+                                                <span className="text-[11px] font-mono font-bold text-slate-700 px-1">
+                                                    {Math.round(zoom * 100)}%
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setZoom(Math.min(3, zoom + 0.1))}
+                                                    className="w-6 h-6 rounded-lg text-slate-600 hover:bg-slate-100 flex items-center justify-center font-bold"
+                                                    title={t('zoomIn')}
+                                                >
+                                                    <Plus className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+
+                                            {/* Quick Rotate */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setRotation((prev) => (prev + 90) % 360)}
+                                                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 rounded-xl transition-all active:scale-95 shadow-2xs"
+                                                title={t('rotateControls')}
+                                            >
+                                                <RotateCw className="w-3.5 h-3.5 text-purple-600" />
+                                                <span>৯০°</span>
+                                            </button>
+
+                                            {/* Change Photo */}
+                                            <label className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 rounded-xl cursor-pointer transition-all active:scale-95 shadow-2xs">
+                                                <Upload className="w-3.5 h-3.5 text-purple-600" />
+                                                <span>{language === 'bn' ? 'ছবি পরিবর্তন' : 'Change Photo'}</span>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                                                />
+                                            </label>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex items-center justify-center pt-1">
+                                        <label className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl cursor-pointer transition-all active:scale-95 shadow-md shadow-purple-600/20">
+                                            <Upload className="w-4 h-4" />
+                                            <span>{language === 'bn' ? '📷 আপনার ছবি নির্বাচন করুন' : '📷 Select Your Photo'}</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                                            />
+                                        </label>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* ============================================================== */}
+            {/* STICKY MOBILE BOTTOM ACTION DOCK (Always visible at the bottom) */}
+            {/* ============================================================== */}
+            <div className="block lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/90 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+                <div className="max-w-md mx-auto flex items-center gap-2">
+                    {!userImage ? (
+                        <label className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-extrabold text-sm shadow-md shadow-purple-600/30 transition-all cursor-pointer">
+                            <Upload className="w-5 h-5 stroke-[2.5]" />
+                            <span>{language === 'bn' ? '📷 আপনার ছবি নির্বাচন করুন' : '📷 Select Your Photo'}</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                            />
+                        </label>
+                    ) : (
+                        <>
+                            <label className="flex items-center justify-center gap-1.5 py-3 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs shrink-0 transition-all cursor-pointer border border-slate-200">
+                                <Upload className="w-4 h-4 text-purple-600" />
+                                <span>{language === 'bn' ? 'পরিবর্তন' : 'Change'}</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                                />
+                            </label>
+
+                            <button
+                                onClick={handleDownload}
+                                disabled={isDownloading}
+                                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 active:scale-95 text-white font-black text-sm shadow-lg shadow-emerald-600/30 transition-all disabled:opacity-50"
+                            >
+                                <Download className="w-5 h-5 stroke-[2.5]" />
+                                <span>
+                                    {isDownloading 
+                                        ? (language === 'bn' ? 'তৈরি হচ্ছে...' : 'Processing...') 
+                                        : (language === 'bn' ? '📥 ফ্রেমসহ ডাউনলোড করুন' : '📥 Download Final Photo')}
+                                </span>
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 

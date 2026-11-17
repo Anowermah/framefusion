@@ -141,9 +141,9 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
     ];
 
     return (
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-gray-100 shadow-card p-6 sm:p-10 space-y-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-gray-100 shadow-card p-3.5 sm:p-10 space-y-6 sm:space-y-8">
             {/* Step Wizard Progress Bar */}
-            <div className="border-b border-gray-100 pb-6">
+            <div className="border-b border-gray-100 pb-5 sm:pb-6">
                 <div className="flex items-center justify-between">
                     {stepsList.map((s, idx) => {
                         const Icon = s.icon;
@@ -154,15 +154,15 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                                 <button
                                     onClick={() => isCompleted && setStep(s.num)}
                                     disabled={!isCompleted && !isCurrent}
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all z-10 ${
+                                    className={`w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all z-10 ${
                                         isCompleted
                                             ? 'bg-green-500 text-white'
                                             : isCurrent
-                                            ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25 ring-4 ring-brand-100'
+                                            ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25 ring-2 sm:ring-4 ring-brand-100'
                                             : 'bg-gray-100 text-gray-400'
                                     }`}
                                 >
-                                    <Icon className="w-4 h-4" />
+                                    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </button>
                                 <span className={`text-[11px] font-semibold mt-2 hidden sm:block ${isCurrent ? 'text-brand-600' : 'text-gray-400'}`}>
                                     {s.label}
@@ -171,7 +171,7 @@ export default function CampaignWizard({ categories }: CampaignWizardProps) {
                                 {/* Connecting Line */}
                                 {idx < stepsList.length - 1 && (
                                     <div 
-                                        className={`absolute top-5 left-1/2 w-full h-[2px] -z-0 ${
+                                        className={`absolute top-3.5 sm:top-5 left-1/2 w-full h-[2px] -z-0 ${
                                             step > s.num ? 'bg-green-500' : 'bg-gray-100'
                                         }`}
                                     />

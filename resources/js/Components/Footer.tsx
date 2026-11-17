@@ -23,7 +23,7 @@ export default function Footer() {
 
     return (
         <footer className="bg-white border-t border-slate-200/70 mt-10 sm:mt-20 w-full">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
                 
                 {/* ============================================================== */}
                 {/* 1. MOBILE COMPACT & CONCISE FOOTER (বিকাশ / নগদ স্টাইল সংক্ষিপ্ত ফুটার) */}

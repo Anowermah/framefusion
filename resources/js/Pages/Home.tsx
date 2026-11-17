@@ -132,6 +132,29 @@ export default function Home({
                                 </Link>
                             </div>
 
+                            {/* Mobile Visual Frame Preview (Sleek showcase for small screens) */}
+                            <div className="block sm:hidden my-2 max-w-[240px] mx-auto aspect-square rounded-2xl bg-white p-2.5 shadow-xl border border-slate-100 relative">
+                                <div
+                                    className="w-full h-full rounded-xl overflow-hidden relative flex items-center justify-center"
+                                    style={{
+                                        backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
+                                        backgroundSize: '12px 12px',
+                                        backgroundColor: '#f8fafc',
+                                    }}
+                                >
+                                    <img
+                                        src="/storage/frames/bangladesh-independence.png"
+                                        alt="Popular Frame"
+                                        className="w-full h-full object-contain filter drop-shadow-md"
+                                        onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                                    />
+                                </div>
+                                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-slate-100 text-[10px] font-bold text-emerald-600 flex items-center gap-1 whitespace-nowrap">
+                                    <Flame className="w-3 h-3 fill-emerald-500" />
+                                    <span>{language === 'bn' ? 'জনপ্রিয় ফ্রেম টেমপ্লেট' : 'Popular Frames'}</span>
+                                </div>
+                            </div>
+
                             {/* Minimalist Trust Badges */}
                             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs font-semibold text-slate-500">
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200/60 shadow-2xs">
@@ -251,7 +274,7 @@ export default function Home({
                     </Link>
                 </div>
 
-                <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none scroll-smooth">
+                <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none scroll-smooth [-webkit-overflow-scrolling:touch]">
                     {/* 1. Trending shortcut */}
                     <Link
                         href="/trending"

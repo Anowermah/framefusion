@@ -1780,7 +1780,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
 
                     {/* CENTER: Main Canvas Workspace (On mobile: order-1, so it displays FIRST at the top!) */}
                     <div className="order-1 lg:order-2 lg:col-span-8 flex flex-col items-center w-full">
-                        <div className="w-full bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-3 sm:p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div className="w-full bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 sm:p-6 flex flex-col items-center justify-center relative overflow-hidden">
                             {/* Canvas Container with Checkerboard background */}
                             <div 
                                 className="relative rounded-2xl overflow-hidden shadow-xl max-w-full touch-none select-none cursor-grab active:cursor-grabbing border-2 sm:border-4 border-white"
@@ -1873,20 +1873,20 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                         </p>
 
                                         {/* Quick Action Toolbar directly under Canvas */}
-                                        <div className="p-2 bg-slate-50 rounded-2xl border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+                                        <div className="p-1.5 sm:p-2 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 scrollbar-none [-webkit-overflow-scrolling:touch] shadow-2xs">
                                             {/* Auto Fit Button */}
                                             <button
                                                 type="button"
                                                 onClick={handleAutoCenter}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-purple-700 bg-white hover:bg-purple-50 border border-purple-200/80 rounded-xl transition-all active:scale-95 shadow-2xs"
+                                                className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-purple-700 bg-white hover:bg-purple-50 border border-purple-200/80 rounded-xl transition-all active:scale-95 shadow-2xs shrink-0 whitespace-nowrap"
                                                 title="Auto Center & Fit"
                                             >
-                                                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                                                <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                                                 <span>{language === 'bn' ? '🎯 অটো ফিট' : 'Auto Fit'}</span>
                                             </button>
 
                                             {/* Quick Zoom */}
-                                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-slate-200/80 shadow-2xs">
+                                            <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-slate-200/80 shadow-2xs shrink-0">
                                                 <button
                                                     type="button"
                                                     onClick={() => setZoom(Math.max(0.2, zoom - 0.1))}
@@ -1912,16 +1912,16 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                             <button
                                                 type="button"
                                                 onClick={() => setRotation((prev) => (prev + 90) % 360)}
-                                                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 rounded-xl transition-all active:scale-95 shadow-2xs"
+                                                className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 rounded-xl transition-all active:scale-95 shadow-2xs shrink-0 whitespace-nowrap"
                                                 title={t('rotateControls')}
                                             >
-                                                <RotateCw className="w-3.5 h-3.5 text-purple-600" />
+                                                <RotateCw className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                                                 <span>৯০°</span>
                                             </button>
 
                                             {/* Change Photo */}
-                                            <label className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 rounded-xl cursor-pointer transition-all active:scale-95 shadow-2xs">
-                                                <Upload className="w-3.5 h-3.5 text-purple-600" />
+                                            <label className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200/80 rounded-xl cursor-pointer transition-all active:scale-95 shadow-2xs shrink-0 whitespace-nowrap">
+                                                <Upload className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                                                 <span>{language === 'bn' ? 'ছবি পরিবর্তন' : 'Change Photo'}</span>
                                                 <input
                                                     type="file"
@@ -1955,12 +1955,12 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             {/* ============================================================== */}
             {/* STICKY MOBILE BOTTOM ACTION DOCK (Always visible at the bottom) */}
             {/* ============================================================== */}
-            <div className="block lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/90 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
-                <div className="max-w-md mx-auto flex items-center gap-2">
+            <div className="block lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/90 p-2 sm:p-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
+                <div className="max-w-md mx-auto flex items-center gap-1.5 sm:gap-2">
                     {!userImage ? (
-                        <label className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-extrabold text-sm shadow-md shadow-purple-600/30 transition-all cursor-pointer">
-                            <Upload className="w-5 h-5 stroke-[2.5]" />
-                            <span>{language === 'bn' ? '📷 আপনার ছবি নির্বাচন করুন' : '📷 Select Your Photo'}</span>
+                        <label className="w-full flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-purple-600/30 transition-all cursor-pointer truncate">
+                            <Upload className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5] shrink-0" />
+                            <span className="truncate">{language === 'bn' ? '📷 আপনার ছবি নির্বাচন করুন' : '📷 Select Your Photo'}</span>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -1970,9 +1970,9 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                         </label>
                     ) : (
                         <>
-                            <label className="flex items-center justify-center gap-1.5 py-3 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs shrink-0 transition-all cursor-pointer border border-slate-200">
-                                <Upload className="w-4 h-4 text-purple-600" />
-                                <span>{language === 'bn' ? 'পরিবর্তন' : 'Change'}</span>
+                            <label className="flex items-center justify-center gap-1 py-2.5 sm:py-3 px-2 sm:px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs shrink-0 transition-all cursor-pointer border border-slate-200">
+                                <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600 shrink-0" />
+                                <span className="whitespace-nowrap">{language === 'bn' ? 'পরিবর্তন' : 'Change'}</span>
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -1984,13 +1984,13 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                             <button
                                 onClick={handleDownload}
                                 disabled={isDownloading}
-                                className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 active:scale-95 text-white font-black text-sm shadow-lg shadow-emerald-600/30 transition-all disabled:opacity-50"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 active:scale-95 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-600/30 transition-all disabled:opacity-50"
                             >
-                                <Download className="w-5 h-5 stroke-[2.5]" />
-                                <span>
+                                <Download className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5] shrink-0" />
+                                <span className="truncate">
                                     {isDownloading 
                                         ? (language === 'bn' ? 'তৈরি হচ্ছে...' : 'Processing...') 
-                                        : (language === 'bn' ? '📥 ফ্রেমসহ ডাউনলোড করুন' : '📥 Download Final Photo')}
+                                        : (language === 'bn' ? '📥 ফ্রেম ডাউনলোড' : '📥 Download Photo')}
                                 </span>
                             </button>
                         </>

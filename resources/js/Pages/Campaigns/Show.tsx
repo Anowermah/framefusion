@@ -178,7 +178,7 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
                 <meta name="twitter:image" content={shareImageUrl} />
             </Head>
 
-            <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-12 pb-28 md:pb-12 space-y-8 sm:space-y-12">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-12 pb-36 sm:pb-32 md:pb-12 space-y-6 sm:space-y-12">
                 {/* Campaign Hero Showcase */}
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-card p-4 sm:p-10">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -541,19 +541,19 @@ export default function Show({ campaign, relatedCampaigns = [] }: CampaignShowPr
             </div>
 
             {/* Mobile Floating Sticky Action Bar (Direct 1-Tap Photo Customizer) */}
-            <div className="md:hidden fixed bottom-16 left-0 right-0 z-40 p-3 pointer-events-none">
-                <div className="max-w-md mx-auto pointer-events-auto shadow-2xl rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 p-2 flex items-center gap-2">
+            <div className="md:hidden fixed bottom-[calc(4.2rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 p-2.5 sm:p-3 pointer-events-none">
+                <div className="max-w-md mx-auto pointer-events-auto shadow-2xl rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 p-1.5 sm:p-2 flex items-center gap-2">
                     <Link
                         href={`/campaigns/${campaign.slug}/editor${selectedFrameIndex > 0 ? `?frame=${selectedFrameIndex}` : ''}`}
-                        className="flex-1 py-3 px-4 bg-gradient-to-r from-brand-500 via-indigo-600 to-brand-600 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-md shadow-brand-500/25 flex items-center justify-center gap-2 transition-all"
+                        className="flex-1 min-w-0 py-2.5 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-brand-500 via-indigo-600 to-brand-600 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-md shadow-brand-500/25 flex items-center justify-center gap-1.5 sm:gap-2 transition-all"
                     >
-                        <Camera className="w-4 h-4" />
-                        <span>{language === 'bn' ? '📸 আপনার ছবি ফ্রেম করুন' : '📸 Customize Your Frame'}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <Camera className="w-4 h-4 shrink-0" />
+                        <span className="truncate">{language === 'bn' ? '📸 আপনার ছবি ফ্রেম করুন' : '📸 Customize Your Frame'}</span>
+                        <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                     </Link>
                     <button
                         onClick={handleNativeShare}
-                        className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all active:scale-95 shrink-0"
+                        className="p-2.5 sm:p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all active:scale-95 shrink-0"
                         title={language === 'bn' ? 'শেয়ার করুন' : 'Share'}
                     >
                         <Share2 className="w-4 h-4" />

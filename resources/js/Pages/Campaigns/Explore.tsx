@@ -64,7 +64,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
         <MainLayout>
             <Head title={language === 'bn' ? 'ক্যাম্পেইন এক্সপ্লোর করুন' : 'Explore Campaigns'} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 pb-24 sm:pb-12 space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                     <div>

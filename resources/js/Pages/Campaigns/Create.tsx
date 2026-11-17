@@ -14,7 +14,7 @@ export default function Create({ categories }: CreateCampaignProps) {
     return (
         <MainLayout>
             <Head title="Create New Campaign" />
-            <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            <div className="py-6 sm:py-12 px-3 sm:px-6 lg:px-8 pb-28 sm:pb-12">
                 <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
                     <span className="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full">
                         Campaign Studio

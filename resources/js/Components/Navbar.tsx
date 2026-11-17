@@ -32,7 +32,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
 
     return (
         <header className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] transition-all">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
                     {/* Brand Logo & Desktop Nav */}
                     <div className="flex items-center gap-3 lg:gap-6 min-w-0">
@@ -271,12 +271,12 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                     </div>
 
                     {/* Mobile App Bar Controls: Ultra-clean, minimal, uncluttered */}
-                    <div className="flex md:hidden items-center gap-2 shrink-0">
+                    <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
                         {/* Segmented 1-Click Language Switcher Pill */}
-                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[11px] font-bold">
+                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[10px] sm:text-[11px] font-bold">
                             <button
                                 onClick={() => setLanguage('bn')}
-                                className={`px-2.5 py-1 rounded-full transition-all ${
+                                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
                                     language === 'bn' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
                                 }`}
                             >
@@ -284,7 +284,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </button>
                             <button
                                 onClick={() => setLanguage('en')}
-                                className={`px-2.5 py-1 rounded-full transition-all ${
+                                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
                                     language === 'en' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
                                 }`}
                             >

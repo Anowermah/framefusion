@@ -7,6 +7,7 @@ import {
     User, ChevronDown, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { compositeFramePhoto } from '@/lib/aiCanvasCompositor';
+import AiFrameMiniStudio from '@/Components/AiFrameMiniStudio';
 
 interface ChatMessage {
     id: string;
@@ -161,8 +162,8 @@ export default function AiChatWidget() {
             id: 'prompt-' + Date.now(),
             sender: 'bot',
             text: language === 'bn'
-                ? `চমৎকার পছন্দ! আপনি "${title}" ফ্রেমটি বেছে নিয়েছেন। এবার নিচের বাটনে ট্যাপ করে আপনার ছবিটি আপলোড করুন এবং ফ্রেমে যে নাম/তথ্য দেখাতে চান তা লিখে "ফ্রেম তৈরি করুন" এ চাপুন:`
-                : `Great choice! You picked "${title}". Now upload your photo and enter your name/details below:`,
+                ? `চমৎকার পছন্দ! আপনি "${title}" ফ্রেমটি বেছে নিয়েছেন। এবার নিচের বাটনে ট্যাপ করে আপনার ছবিটি আপলোড করুন। ছবিটি টেনে ইচ্ছামতো পজিশন করা, জুম ও নাম যুক্ত করার সকল কন্ট্রোল পেয়ে যাবেন:`
+                : `Great choice! You picked "${title}". Upload your photo below to position it freely with zoom, move, and name controls:`,
             timestamp: time,
             promptForUpload: true,
             selectedCampaign: campaign,
@@ -384,95 +385,60 @@ export default function AiChatWidget() {
                                     </div>
                                 )}
 
-                                {/* Interactive In-Chat Upload & Customization Form */}
+                                {/* Interactive In-Chat Photo Positioning & Customization Studio */}
                                 {msg.promptForUpload && (
-                                    <div className="w-full bg-white rounded-2xl border border-violet-200 p-3.5 shadow-md space-y-3 animate-in fade-in zoom-in-95">
-                                        <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                                            <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
-                                                <Upload className="w-4 h-4" />
-                                            </div>
-                                            <span className="text-xs font-bold text-slate-800">
-                                                {language === 'bn' ? 'ছবি ও তথ্য যুক্ত করুন' : 'Upload Photo & Details'}
-                                            </span>
-                                        </div>
-
-                                        {/* Photo Upload area */}
-                                        <div>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                ref={fileInputRef}
-                                                onChange={handlePhotoChange}
-                                                className="hidden"
+                                    <div className="w-full">
+                                        {userPhotoFile ? (
+                                            <AiFrameMiniStudio
+                                                campaign={msg.selectedCampaign || activeCampaign}
+                                                userPhotoFile={userPhotoFile}
+                                                userPhotoUrl={userPhotoPreview}
+                                                onPhotoChange={(file) => {
+                                                    setUserPhotoFile(file);
+                                                    setUserPhotoPreview(URL.createObjectURL(file));
+                                                }}
+                                                language={language}
+                                                compact={true}
                                             />
-                                            {userPhotoPreview ? (
-                                                <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200">
-                                                    <img
-                                                        src={userPhotoPreview}
-                                                        alt="User"
-                                                        className="w-12 h-12 rounded-lg object-cover border border-white shadow-xs shrink-0"
-                                                    />
-                                                    <div className="flex-1 min-w-0">
-                                                        <span className="text-[11px] font-bold text-slate-800 block truncate">
-                                                            {userPhotoFile?.name}
-                                                        </span>
-                                                        <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                                                            <CheckCircle2 className="w-3 h-3" />
-                                                            {language === 'bn' ? 'ছবি সিলেক্ট হয়েছে' : 'Photo Selected'}
-                                                        </span>
+                                        ) : (
+                                            <div className="w-full bg-white rounded-2xl border border-violet-200 p-3.5 shadow-md space-y-3 animate-in fade-in zoom-in-95">
+                                                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                                                    <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+                                                        <Upload className="w-4 h-4" />
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => fileInputRef.current?.click()}
-                                                        className="px-2 py-1 text-[10px] font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100"
-                                                    >
-                                                        {language === 'bn' ? 'পরিবর্তন' : 'Change'}
-                                                    </button>
+                                                    <span className="text-xs font-bold text-slate-800">
+                                                        {language === 'bn' ? 'ছবি নির্বাচন করুন' : 'Select Photo to Frame'}
+                                                    </span>
                                                 </div>
-                                            ) : (
+
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    ref={fileInputRef}
+                                                    onChange={handlePhotoChange}
+                                                    className="hidden"
+                                                />
+
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="w-full py-3 px-3 rounded-xl border-2 border-dashed border-violet-300 hover:border-violet-500 bg-violet-50/50 hover:bg-violet-50 text-violet-700 font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-98"
+                                                    className="w-full py-3.5 px-3 rounded-xl border-2 border-dashed border-violet-300 hover:border-violet-500 bg-violet-50/50 hover:bg-violet-50 text-violet-700 font-extrabold text-xs flex items-center justify-center gap-2 transition-all active:scale-98 shadow-xs"
                                                 >
-                                                    <ImageIcon className="w-4 h-4" />
+                                                    <ImageIcon className="w-4 h-4 text-violet-600" />
                                                     <span>{language === 'bn' ? '📷 আপনার ছবি নির্বাচন করুন' : '📷 Select Your Photo'}</span>
                                                 </button>
-                                            )}
-                                        </div>
 
-                                        {/* Optional Name & Title */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                            <input
-                                                type="text"
-                                                placeholder={language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}
-                                                value={customName}
-                                                onChange={e => setCustomName(e.target.value)}
-                                                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-violet-500"
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder={language === 'bn' ? 'পদবী / শুভেচ্ছা বার্তা (ঐচ্ছিক)' : 'Designation / Note (Optional)'}
-                                                value={customTitle}
-                                                onChange={e => setCustomTitle(e.target.value)}
-                                                className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-violet-500"
-                                            />
-                                        </div>
-
-                                        {/* Generate Button */}
-                                        <button
-                                            type="button"
-                                            onClick={handleGenerateFrame}
-                                            disabled={!userPhotoFile || isCompositing}
-                                            className="w-full py-2.5 px-4 bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-extrabold text-xs rounded-xl shadow-md shadow-violet-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95"
-                                        >
-                                            <Sparkles className="w-4 h-4 text-amber-300 fill-amber-300" />
-                                            <span>
-                                                {isCompositing
-                                                    ? (language === 'bn' ? 'ফ্রেম তৈরি হচ্ছে...' : 'Compositing Frame...')
-                                                    : (language === 'bn' ? '✨ ফ্রেম তৈরি করুন' : '✨ Generate Frame')}
-                                            </span>
-                                        </button>
+                                                {(msg.selectedCampaign || activeCampaign) && (
+                                                    <Link
+                                                        href={`/campaigns/${(msg.selectedCampaign || activeCampaign).slug}/editor`}
+                                                        className="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all text-center block"
+                                                    >
+                                                        <ArrowRight className="w-3.5 h-3.5" />
+                                                        <span>{language === 'bn' ? '🎨 ফুল স্টুডিও এডিটরে ওপেন করুন' : '🎨 Open in Studio Editor'}</span>
+                                                    </Link>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 

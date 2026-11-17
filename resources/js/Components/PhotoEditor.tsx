@@ -199,6 +199,33 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
         };
     }, [activeFrameUrl]);
 
+    // Read preloaded user photo from AI Studio / Chatbot if passed
+    useEffect(() => {
+        try {
+            const preloaded = sessionStorage.getItem('framefusion_preloaded_photo');
+            if (preloaded) {
+                const img = new Image();
+                img.onload = () => {
+                    setUserImage(img);
+                    const savedPos = sessionStorage.getItem('framefusion_preloaded_pos');
+                    if (savedPos) {
+                        try {
+                            const parsed = JSON.parse(savedPos);
+                            if (parsed.zoom) setZoom(parsed.zoom);
+                            if (parsed.position) setPosition(parsed.position);
+                            if (parsed.rotation) setRotation(parsed.rotation);
+                        } catch (e) {}
+                    }
+                    sessionStorage.removeItem('framefusion_preloaded_photo');
+                    sessionStorage.removeItem('framefusion_preloaded_pos');
+                };
+                img.src = preloaded;
+            }
+        } catch (e) {
+            console.error('Failed reading preloaded photo from sessionStorage', e);
+        }
+    }, []);
+
     // Handle User Image File Upload
     const handleFileUpload = (file: File) => {
         if (!file.type.startsWith('image/')) {

@@ -115,9 +115,11 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
         }
     }, [activeFrameIndex, isEventNotice, effectiveSlots]);
 
-    // Dragging state
+    // Dragging & Pinch Zoom state
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+    const [pinchStartDist, setPinchStartDist] = useState<number | null>(null);
+    const [pinchStartZoom, setPinchStartZoom] = useState<number>(1);
 
     // Filter adjustments
     const [brightness, setBrightness] = useState(100);
@@ -663,19 +665,47 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     };
 
     const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-        if (!userImage || e.touches.length === 0) return;
-        setIsDragging(true);
-        const touch = e.touches[0];
-        setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
+        if (!userImage) return;
+        if (e.touches.length === 2) {
+            setIsDragging(false);
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            setPinchStartDist(Math.hypot(dx, dy));
+            setPinchStartZoom(zoom);
+            return;
+        }
+        if (e.touches.length === 1) {
+            setIsDragging(true);
+            const touch = e.touches[0];
+            setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
+        }
     };
 
     const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+        if (e.touches.length === 2 && pinchStartDist) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const currentDist = Math.hypot(dx, dy);
+            const scaleFactor = currentDist / pinchStartDist;
+            const newZoom = Math.min(3, Math.max(0.2, pinchStartZoom * scaleFactor));
+            setZoom(newZoom);
+            return;
+        }
         if (!isDragging || e.touches.length === 0) return;
         const touch = e.touches[0];
         setPosition({
             x: touch.clientX - dragStart.x,
             y: touch.clientY - dragStart.y,
         });
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
+        if (e.touches.length < 2) {
+            setPinchStartDist(null);
+        }
+        if (e.touches.length === 0) {
+            setIsDragging(false);
+        }
     };
 
     // Reset position & zoom
@@ -766,6 +796,31 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     };
 
     const campaignTitle = language === 'bn' && campaign.title_bn ? campaign.title_bn : campaign.title;
+
+    const handleNativeShare = async () => {
+        const pageUrl = window.location.href;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: campaignTitle,
+                    text: studioCaption,
+                    url: pageUrl,
+                });
+                return;
+            } catch (err) {
+                // share dismissed
+            }
+        }
+        navigator.clipboard.writeText(studioCaption);
+        setCaptionCopied(true);
+        setTimeout(() => setCaptionCopied(false), 2500);
+    };
+
+    const handleWhatsAppShare = () => {
+        const pageUrl = window.location.href;
+        const text = encodeURIComponent(`${studioCaption}\n\n${pageUrl}`);
+        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    };
 
     return (
         <div className="min-h-screen bg-[#F8F9FC] py-4 sm:py-8 px-3 sm:px-6 lg:px-8 pb-32 lg:pb-12">
@@ -1581,8 +1636,8 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                     onMouseLeave={handleMouseUp}
                                     onTouchStart={handleTouchStart}
                                     onTouchMove={handleTouchMove}
-                                    onTouchEnd={handleMouseUp}
-                                    className="max-h-[380px] sm:max-h-[560px] max-w-full object-contain mx-auto"
+                                    onTouchEnd={handleTouchEnd}
+                                    className="max-h-[380px] sm:max-h-[560px] max-w-full object-contain mx-auto touch-none select-none cursor-move"
                                 />
 
                                 {/* Upload Prompt Overlay if no user photo loaded yet */}
@@ -1824,6 +1879,24 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                             <p className="text-[11px] text-slate-600 font-mono line-clamp-2 select-all">
                                 {studioCaption}
                             </p>
+                        </div>
+
+                        {/* Instant Social Share Buttons */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <button
+                                onClick={handleNativeShare}
+                                className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+                            >
+                                <Share2 className="w-4 h-4" />
+                                <span>{language === 'bn' ? '📲 শেয়ার করুন' : '📲 Share'}</span>
+                            </button>
+                            <button
+                                onClick={handleWhatsAppShare}
+                                className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition-all"
+                            >
+                                <MessageCircle className="w-4 h-4" />
+                                <span>WhatsApp</span>
+                            </button>
                         </div>
 
                         <div className="space-y-3 pt-2">

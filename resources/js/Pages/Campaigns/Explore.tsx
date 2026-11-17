@@ -129,7 +129,7 @@ export default function Explore({ campaigns, categories, filters }: ExploreProps
                     </form>
 
                     {/* Category Filter Pills (Horizontal Scroll) */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none text-xs">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none text-xs [-webkit-overflow-scrolling:touch]">
                         <button
                             type="button"
                             onClick={() => {

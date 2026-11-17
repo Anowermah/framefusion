@@ -157,10 +157,14 @@
             </script>
         @endif
 
-        <!-- Google Fonts: Inter, Hind Siliguri, Noto Serif Bengali, Anek Bangla, Tiro Bangla -->
+        <!-- Google Fonts: Inter, Hind Siliguri, Noto Serif Bengali, Anek Bangla, Tiro Bangla (Non-blocking Asynchronous) -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap">
+        <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+        <noscript>
+            <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
+        </noscript>
 
         <!-- Google Analytics Tracking (Controlled from Admin) -->
         @if($gaId = \App\Models\PlatformSetting::get('google_analytics_id'))
@@ -183,6 +187,29 @@
         @inertiaHead
     </head>
     <body class="font-sans antialiased bg-[#F8F9FC] text-[#171923] selection:bg-brand-500 selection:text-white">
+        <!-- Initial Instant Loader (Smoothly fades out once React mounts) -->
+        <div id="initial-page-loader" style="position:fixed;inset:0;z-index:99999;background:#F8F9FC;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;transition:opacity 0.25s ease-out;">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#635BFF,#8B5CF6);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px -5px rgba(99,91,255,0.35);margin-bottom:16px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                    <circle cx="9" cy="9" r="2"/>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+            </div>
+            <div style="width:24px;height:24px;border:3px solid #E2E8F0;border-top-color:#635BFF;border-radius:50%;animation:ffSpin 0.75s linear infinite;"></div>
+            <style>@keyframes ffSpin{to{transform:rotate(360deg)}}</style>
+            <div id="loader-fallback-prompt" style="display:none;margin-top:16px;text-align:center;">
+                <p style="font-size:12px;color:#64748B;margin:0 0 8px 0;">লোড হতে কিছুটা সময় নিচ্ছে?</p>
+                <button onclick="window.location.reload(true)" style="padding:6px 14px;font-size:11px;font-weight:700;color:#635BFF;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px;cursor:pointer;">রিফ্রেশ করুন</button>
+            </div>
+            <script>
+                setTimeout(function(){
+                    var fb = document.getElementById('loader-fallback-prompt');
+                    if (fb) fb.style.display = 'block';
+                }, 4000);
+            </script>
+        </div>
+
         @inertia
 
         <!-- Custom Footer Scripts (Admin Database) -->

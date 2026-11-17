@@ -166,15 +166,31 @@
             <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif+Bengali:wght@400;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
         </noscript>
 
-        <!-- Google Analytics Tracking (Controlled from Admin) -->
-        @if($gaId = \App\Models\PlatformSetting::get('google_analytics_id'))
-            <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
-            <script>
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '{{ $gaId }}');
-            </script>
+        <!-- Google Tag Manager / Google Analytics -->
+        @php
+            $gaId = \App\Models\PlatformSetting::get('google_analytics_id', 'GTM-P4XBXWZG') ?: 'GTM-P4XBXWZG';
+        @endphp
+        @if(!empty($gaId))
+            @if(str_starts_with($gaId, 'GTM-'))
+                <!-- Google Tag Manager -->
+                <script async src="https://www.googletagmanager.com/gtm.js?id={{ $gaId }}"></script>
+                <script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+                </script>
+                <!-- End Google Tag Manager -->
+            @else
+                <!-- Google Analytics (gtag.js) -->
+                <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
+                <script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '{{ $gaId }}');
+                </script>
+            @endif
         @endif
 
         <!-- Custom Header Scripts (Admin Database) -->
@@ -187,6 +203,12 @@
         @inertiaHead
     </head>
     <body class="font-sans antialiased bg-[#F8F9FC] text-[#171923] selection:bg-brand-500 selection:text-white">
+        @if(!empty($gaId) && str_starts_with($gaId, 'GTM-'))
+            <!-- Google Tag Manager (noscript) -->
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gaId }}"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <!-- End Google Tag Manager (noscript) -->
+        @endif
         <!-- Initial Instant Loader (Smoothly fades out once React mounts) -->
         <div id="initial-page-loader" style="position:fixed;inset:0;z-index:99999;background:#F8F9FC;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;transition:opacity 0.25s ease-out;">
             <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#635BFF,#8B5CF6);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px -5px rgba(99,91,255,0.35);margin-bottom:16px;">

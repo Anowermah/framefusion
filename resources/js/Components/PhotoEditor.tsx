@@ -157,7 +157,10 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     const [primaryText, setPrimaryText] = useState('');
     const [secondaryText, setSecondaryText] = useState('');
     const [textPosition, setTextPosition] = useState<'bottom' | 'top' | 'center' | 'custom'>('bottom');
+    const [textXOffset, setTextXOffset] = useState(50);
     const [textYOffset, setTextYOffset] = useState(86);
+    const [textZOffset, setTextZOffset] = useState(2);
+    const [textZLayer, setTextZLayer] = useState<'above' | 'below'>('above');
     const [textColor, setTextColor] = useState('#FFFFFF');
     const [textShadow, setTextShadow] = useState(true);
     const [textBgStyle, setTextBgStyle] = useState<'dark_pill' | 'gold_ribbon' | 'brand_pill' | 'transparent'>('dark_pill');
@@ -292,27 +295,10 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             ctx.fillText(t('uploadPhoto'), width / 2, height / 2);
         }
 
-        // LAYER 2: Draw Transparent PNG Frame OVER the user photo
-        if (frameImage) {
-            ctx.save();
-            ctx.filter = 'none'; // Never apply photo filters to the official campaign frame!
+        // LAYER 2 & 3: Custom Text Drawing Function (Supports X-Offset, Y-Offset, and Z-Offset Depth/Layering)
+        const drawCustomText = () => {
+            if (!enableText || !primaryText.trim()) return;
 
-            // Compute centered frame drawing preserving frame ratio
-            if (aspectRatio === '1:1') {
-                ctx.drawImage(frameImage, 0, 0, width, height);
-            } else {
-                // If portrait or story, center the square frame within the canvas
-                const frameSize = Math.min(width, height);
-                const fx = (width - frameSize) / 2;
-                const fy = (height - frameSize) / 2;
-                ctx.drawImage(frameImage, fx, fy, frameSize, frameSize);
-            }
-
-            ctx.restore();
-        }
-
-        // LAYER 3: Draw Custom Text / Supporter Name / Custom Message
-        if (enableText && primaryText.trim()) {
             ctx.save();
             ctx.filter = 'none';
 
@@ -334,13 +320,14 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            // Calculate Y position
+            // Calculate Y position (Fine-tune Y-Offset)
             let yPos = (textYOffset / 100) * height;
             if (textPosition === 'bottom') yPos = height * 0.86;
             if (textPosition === 'top') yPos = height * 0.14;
             if (textPosition === 'center') yPos = height * 0.50;
 
-            const xPos = width / 2;
+            // Calculate X position (Fine-tune X-Offset)
+            const xPos = (textXOffset / 100) * width;
 
             // Measure text for background pill / ribbon
             ctx.font = `bold ${Math.round(baseFontSize)}px ${fontStack}`;
@@ -393,18 +380,30 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                 ctx.restore();
             }
 
-            // High contrast text shadow
-            if (textShadow) {
+            // High contrast text shadow / Z-Offset 3D depth
+            if (textShadow || textZOffset > 0) {
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-                ctx.shadowBlur = Math.round(6 * scaleMultiplier);
+                ctx.shadowBlur = Math.round((4 + textZOffset * 1.5) * scaleMultiplier);
                 ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = Math.round(2 * scaleMultiplier);
+                ctx.shadowOffsetY = Math.round(Math.max(1, textZOffset * 1.2) * scaleMultiplier);
+            }
+
+            const primaryY = sText ? yPos - (subFontSize * 0.45) : yPos;
+
+            // 3D Extrusion effect when textZOffset > 1
+            if (textZOffset > 1) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                const depthSteps = Math.min(4, Math.round(textZOffset));
+                for (let d = 1; d <= depthSteps; d++) {
+                    ctx.fillText(pText, xPos, primaryY + (d * scaleMultiplier));
+                }
+                ctx.restore();
             }
 
             // Draw Primary Text
             ctx.font = `bold ${Math.round(baseFontSize)}px ${fontStack}`;
             ctx.fillStyle = textColor;
-            const primaryY = sText ? yPos - (subFontSize * 0.45) : yPos;
             ctx.fillText(pText, xPos, primaryY);
 
             // Draw Secondary Subtitle
@@ -416,6 +415,35 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
             }
 
             ctx.restore();
+        };
+
+        // If Z-Layer is set to 'below', draw text UNDER the frame
+        if (textZLayer === 'below') {
+            drawCustomText();
+        }
+
+        // LAYER 2: Draw Transparent PNG Frame OVER the user photo
+        if (frameImage) {
+            ctx.save();
+            ctx.filter = 'none'; // Never apply photo filters to the official campaign frame!
+
+            // Compute centered frame drawing preserving frame ratio
+            if (aspectRatio === '1:1') {
+                ctx.drawImage(frameImage, 0, 0, width, height);
+            } else {
+                // If portrait or story, center the square frame within the canvas
+                const frameSize = Math.min(width, height);
+                const fx = (width - frameSize) / 2;
+                const fy = (height - frameSize) / 2;
+                ctx.drawImage(frameImage, fx, fy, frameSize, frameSize);
+            }
+
+            ctx.restore();
+        }
+
+        // If Z-Layer is set to 'above' (default), draw text OVER the frame
+        if (textZLayer === 'above') {
+            drawCustomText();
         }
 
         // LAYER 3B: Event & Notice Poster Dynamic Typography (Admin Controlled Slots)
@@ -630,7 +658,7 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
     }, [
         userImage, frameImage, zoom, position, rotation, brightness, contrast, 
         saturation, grayscale, sepia, aspectRatio, t,
-        enableText, primaryText, secondaryText, textPosition, textYOffset, 
+        enableText, primaryText, secondaryText, textPosition, textXOffset, textYOffset, textZOffset, textZLayer, 
         textColor, textShadow, textBgStyle, textSize,
         enableWatermark, watermarkText, watermarkPosition,
         campaign.campaign_type,
@@ -1260,6 +1288,47 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                             <span>{language === 'bn' ? 'রিসেট' : 'Reset'}</span>
                                         </button>
                                     </div>
+
+                                    {/* Fine-tune Photo X & Y Offsets */}
+                                    <div className="p-3 bg-slate-50/70 rounded-2xl border border-slate-200/70 space-y-2.5">
+                                        <div className="flex justify-between items-center text-xs font-bold text-slate-700">
+                                            <span>{language === 'bn' ? 'সূক্ষ্ম অবস্থান সামঞ্জস্য (Fine-tune Offsets)' : 'Fine-tune Offsets'}</span>
+                                        </div>
+
+                                        {/* Photo X-Offset */}
+                                        <div className="space-y-1">
+                                            <div className="flex justify-between text-[11px] font-semibold text-slate-600">
+                                                <span>{language === 'bn' ? 'ডানে / বামে (Fine-tune X-Offset)' : 'Fine-tune X-Offset'}</span>
+                                                <span className="font-mono text-purple-700 font-bold">{Math.round(position.x)}px</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="-450"
+                                                max="450"
+                                                step="2"
+                                                value={position.x}
+                                                onChange={(e) => setPosition((prev) => ({ ...prev, x: parseInt(e.target.value) }))}
+                                                className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+                                            />
+                                        </div>
+
+                                        {/* Photo Y-Offset */}
+                                        <div className="space-y-1">
+                                            <div className="flex justify-between text-[11px] font-semibold text-slate-600">
+                                                <span>{language === 'bn' ? 'উপরে / নিচে (Fine-tune Y-Offset)' : 'Fine-tune Y-Offset'}</span>
+                                                <span className="font-mono text-purple-700 font-bold">{Math.round(position.y)}px</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="-450"
+                                                max="450"
+                                                step="2"
+                                                value={position.y}
+                                                onChange={(e) => setPosition((prev) => ({ ...prev, y: parseInt(e.target.value) }))}
+                                                className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -1353,50 +1422,53 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                             </div>
                                         </div>
 
-                                        {/* Position Presets + Y-Offset Slider */}
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center text-xs font-bold text-gray-700">
-                                                <span>{language === 'bn' ? 'অবস্থান নির্বাচন' : 'Position'}</span>
-                                                <div className="flex items-center gap-1">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => { setTextPosition('bottom'); setTextYOffset(86); }}
-                                                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
-                                                            textPosition === 'bottom' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                        }`}
-                                                    >
-                                                        {language === 'bn' ? 'নিচে' : 'Bottom'}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => { setTextPosition('top'); setTextYOffset(14); }}
-                                                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
-                                                            textPosition === 'top' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                        }`}
-                                                    >
-                                                        {language === 'bn' ? 'উপরে' : 'Top'}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => { setTextPosition('center'); setTextYOffset(50); }}
-                                                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
-                                                            textPosition === 'center' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                        }`}
-                                                    >
-                                                        {language === 'bn' ? 'মাঝে' : 'Center'}
-                                                    </button>
-                                                </div>
+                                        {/* Position Controls: Y-Offset, X-Offset, Z-Offset */}
+                                        <div className="space-y-3 p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80">
+                                            <div className="flex justify-between items-center text-xs font-bold text-gray-800">
+                                                <span className="flex items-center gap-1.5">
+                                                    <Move className="w-3.5 h-3.5 text-purple-600" />
+                                                    <span>{language === 'bn' ? 'অবস্থান নির্বাচন (Position)' : 'Position & Offsets'}</span>
+                                                </span>
                                             </div>
 
-                                            {/* Fine-tune Vertical Slider */}
-                                            <div className="space-y-1">
-                                                <div className="flex justify-between text-[11px] text-gray-400">
-                                                    <span>{language === 'bn' ? 'সূক্ষ্ম অবস্থান সামঞ্জস্য' : 'Fine-tune Y-Offset'}</span>
-                                                    <span>{textYOffset}%</span>
+                                            {/* 1. Fine-tune Y-Offset (Vertical) */}
+                                            <div className="space-y-1.5">
+                                                <div className="flex justify-between items-center text-[11px] font-semibold text-gray-700">
+                                                    <span>{language === 'bn' ? 'উল্লম্ব অবস্থান (Fine-tune Y-Offset)' : 'Fine-tune Y-Offset'}</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setTextPosition('top'); setTextYOffset(14); }}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textYOffset <= 25 ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'উপরে' : 'Top'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setTextPosition('center'); setTextYOffset(50); }}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textYOffset > 25 && textYOffset < 75 ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'মাঝে' : 'Center'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setTextPosition('bottom'); setTextYOffset(86); }}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textYOffset >= 75 ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'নিচে' : 'Bottom'}
+                                                        </button>
+                                                        <span className="font-mono text-purple-700 font-bold ml-1">{textYOffset}%</span>
+                                                    </div>
                                                 </div>
                                                 <input
                                                     type="range"
-                                                    min="10"
+                                                    min="8"
                                                     max="92"
                                                     step="1"
                                                     value={textYOffset}
@@ -1404,8 +1476,98 @@ export default function PhotoEditor({ campaign }: PhotoEditorProps) {
                                                         setTextYOffset(parseInt(e.target.value));
                                                         setTextPosition('custom');
                                                     }}
-                                                    className="w-full accent-brand-500 cursor-pointer"
+                                                    className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
                                                 />
+                                            </div>
+
+                                            {/* 2. Fine-tune X-Offset (Horizontal) */}
+                                            <div className="space-y-1.5">
+                                                <div className="flex justify-between items-center text-[11px] font-semibold text-gray-700">
+                                                    <span>{language === 'bn' ? 'অনুভূমিক অবস্থান (Fine-tune X-Offset)' : 'Fine-tune X-Offset'}</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setTextXOffset(25)}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textXOffset <= 35 ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'বামে' : 'Left'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setTextXOffset(50)}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textXOffset > 35 && textXOffset < 65 ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'মাঝে' : 'Center'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setTextXOffset(75)}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textXOffset >= 65 ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'ডানে' : 'Right'}
+                                                        </button>
+                                                        <span className="font-mono text-purple-700 font-bold ml-1">{textXOffset}%</span>
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min="10"
+                                                    max="90"
+                                                    step="1"
+                                                    value={textXOffset}
+                                                    onChange={(e) => setTextXOffset(parseInt(e.target.value))}
+                                                    className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+                                                />
+                                            </div>
+
+                                            {/* 3. Fine-tune Z-Offset (Layer & 3D Depth) */}
+                                            <div className="space-y-1.5 pt-2 border-t border-slate-200/60">
+                                                <div className="flex justify-between items-center text-[11px] font-semibold text-gray-700">
+                                                    <span className="flex items-center gap-1">
+                                                        <Layers className="w-3.5 h-3.5 text-purple-600" />
+                                                        <span>{language === 'bn' ? 'গভীরতা ও স্তর (Fine-tune Z-Offset)' : 'Fine-tune Z-Offset (Depth & Layer)'}</span>
+                                                    </span>
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setTextZLayer('above')}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textZLayer === 'above' ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'উপরে' : 'Top'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setTextZLayer('below')}
+                                                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                                                                textZLayer === 'below' ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                                            }`}
+                                                        >
+                                                            {language === 'bn' ? 'নিচে' : 'Back'}
+                                                        </button>
+                                                        <span className="font-mono text-purple-700 font-bold ml-1">{textZOffset}px</span>
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="8"
+                                                    step="1"
+                                                    value={textZOffset}
+                                                    onChange={(e) => setTextZOffset(parseInt(e.target.value))}
+                                                    className="w-full accent-purple-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+                                                />
+                                                <div className="flex justify-between text-[10px] text-slate-400">
+                                                    <span>{language === 'bn' ? 'ফ্ল্যাট (০px)' : 'Flat (0px)'}</span>
+                                                    <span>{language === 'bn' ? '৩ডি পপ-আউট (৮px)' : '3D Pop (8px)'}</span>
+                                                </div>
                                             </div>
                                         </div>
 

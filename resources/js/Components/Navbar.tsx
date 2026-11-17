@@ -31,7 +31,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
     };
 
     return (
-        <header className="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] transition-all">
+        <header className="w-full bg-white/85 backdrop-blur-xl backdrop-saturate-150 border-b border-slate-200/60 shadow-[0_1px_8px_-1px_rgba(0,0,0,0.04)] transition-all">
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
                     {/* Brand Logo & Desktop Nav */}
@@ -270,13 +270,22 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                         )}
                     </div>
 
-                    {/* Mobile App Bar Controls: Ultra-clean, minimal, uncluttered */}
-                    <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
-                        {/* Segmented 1-Click Language Switcher Pill */}
-                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[10px] sm:text-[11px] font-bold">
+                    {/* Mobile App Bar Controls: Ultra-clean, modern, native app style */}
+                    <div className="flex md:hidden items-center gap-1.5 shrink-0">
+                        {/* 1. Quick Search Icon Button */}
+                        <Link
+                            href="/explore"
+                            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200/80 active:scale-90 text-slate-600 flex items-center justify-center transition-all border border-slate-200/60 shadow-2xs"
+                            title={language === 'bn' ? 'ক্যাম্পেইন খুঁজুন' : 'Search campaigns'}
+                        >
+                            <Search className="w-3.5 h-3.5" />
+                        </Link>
+
+                        {/* 2. Segmented 1-Click Language Switcher Pill */}
+                        <div className="bg-slate-100 p-0.5 rounded-full flex items-center border border-slate-200/60 text-[10px] font-bold shadow-2xs">
                             <button
                                 onClick={() => setLanguage('bn')}
-                                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
+                                className={`px-2 py-0.5 rounded-full transition-all ${
                                     language === 'bn' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
                                 }`}
                             >
@@ -284,7 +293,7 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </button>
                             <button
                                 onClick={() => setLanguage('en')}
-                                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
+                                className={`px-2 py-0.5 rounded-full transition-all ${
                                     language === 'en' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500'
                                 }`}
                             >
@@ -292,17 +301,25 @@ export default function Navbar({ onSearchClick }: NavbarProps) {
                             </button>
                         </div>
 
-                        {/* If logged in, show sleek avatar link to dashboard */}
-                        {user && (
+                        {/* 3. User Avatar or Minimalist Login Pill */}
+                        {user ? (
                             <Link
                                 href="/dashboard"
-                                className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-100 active:scale-90 transition-transform"
+                                className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs overflow-hidden shadow-xs ring-2 ring-violet-200 active:scale-90 transition-transform"
+                                title={user.name}
                             >
                                 {user.avatar_url ? (
                                     <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
                                     user.name.charAt(0).toUpperCase()
                                 )}
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="px-2.5 py-1 text-[11px] font-bold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200/80 rounded-full active:scale-95 transition-all shadow-2xs"
+                            >
+                                {language === 'bn' ? 'লগইন' : 'Login'}
                             </Link>
                         )}
                     </div>

@@ -50,203 +50,184 @@ export default function MobileBottomNav() {
             {/* ============================================================== */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pointer-events-auto">
                 {/* Backdrop Blur Container with Safe Area Support */}
-                <div className="relative bg-white/95 backdrop-blur-xl border-t border-gray-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-1 sm:px-3 pt-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom,0px))]">
-                    <div className="flex items-center justify-around h-13 sm:h-14">
-                        {isAdminRoute ? (
-                            /* =================== ADMIN BOTTOM BAR =================== */
-                            <>
-                                <Link
-                                    href="/admin"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/admin', true)
-                                            ? 'text-purple-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        <LayoutDashboard className="w-5 h-5" />
-                                        {isActive('/admin', true) && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        Overview
-                                    </span>
-                                </Link>
-
-                                <Link
-                                    href="/admin/users"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/admin/users')
-                                            ? 'text-purple-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        <Users className="w-5 h-5" />
-                                        {isActive('/admin/users') && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        Users
-                                    </span>
-                                </Link>
-
-                                <Link
-                                    href="/admin/campaigns"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/admin/campaigns')
-                                            ? 'text-purple-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        <Layers className="w-5 h-5" />
-                                        {isActive('/admin/campaigns') && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        Campaigns
-                                    </span>
-                                </Link>
-
-                                <Link
-                                    href="/admin/settings"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/admin/settings')
-                                            ? 'text-purple-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        <Settings className="w-5 h-5" />
-                                        {isActive('/admin/settings') && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-purple-600 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        Settings
-                                    </span>
-                                </Link>
-
-                                <Link
-                                    href="/"
-                                    className="flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-brand-600 transition-all active:scale-90 min-w-0"
-                                >
-                                    <ExternalLink className="w-5 h-5 text-gray-400" />
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        Site
-                                    </span>
-                                </Link>
-                            </>
-                        ) : (
-                            /* =================== PUBLIC USER BOTTOM BAR =================== */
-                            <>
-                                {/* 1. Home Tab */}
-                                <Link
-                                    href="/"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/', true)
-                                            ? 'text-brand-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        <Home className="w-5 h-5" />
-                                        {isActive('/', true) && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-brand-500 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        {language === 'bn' ? 'হোম' : 'Home'}
-                                    </span>
-                                </Link>
-
-                                {/* 2. Explore Tab */}
-                                <Link
-                                    href="/explore"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/explore')
-                                            ? 'text-brand-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        <Compass className="w-5 h-5" />
-                                        {isActive('/explore') && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-brand-500 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        {language === 'bn' ? 'এক্সপ্লোর' : 'Explore'}
-                                    </span>
-                                </Link>
-
-                                {/* 3. CENTER FLOATING ACTION BUTTON (Create Frame / Campaign) */}
-                                <div className="flex-1 flex items-center justify-center -mt-5 min-w-0 shrink-0">
-                                    <Link
-                                        href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"}
-                                        className="relative group flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-brand-600 via-brand-500 to-purple-600 text-white shadow-lg shadow-brand-500/35 ring-3 ring-white active:scale-90 transition-transform"
-                                        title={t('createCampaign')}
-                                    >
-                                        <Plus className="w-5 h-5 stroke-[2.5]" />
-                                        <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-amber-400 rounded-full ring-2 ring-white animate-pulse" />
-                                    </Link>
+                <div className="relative bg-white/95 backdrop-blur-2xl border-t border-slate-200/80 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] px-1 sm:px-2 pt-1 pb-[calc(0.45rem+env(safe-area-inset-bottom,0px))]">
+                    {isAdminRoute ? (
+                        /* =================== ADMIN BOTTOM BAR =================== */
+                        <div className="grid grid-cols-5 items-center h-14">
+                            <Link
+                                href="/admin"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/admin', true) ? 'text-purple-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/admin', true) ? 'bg-purple-100 text-purple-700' : ''}`}>
+                                    <LayoutDashboard className={`w-5 h-5 ${isActive('/admin', true) ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
                                 </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/admin', true) ? 'text-purple-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    Overview
+                                </span>
+                            </Link>
 
-                                {/* 4. Trending Tab */}
+                            <Link
+                                href="/admin/users"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/admin/users') ? 'text-purple-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/admin/users') ? 'bg-purple-100 text-purple-700' : ''}`}>
+                                    <Users className={`w-5 h-5 ${isActive('/admin/users') ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/admin/users') ? 'text-purple-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    Users
+                                </span>
+                            </Link>
+
+                            <Link
+                                href="/admin/campaigns"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/admin/campaigns') ? 'text-purple-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/admin/campaigns') ? 'bg-purple-100 text-purple-700' : ''}`}>
+                                    <Layers className={`w-5 h-5 ${isActive('/admin/campaigns') ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/admin/campaigns') ? 'text-purple-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    Campaigns
+                                </span>
+                            </Link>
+
+                            <Link
+                                href="/admin/settings"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/admin/settings') ? 'text-purple-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/admin/settings') ? 'bg-purple-100 text-purple-700' : ''}`}>
+                                    <Settings className={`w-5 h-5 ${isActive('/admin/settings') ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/admin/settings') ? 'text-purple-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    Settings
+                                </span>
+                            </Link>
+
+                            <Link
+                                href="/"
+                                className="flex flex-col items-center justify-center py-1 text-slate-500 hover:text-violet-600 transition-all active:scale-90 min-w-0"
+                            >
+                                <div className="p-1 rounded-xl">
+                                    <ExternalLink className="w-5 h-5 text-slate-400 stroke-[1.8]" />
+                                </div>
+                                <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold text-slate-500">
+                                    Site
+                                </span>
+                            </Link>
+                        </div>
+                    ) : (
+                        /* =================== PUBLIC USER BOTTOM BAR =================== */
+                        <div className="grid grid-cols-5 items-center h-14">
+                            {/* 1. Home Tab */}
+                            <Link
+                                href="/"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/', true) ? 'text-violet-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/', true) ? 'bg-violet-100 text-violet-700 shadow-2xs' : ''}`}>
+                                    <Home className={`w-5 h-5 ${isActive('/', true) ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/', true) ? 'text-violet-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    {language === 'bn' ? 'হোম' : 'Home'}
+                                </span>
+                            </Link>
+
+                            {/* 2. Explore Tab */}
+                            <Link
+                                href="/explore"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/explore') ? 'text-violet-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/explore') ? 'bg-violet-100 text-violet-700 shadow-2xs' : ''}`}>
+                                    <Compass className={`w-5 h-5 ${isActive('/explore') ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/explore') ? 'text-violet-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    {language === 'bn' ? 'এক্সপ্লোর' : 'Explore'}
+                                </span>
+                            </Link>
+
+                            {/* 3. CENTER FLOATING ACTION BUTTON (Create Frame / Campaign) */}
+                            <div className="flex flex-col items-center justify-center min-w-0">
                                 <Link
-                                    href="/trending"
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        isActive('/trending')
-                                            ? 'text-amber-600 font-black'
-                                            : 'text-gray-500 hover:text-gray-800'
-                                    }`}
+                                    href={user ? "/campaigns/create" : "/login?redirect=/campaigns/create"}
+                                    className="relative flex items-center justify-center w-11 h-11 -mt-5 rounded-full bg-gradient-to-tr from-violet-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-violet-500/35 ring-4 ring-white active:scale-90 transition-transform group"
+                                    title={t('createCampaign')}
                                 >
-                                    <div className="relative">
-                                        <Flame className="w-5 h-5" />
-                                        {isActive('/trending') && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-amber-500 rounded-full" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        {language === 'bn' ? 'ট্রেন্ডিং' : 'Trending'}
-                                    </span>
+                                    <Plus className="w-5 h-5 stroke-[2.75] transition-transform group-hover:rotate-90 duration-200" />
+                                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-amber-400 rounded-full ring-2 ring-white animate-pulse" />
                                 </Link>
+                                <span className="text-[10px] mt-0.5 tracking-tight truncate font-bold text-slate-600">
+                                    {language === 'bn' ? 'তৈরি' : 'Create'}
+                                </span>
+                            </div>
 
-                                {/* 5. Account / Menu Tab (Triggers App Bottom Sheet) */}
-                                <button
-                                    type="button"
-                                    onClick={() => setSheetOpen(true)}
-                                    className={`flex flex-col items-center justify-center flex-1 py-1 transition-all active:scale-90 min-w-0 ${
-                                        sheetOpen ? 'text-brand-600 font-black' : 'text-gray-500 hover:text-gray-800'
-                                    }`}
-                                >
-                                    <div className="relative">
-                                        {user ? (
-                                            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-[10px] overflow-hidden border border-brand-300">
-                                                {user.avatar_url ? (
-                                                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    user.name.charAt(0).toUpperCase()
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <User className="w-5 h-5" />
-                                        )}
-                                        {isAdmin && (
-                                            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-purple-600 rounded-full ring-1 ring-white" />
-                                        )}
-                                    </div>
-                                    <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold">
-                                        {user ? (language === 'bn' ? 'অ্যাকাউন্ট' : 'Account') : (language === 'bn' ? 'মেনু' : 'Menu')}
-                                    </span>
-                                </button>
-                            </>
-                        )}
-                    </div>
+                            {/* 4. Trending Tab */}
+                            <Link
+                                href="/trending"
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    isActive('/trending') ? 'text-amber-600' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${isActive('/trending') ? 'bg-amber-100 text-amber-600 shadow-2xs' : ''}`}>
+                                    <Flame className={`w-5 h-5 ${isActive('/trending') ? 'stroke-[2.5] fill-amber-500/20' : 'stroke-[1.8]'}`} />
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    isActive('/trending') ? 'text-amber-600 font-black' : 'text-slate-500'
+                                }`}>
+                                    {language === 'bn' ? 'ট্রেন্ডিং' : 'Trending'}
+                                </span>
+                            </Link>
+
+                            {/* 5. Account / Menu Tab (Triggers App Bottom Sheet) */}
+                            <button
+                                type="button"
+                                onClick={() => setSheetOpen(true)}
+                                className={`flex flex-col items-center justify-center py-1 transition-all active:scale-90 min-w-0 ${
+                                    sheetOpen ? 'text-violet-700' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-xl transition-all ${sheetOpen ? 'bg-violet-100 text-violet-700 shadow-2xs' : ''}`}>
+                                    {user ? (
+                                        <div className="w-5 h-5 rounded-full bg-violet-100 text-violet-700 font-bold flex items-center justify-center text-[10px] overflow-hidden border border-violet-300">
+                                            {user.avatar_url ? (
+                                                <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                user.name.charAt(0).toUpperCase()
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <User className={`w-5 h-5 ${sheetOpen ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+                                    )}
+                                </div>
+                                <span className={`text-[10px] mt-0.5 tracking-tight truncate max-w-full font-bold ${
+                                    sheetOpen ? 'text-violet-700 font-black' : 'text-slate-500'
+                                }`}>
+                                    {user ? (language === 'bn' ? 'অ্যাকাউন্ট' : 'Account') : (language === 'bn' ? 'মেনু' : 'Menu')}
+                                </span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -263,7 +244,7 @@ export default function MobileBottomNav() {
                     />
 
                     {/* Sliding Bottom Sheet Container with Dedicated Header & Scroll Body */}
-                    <div className="relative bg-white rounded-t-3xl shadow-2xl z-[102] max-h-[88vh] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-hidden">
+                    <div className="relative bg-white rounded-t-[32px] shadow-2xl z-[102] max-h-[88vh] flex flex-col animate-in slide-in-from-bottom duration-300 overflow-hidden border-t border-slate-200/50">
                         
                         {/* Sticky Sheet Header: Drag handle & Title & Close button */}
                         <div className="p-4 pb-2.5 border-b border-gray-100 flex flex-col shrink-0 bg-white">
